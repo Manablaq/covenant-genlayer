@@ -1,6 +1,6 @@
-# Covenant Architecture — Gate B Draft
+# Covenant Architecture — v1 Gate B Freeze
 
-Status: architecture freeze in progress.
+Status: Gate B freeze.
 
 No production Intelligent Contract implementation begins until every Gate B item is frozen.
 

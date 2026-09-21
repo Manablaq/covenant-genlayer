@@ -1,6 +1,6 @@
 # Covenant Canonicalization — v1
 
-Status: Gate B freeze in progress.
+Status: Gate B freeze.
 
 This document defines the exact byte commitments that bind a Covenant authorization to one consequential action.
 

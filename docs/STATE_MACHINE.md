@@ -1,6 +1,6 @@
 # Covenant Request State Machine — v1
 
-Status: Gate B freeze in progress.
+Status: Gate B freeze.
 
 This document defines Covenant application state.
 
