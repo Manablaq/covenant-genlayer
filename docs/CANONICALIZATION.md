@@ -256,6 +256,37 @@ An Evidence Record commitment is:
 
 Evidence from the same source cannot be transplanted to another Action Subject without changing its Evidence Record commitment.
 
+## Evidence content-digest processing
+
+Covenant v1 freezes the exact byte input used by the `content_digest` field.
+
+Evidence retrieval uses the exact committed `immutable_reference` as the request URL inside GenLayer nondeterministic execution. The v1 transport operation is HTTP GET through `gl.nondet.web.request(immutable_reference, method="GET")`.
+
+A retrieval is body-eligible only when the request completes and `200 <= response.status_code < 300`.
+
+For a body-eligible response:
+
+`exact_response_body_bytes = response.body`
+
+and:
+
+`content_digest = SHA256(exact_response_body_bytes)`
+
+`exact_response_body_bytes` means the exact byte sequence exposed by GenVM Web Access as `response.body`. Covenant performs no application-level transformation before hashing.
+
+Before computing `content_digest`, Covenant v1 does not decode the body as text, render the page, parse or reserialize JSON, normalize Unicode, normalize line endings, trim whitespace, case-fold text, rewrite HTML, perform LLM extraction, or substitute another URL.
+
+`gl.nondet.web.render(...)` output is not a valid v1 `content_digest` input.
+
+A completed non-2xx response cannot authorize and is classified as `SOURCE_UNAVAILABLE`. A transport timeout is `SOURCE_TIMEOUT`. Another retrieval failure that produces no body-eligible response is `SOURCE_UNAVAILABLE`.
+
+For a body-eligible response, SHA-256 mismatch against the committed Evidence Record `content_digest` is `EVIDENCE_INTEGRITY_MISMATCH`.
+
+Only after exact digest equality may Covenant decode evidence for semantic interpretation. V1 semantic evidence text uses strict UTF-8 decoding of the already digest-verified body. UTF-8 decoding failure is `SOURCE_MALFORMED`.
+
+Digest equality does not establish publisher authority by itself and does not override the approved-authority, approved-source-prefix, immutable-reference, redirect, freshness, role, or corroboration rules.
+
+
 ## Evidence Set commitment
 
 An evidence set is canonicalized from Evidence Record commitments, not from submission order.

@@ -178,6 +178,31 @@ The implementation must verify that fetched/decoded evidence corresponds to the 
 
 A digest establishes content identity; it does not by itself establish publisher authority.
 
+## Frozen evidence-body processing rule
+
+Covenant v1 verifies Evidence Record `content_digest` against the exact byte sequence exposed by GenVM Web Access as `response.body` for the exact committed immutable/versioned evidence reference.
+
+The retrieval operation is HTTP GET through `gl.nondet.web.request(reference, method="GET")`.
+
+Only a completed response satisfying `200 <= response.status_code < 300` is body-eligible.
+
+For a body-eligible response:
+
+`content_digest = SHA256(exact response.body bytes)`
+
+The digest is computed before UTF-8 decoding, JSON parsing, HTML interpretation, rendering, normalization, trimming, LLM extraction, or any other application-level content transformation. `gl.nondet.web.render(...)` output is not a valid v1 digest input.
+
+A completed non-2xx HTTP response is `SOURCE_UNAVAILABLE`. A transport timeout is `SOURCE_TIMEOUT`. Another retrieval failure that produces no body-eligible response is `SOURCE_UNAVAILABLE`.
+
+A body-eligible response whose SHA-256 digest differs from the committed Evidence Record `content_digest` is `EVIDENCE_INTEGRITY_MISMATCH`.
+
+Only after exact digest verification may v1 decode the body for semantic interpretation. Semantic evidence text uses strict UTF-8. UTF-8 decoding failure is `SOURCE_MALFORMED`.
+
+The raw-body digest rule does not weaken provenance. The same record must still satisfy its frozen authority identity, publisher/source rule, immutable or versioned reference, stable record ID, version, timing, role, and corroboration requirements.
+
+Redirect authority remains governed by the separate redirect boundary; matching body bytes never grant authority to an otherwise unapproved origin.
+
+
 ## Evidence roles
 
 V1 uses two evidence roles:
