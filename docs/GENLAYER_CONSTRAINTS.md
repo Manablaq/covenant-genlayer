@@ -10,7 +10,19 @@ This file records implementation-sensitive GenLayer facts that must be verified 
 
 Every Intelligent Contract must begin with the GenVM dependency/version comment.
 
-Covenant will pin the exact runner only after the local toolchain is installed and verified. We will not copy a stale runner hash from another project.
+Covenant pins the following reviewed runner identity:
+
+`py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6`
+
+The matching SDK/artifact environment is explicitly pinned to GenVM `v0.2.16`.
+
+SDK-dependent linter operations must run with `GENVM_VERSION=v0.2.16` so unrelated newer cached artifacts cannot silently change validation behavior.
+
+Production Covenant contracts must therefore begin with the exact runner dependency declaration. Under the pinned SDK/toolchain, the second line carries the narrow Pyright compatibility directive `# pyright: reportUnknownMemberType=false` because the SDK's public decorator typing is incomplete under strict Pyright.
+
+No broader strict-typecheck suppression is permitted.
+
+Any runner, GenVM release or compatibility-rule change requires the affected static, deterministic, full-runtime and deployment-parity gates to be rerun.
 
 ### Persistent storage
 
