@@ -1,4 +1,4 @@
-# Covenant Threat Model — Draft 0
+# Covenant Threat Model — v1 Gate B Freeze
 
 Covenant treats agents, web content, evidence sources, leader output, browser state and transaction transport as potentially adversarial or unreliable.
 
@@ -41,7 +41,7 @@ Covenant treats agents, web content, evidence sources, leader output, browser st
 - nonce replay
 - receipt double consumption
 - expired receipt
-- mandate superseded while request active
+- mandate superseded while request active preserves the frozen request and does not retroactively cancel or mutate it
 - owner bypass attempt
 - accepted-but-not-final consequence attempt
 - successful finalized receipt consumption

@@ -1,4 +1,4 @@
-# Covenant Protocol Specification — Draft 0
+# Covenant Protocol Specification — v1 Gate B Freeze
 
 ## Question Covenant answers
 
@@ -16,7 +16,7 @@ A request binds:
 
 - mandate ID
 - version
-- mandate hash
+- mandate commitment
 
 A later mandate version cannot retroactively alter an existing request.
 
@@ -36,25 +36,31 @@ A mandate defines:
 
 The Action Intent is Covenant's canonical consequential commitment.
 
-Required fields will include:
+Required fields are:
 
 - agent
 - mandate ID
 - mandate version
-- mandate hash
+- mandate commitment
 - action type
 - target
 - recipient
 - value
 - payload hash
-- evidence-set hash
-- consumer
+- evidence-set commitment
+- authorized consumer
 - nonce
 - chain/domain
 - issued-at boundary
 - expiry
 
-The canonical serialization and domain-separation algorithm must be frozen before implementation.
+The canonical serialization and domain-separation algorithm is frozen in `CANONICALIZATION.md`.
+
+The stable Request ID is derived from the immutable Action Subject.
+
+Permitted evidence repair may change the Evidence Set and final Action Intent without changing the Request ID.
+
+Any Authorization Receipt binds the stable Request ID plus the exact final Action Intent that was actually authorized.
 
 ## Evidence
 
@@ -73,27 +79,36 @@ A record must carry enough identity to establish:
 
 A random page containing the expected statement is not trusted evidence.
 
-## Decision family
+## Request states
 
-Initial draft:
+Covenant v1 freezes exactly six persistent request states:
 
+- `PENDING`
+- `REPAIR_REQUIRED`
 - `AUTHORIZED`
-- `DENIED_POLICY_VIOLATION`
-- `EVIDENCE_REPAIR_REQUIRED`
-- `EVIDENCE_EXPIRED`
-- `CORROBORATION_REQUIRED`
-- `HUMAN_APPROVAL_REQUIRED`
-- `SOURCE_RETRY_REQUIRED`
-- `MANDATE_SUPERSEDED`
-- `REQUEST_EXPIRED`
+- `DENIED`
+- `EXPIRED`
+- `CONSUMED`
 
-The final state enum may be reduced after size/state-machine review.
+`DENIED`, `EXPIRED` and `CONSUMED` are terminal.
 
-Infrastructure failure must never silently become policy denial.
+`PENDING`, `REPAIR_REQUIRED` and `AUTHORIZED` are nonterminal and each has a deterministic expiry or recovery path.
+
+Repairable source, evidence, corroboration or human-approval conditions use `REPAIR_REQUIRED` with a fixed non-extending deadline.
+
+Infrastructure or source failure must never silently become policy denial.
+
+Mandate supersession is not a request state. A later mandate version may affect eligibility for new requests but cannot retroactively rewrite or cancel an existing frozen request.
+
+GenLayer network lifecycle states such as `Accepted`, `Undetermined` and `Finalized` are not Covenant request states.
 
 ## Receipt
 
-A finalized Authorization Receipt binds one exact Action Intent.
+An Authorization Receipt exists only after the request reaches `AUTHORIZED` and binds the stable Request ID plus one exact final Action Intent.
+
+`AUTHORIZED` is Covenant application state, not GenLayer transaction finality.
+
+Irreversible consumers must separately wait for the authorization-creating transaction to reach the required network finality.
 
 It must not be usable for:
 
@@ -116,7 +131,7 @@ Consumption is one-time.
 Deterministic contract logic handles facts such as:
 
 - mandate/version equality;
-- active/superseded state;
+- eligibility for new requests and immutable historical mandate-version binding;
 - nonce use;
 - expiry;
 - consumer equality;
