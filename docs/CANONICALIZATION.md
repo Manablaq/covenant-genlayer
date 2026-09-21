@@ -262,7 +262,7 @@ Covenant v1 freezes the exact byte input used by the `content_digest` field.
 
 Evidence retrieval uses the exact committed `immutable_reference` as the request URL inside GenLayer nondeterministic execution. The v1 transport operation is HTTP GET through `gl.nondet.web.request(immutable_reference, method="GET")`.
 
-A retrieval is body-eligible only when the request completes and `200 <= response.status_code < 300`.
+A retrieval is body-eligible only when the request completes and `200 <= response.status < 300`.
 
 For a body-eligible response:
 

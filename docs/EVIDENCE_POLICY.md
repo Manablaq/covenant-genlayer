@@ -184,7 +184,7 @@ Covenant v1 verifies Evidence Record `content_digest` against the exact byte seq
 
 The retrieval operation is HTTP GET through `gl.nondet.web.request(reference, method="GET")`.
 
-Only a completed response satisfying `200 <= response.status_code < 300` is body-eligible.
+Only a completed response satisfying `200 <= response.status < 300` is body-eligible.
 
 For a body-eligible response:
 
