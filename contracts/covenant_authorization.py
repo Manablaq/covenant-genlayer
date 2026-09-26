@@ -255,6 +255,37 @@ class RequestRecord:
     receipt_consumed: bool
 
 
+@allow_storage
+@dataclass
+class MandatePolicy:
+    """Immutable mandate data loaded once at a transaction boundary.
+
+    Registry views are deliberately materialized here instead of being read
+    from each evidence loop iteration.  The values remain frozen by the
+    mandate commitment checks at every consequential boundary.
+    """
+
+    max_value: u256
+    max_request_lifetime_seconds: u256
+    repair_window_seconds: u256
+    allowed_action_hashes: DynArray[bytes]
+    allowed_target_commitments: DynArray[bytes]
+    allowed_recipient_commitments: DynArray[bytes]
+    required_primary_count: u256
+    required_corroboration_count: u256
+    max_publication_age_seconds: u256
+    max_observation_age_seconds: u256
+    max_publish_observe_gap_seconds: u256
+    max_evidence_records: u256
+    authority_role_masks: DynArray[u256]
+    authority_ids: DynArray[bytes]
+    authority_publisher_names: DynArray[str]
+    authority_source_prefixes: DynArray[str]
+    authority_rule_hashes: DynArray[bytes]
+    human_mode: u256
+    human_approver: Address
+
+
 @gl.contract_interface
 class CovenantMandatesIface:
     class View:
@@ -312,6 +343,86 @@ class CovenantAuthorization(gl.Contract):
             raise gl.vm.UserError("mandates contract address mismatch")
         if registry.view().get_chain_id() != gl.message.chain_id:
             raise gl.vm.UserError("mandates chain mismatch")
+
+    def _load_mandate_policy(
+        self,
+        registry: typing.Any,
+        mandate_id: bytes,
+        mandate_version: u256,
+    ) -> MandatePolicy:
+        """Load the immutable policy exactly once for this execution path."""
+        view = registry.view()
+        return MandatePolicy(
+            max_value=view.get_max_value(mandate_id, mandate_version),
+            max_request_lifetime_seconds=view.get_max_request_lifetime_seconds(
+                mandate_id,
+                mandate_version,
+            ),
+            repair_window_seconds=view.get_repair_window_seconds(
+                mandate_id,
+                mandate_version,
+            ),
+            allowed_action_hashes=view.get_allowed_action_hashes(
+                mandate_id,
+                mandate_version,
+            ),
+            allowed_target_commitments=view.get_allowed_target_commitments(
+                mandate_id,
+                mandate_version,
+            ),
+            allowed_recipient_commitments=view.get_allowed_recipient_commitments(
+                mandate_id,
+                mandate_version,
+            ),
+            required_primary_count=view.get_required_primary_count(
+                mandate_id,
+                mandate_version,
+            ),
+            required_corroboration_count=view.get_required_corroboration_count(
+                mandate_id,
+                mandate_version,
+            ),
+            max_publication_age_seconds=view.get_max_publication_age_seconds(
+                mandate_id,
+                mandate_version,
+            ),
+            max_observation_age_seconds=view.get_max_observation_age_seconds(
+                mandate_id,
+                mandate_version,
+            ),
+            max_publish_observe_gap_seconds=view.get_max_publish_observe_gap_seconds(
+                mandate_id,
+                mandate_version,
+            ),
+            max_evidence_records=view.get_max_evidence_records(
+                mandate_id,
+                mandate_version,
+            ),
+            authority_role_masks=view.get_authority_role_masks(
+                mandate_id,
+                mandate_version,
+            ),
+            authority_ids=view.get_authority_ids(
+                mandate_id,
+                mandate_version,
+            ),
+            authority_publisher_names=view.get_authority_publisher_names(
+                mandate_id,
+                mandate_version,
+            ),
+            authority_source_prefixes=view.get_authority_source_prefixes(
+                mandate_id,
+                mandate_version,
+            ),
+            authority_rule_hashes=view.get_authority_rule_hashes(
+                mandate_id,
+                mandate_version,
+            ),
+            human_mode=view.get_human_mode(mandate_id, mandate_version),
+            human_approver=Address(
+                view.get_human_approver(mandate_id, mandate_version)
+            ),
+        )
 
     def _action_subject(
         self,
@@ -490,6 +601,15 @@ class CovenantAuthorization(gl.Contract):
             if not isinstance(value, str):
                 raise gl.vm.UserError(label + " must be text")
 
+        publisher_name = typing.cast(str, publisher_name)
+        record_id = typing.cast(str, record_id)
+        immutable_reference = typing.cast(str, immutable_reference)
+        version = typing.cast(str, version)
+        role = typing.cast(int, role)
+        published_at = typing.cast(int, published_at)
+        observed_at = typing.cast(int, observed_at)
+        expires_at = typing.cast(int, expires_at)
+
         return EvidenceInput(
             authority_id=authority_id,
             role=u256(role),
@@ -553,37 +673,23 @@ class CovenantAuthorization(gl.Contract):
 
     def _deterministic_action_allowed(
         self,
-        mandate_id: bytes,
-        mandate_version: u256,
+        policy: MandatePolicy,
         action_type_hash: bytes,
         target_commitment: bytes,
         recipient_commitment: bytes,
         value: u256,
     ) -> bool:
-        registry = CovenantMandatesIface(self.mandates_address)
-        if value > registry.view().get_max_value(mandate_id, mandate_version):
+        if value > policy.max_value:
             return False
-        allowed_actions = registry.view().get_allowed_action_hashes(
-            mandate_id,
-            mandate_version,
-        )
-        if not _contains_bytes(allowed_actions, action_type_hash):
+        if not _contains_bytes(policy.allowed_action_hashes, action_type_hash):
             return False
-        allowed_targets = registry.view().get_allowed_target_commitments(
-            mandate_id,
-            mandate_version,
-        )
-        if len(allowed_targets) > 0 and not _contains_bytes(
-            allowed_targets,
+        if len(policy.allowed_target_commitments) > 0 and not _contains_bytes(
+            policy.allowed_target_commitments,
             target_commitment,
         ):
             return False
-        allowed_recipients = registry.view().get_allowed_recipient_commitments(
-            mandate_id,
-            mandate_version,
-        )
-        if len(allowed_recipients) > 0 and not _contains_bytes(
-            allowed_recipients,
+        if len(policy.allowed_recipient_commitments) > 0 and not _contains_bytes(
+            policy.allowed_recipient_commitments,
             recipient_commitment,
         ):
             return False
@@ -591,25 +697,14 @@ class CovenantAuthorization(gl.Contract):
 
     def _authority_reason(
         self,
-        mandate_id: bytes,
-        mandate_version: u256,
+        policy: MandatePolicy,
         record: EvidenceRecord,
     ) -> u256:
-        registry = CovenantMandatesIface(self.mandates_address)
-        authority_ids = registry.view().get_authority_ids(mandate_id, mandate_version)
-        role_masks = registry.view().get_authority_role_masks(mandate_id, mandate_version)
-        publisher_names = registry.view().get_authority_publisher_names(
-            mandate_id,
-            mandate_version,
-        )
-        source_prefixes = registry.view().get_authority_source_prefixes(
-            mandate_id,
-            mandate_version,
-        )
-        rule_hashes = registry.view().get_authority_rule_hashes(
-            mandate_id,
-            mandate_version,
-        )
+        authority_ids = policy.authority_ids
+        role_masks = policy.authority_role_masks
+        publisher_names = policy.authority_publisher_names
+        source_prefixes = policy.authority_source_prefixes
+        rule_hashes = policy.authority_rule_hashes
         if (
             len(authority_ids) != len(role_masks)
             or len(authority_ids) != len(publisher_names)
@@ -645,12 +740,10 @@ class CovenantAuthorization(gl.Contract):
 
     def _freshness_reason(
         self,
-        mandate_id: bytes,
-        mandate_version: u256,
+        policy: MandatePolicy,
         record: EvidenceRecord,
         now: u256,
     ) -> u256:
-        registry = CovenantMandatesIface(self.mandates_address)
         if record.published_at > record.observed_at:
             return REPAIR_EVIDENCE_STALE
         if record.observed_at > now:
@@ -658,23 +751,11 @@ class CovenantAuthorization(gl.Contract):
         if now >= record.expires_at:
             return REPAIR_EVIDENCE_STALE
 
-        max_publication_age = registry.view().get_max_publication_age_seconds(
-            mandate_id,
-            mandate_version,
-        )
-        max_observation_age = registry.view().get_max_observation_age_seconds(
-            mandate_id,
-            mandate_version,
-        )
-        max_gap = registry.view().get_max_publish_observe_gap_seconds(
-            mandate_id,
-            mandate_version,
-        )
-        if now - record.published_at > max_publication_age:
+        if now - record.published_at > policy.max_publication_age_seconds:
             return REPAIR_EVIDENCE_STALE
-        if now - record.observed_at > max_observation_age:
+        if now - record.observed_at > policy.max_observation_age_seconds:
             return REPAIR_EVIDENCE_STALE
-        if record.observed_at - record.published_at > max_gap:
+        if record.observed_at - record.published_at > policy.max_publish_observe_gap_seconds:
             return REPAIR_EVIDENCE_STALE
         return REPAIR_NONE
 
@@ -682,13 +763,9 @@ class CovenantAuthorization(gl.Contract):
         self,
         request: RequestRecord,
         now: u256,
+        policy: MandatePolicy,
     ) -> u256:
-        registry = CovenantMandatesIface(self.mandates_address)
-        max_records = registry.view().get_max_evidence_records(
-            request.mandate_id,
-            request.mandate_version,
-        )
-        if request.evidence_count > max_records:
+        if request.evidence_count > policy.max_evidence_records:
             raise gl.vm.UserError("evidence count exceeds mandate maximum")
 
         primary_ids: list[bytes] = []
@@ -699,16 +776,14 @@ class CovenantAuthorization(gl.Contract):
             record = self.evidence_records[key]
 
             authority_reason = self._authority_reason(
-                request.mandate_id,
-                request.mandate_version,
+                policy,
                 record,
             )
             if authority_reason != REPAIR_NONE:
                 return authority_reason
 
             freshness_reason = self._freshness_reason(
-                request.mandate_id,
-                request.mandate_version,
+                policy,
                 record,
                 now,
             )
@@ -724,32 +799,19 @@ class CovenantAuthorization(gl.Contract):
             else:
                 return REPAIR_EVIDENCE_AUTHORITY_INVALID
 
-        required_primary = registry.view().get_required_primary_count(
-            request.mandate_id,
-            request.mandate_version,
-        )
-        required_corroboration = registry.view().get_required_corroboration_count(
-            request.mandate_id,
-            request.mandate_version,
-        )
-
-        if len(primary_ids) != int(required_primary):
+        if len(primary_ids) != int(policy.required_primary_count):
             return REPAIR_CORROBORATION_MISSING
 
         independent_corroboration_count = 0
         for authority_id in corroboration_ids:
             if authority_id not in primary_ids:
                 independent_corroboration_count += 1
-        if independent_corroboration_count < int(required_corroboration):
+        if independent_corroboration_count < int(policy.required_corroboration_count):
             return REPAIR_CORROBORATION_MISSING
 
-        human_mode = registry.view().get_human_mode(
-            request.mandate_id,
-            request.mandate_version,
-        )
-        if human_mode == HUMAN_SINGLE_ADDRESS and not request.human_approved:
+        if policy.human_mode == HUMAN_SINGLE_ADDRESS and not request.human_approved:
             return REPAIR_HUMAN_APPROVAL_MISSING
-        if human_mode != HUMAN_NONE and human_mode != HUMAN_SINGLE_ADDRESS:
+        if policy.human_mode != HUMAN_NONE and policy.human_mode != HUMAN_SINGLE_ADDRESS:
             raise gl.vm.UserError("unsupported human policy mode")
 
         return REPAIR_NONE
@@ -758,15 +820,13 @@ class CovenantAuthorization(gl.Contract):
         self,
         request: RequestRecord,
         transition_time: u256,
+        policy: MandatePolicy,
     ) -> u256:
         if request.repair_deadline != u256(0):
             return request.repair_deadline
-        registry = CovenantMandatesIface(self.mandates_address)
-        window = registry.view().get_repair_window_seconds(
-            request.mandate_id,
-            request.mandate_version,
+        candidate = u256(
+            int(transition_time) + int(policy.repair_window_seconds)
         )
-        candidate = u256(int(transition_time) + int(window))
         return _min_u256(request.expires_at, candidate)
 
     def _enter_repair(
@@ -774,6 +834,7 @@ class CovenantAuthorization(gl.Contract):
         request_id: bytes,
         reason: u256,
         transition_time: u256,
+        policy: MandatePolicy,
     ) -> None:
         if reason == REPAIR_NONE or reason > REPAIR_HUMAN_APPROVAL_MISSING:
             raise gl.vm.UserError("invalid repair reason")
@@ -781,6 +842,7 @@ class CovenantAuthorization(gl.Contract):
         request.repair_deadline = self._fixed_repair_deadline(
             request,
             transition_time,
+            policy,
         )
         request.repair_reason = reason
         request.state = STATE_REPAIR_REQUIRED
@@ -914,7 +976,8 @@ class CovenantAuthorization(gl.Contract):
     def _recheck_frozen_request(
         self,
         request: RequestRecord,
-    ) -> None:
+        policy: typing.Optional[MandatePolicy] = None,
+    ) -> MandatePolicy:
         registry = CovenantMandatesIface(self.mandates_address)
         self._require_registry_binding()
         if not registry.view().version_exists(
@@ -927,6 +990,12 @@ class CovenantAuthorization(gl.Contract):
             request.mandate_version,
         ) != request.mandate_commitment:
             raise gl.vm.UserError("frozen mandate commitment changed")
+        if policy is None:
+            policy = self._load_mandate_policy(
+                registry,
+                request.mandate_id,
+                request.mandate_version,
+            )
 
         recomputed_action_subject = self._action_subject(
             request.agent,
@@ -960,14 +1029,14 @@ class CovenantAuthorization(gl.Contract):
             raise gl.vm.UserError("nonce reservation mismatch")
 
         if not self._deterministic_action_allowed(
-            request.mandate_id,
-            request.mandate_version,
+            policy,
             request.action_type_hash,
             request.target_commitment,
             request.recipient_commitment,
             request.value,
         ):
             raise gl.vm.UserError("deterministic policy no longer matches frozen request")
+        return policy
 
     @gl.public.write
     def create_request(
@@ -1007,21 +1076,19 @@ class CovenantAuthorization(gl.Contract):
         ) != mandate_commitment:
             raise gl.vm.UserError("mandate commitment mismatch")
 
+        policy = self._load_mandate_policy(
+            registry,
+            mandate_id,
+            mandate_version,
+        )
+
         issued_at = _now()
         if expires_at <= issued_at:
             raise gl.vm.UserError("request expiry must be after issued_at")
-        max_lifetime = registry.view().get_max_request_lifetime_seconds(
-            mandate_id,
-            mandate_version,
-        )
-        if expires_at - issued_at > max_lifetime:
+        if expires_at - issued_at > policy.max_request_lifetime_seconds:
             raise gl.vm.UserError("request lifetime exceeds mandate maximum")
 
-        max_records = registry.view().get_max_evidence_records(
-            mandate_id,
-            mandate_version,
-        )
-        if len(evidence) > int(max_records):
+        if len(evidence) > int(policy.max_evidence_records):
             raise gl.vm.UserError("evidence count exceeds mandate maximum")
 
         action_type_hash = _text(action_type)
@@ -1058,16 +1125,12 @@ class CovenantAuthorization(gl.Contract):
             evidence,
         )
 
-        human_approver = Address(registry.view().get_human_approver(
-            mandate_id,
-            mandate_version,
-        ))
+        human_approver = policy.human_approver
         initial_state = STATE_PENDING
         initial_reason = REPAIR_NONE
 
         deterministic_allowed = self._deterministic_action_allowed(
-            mandate_id,
-            mandate_version,
+            policy,
             action_type_hash,
             target_commitment,
             recipient_commitment,
@@ -1116,9 +1179,13 @@ class CovenantAuthorization(gl.Contract):
         self.nonce_request_ids[nonce_key] = request_id
 
         if initial_state == STATE_PENDING:
-            reason = self._evidence_policy_reason(self.requests[request_id], issued_at)
+            reason = self._evidence_policy_reason(
+                self.requests[request_id],
+                issued_at,
+                policy,
+            )
             if reason != REPAIR_NONE:
-                self._enter_repair(request_id, reason, issued_at)
+                self._enter_repair(request_id, reason, issued_at, policy)
 
         return request_id
 
@@ -1134,11 +1201,11 @@ class CovenantAuthorization(gl.Contract):
             request.repair_reason = REPAIR_NONE
             return
 
-        self._recheck_frozen_request(request)
+        policy = self._recheck_frozen_request(request)
 
-        reason = self._evidence_policy_reason(request, now)
+        reason = self._evidence_policy_reason(request, now, policy)
         if reason != REPAIR_NONE:
-            self._enter_repair(request_id, reason, now)
+            self._enter_repair(request_id, reason, now, policy)
             return
 
         consensus = self._run_semantic_consensus(request)
@@ -1148,11 +1215,11 @@ class CovenantAuthorization(gl.Contract):
             raise gl.vm.UserError("request state changed during evaluation")
         if current.action_intent != request.action_intent:
             raise gl.vm.UserError("action intent changed during evaluation")
-        self._recheck_frozen_request(current)
+        self._recheck_frozen_request(current, policy)
 
-        post_reason = self._evidence_policy_reason(current, now)
+        post_reason = self._evidence_policy_reason(current, now, policy)
         if post_reason != REPAIR_NONE:
-            self._enter_repair(request_id, post_reason, now)
+            self._enter_repair(request_id, post_reason, now, policy)
             return
 
         authorize_result = _decision_result(
@@ -1194,7 +1261,7 @@ class CovenantAuthorization(gl.Contract):
                 reason_code,
             )
             if consensus == repair_result:
-                self._enter_repair(request_id, reason_code, now)
+                self._enter_repair(request_id, reason_code, now, policy)
                 return
 
         raise gl.vm.UserError("invalid consequential consensus result")
@@ -1222,15 +1289,15 @@ class CovenantAuthorization(gl.Contract):
         frozen_revision = request.evidence_revision
         frozen_deadline = request.repair_deadline
 
-        self._recheck_frozen_request(request)
+        policy = self._recheck_frozen_request(request)
 
-        reason = self._evidence_policy_reason(request, now)
+        reason = self._evidence_policy_reason(request, now, policy)
         if reason != REPAIR_NONE and reason not in (
             REPAIR_SOURCE_UNAVAILABLE,
             REPAIR_SOURCE_TIMEOUT,
             REPAIR_SOURCE_MALFORMED,
         ):
-            self._enter_repair(request_id, reason, now)
+            self._enter_repair(request_id, reason, now, policy)
             return
 
         consensus = self._run_semantic_consensus(request)
@@ -1247,10 +1314,10 @@ class CovenantAuthorization(gl.Contract):
         if current.repair_deadline != frozen_deadline:
             raise gl.vm.UserError("repair deadline changed during source retry")
 
-        self._recheck_frozen_request(current)
-        post_reason = self._evidence_policy_reason(current, now)
+        self._recheck_frozen_request(current, policy)
+        post_reason = self._evidence_policy_reason(current, now, policy)
         if post_reason != REPAIR_NONE:
-            self._enter_repair(request_id, post_reason, now)
+            self._enter_repair(request_id, post_reason, now, policy)
             return
 
         authorize_result = _decision_result(
@@ -1315,12 +1382,8 @@ class CovenantAuthorization(gl.Contract):
         if now >= request.expires_at or now >= request.repair_deadline:
             raise gl.vm.UserError("evidence repair deadline reached")
 
-        registry = CovenantMandatesIface(self.mandates_address)
-        max_records = registry.view().get_max_evidence_records(
-            request.mandate_id,
-            request.mandate_version,
-        )
-        if len(evidence) > int(max_records):
+        policy = self._recheck_frozen_request(request)
+        if len(evidence) > int(policy.max_evidence_records):
             raise gl.vm.UserError("evidence count exceeds mandate maximum")
 
         old_action_intent = request.action_intent
@@ -1355,18 +1418,11 @@ class CovenantAuthorization(gl.Contract):
         if request.human_approved:
             raise gl.vm.UserError("human approval already recorded")
 
-        registry = CovenantMandatesIface(self.mandates_address)
-        human_mode = registry.view().get_human_mode(
-            request.mandate_id,
-            request.mandate_version,
-        )
-        if human_mode != HUMAN_SINGLE_ADDRESS:
+        policy = self._recheck_frozen_request(request)
+        if policy.human_mode != HUMAN_SINGLE_ADDRESS:
             raise gl.vm.UserError("human approval not enabled")
 
-        approver = Address(registry.view().get_human_approver(
-            request.mandate_id,
-            request.mandate_version,
-        ))
+        approver = policy.human_approver
         if approver != request.human_approver:
             raise gl.vm.UserError("frozen human approver mismatch")
         if gl.message.sender_address != request.human_approver:

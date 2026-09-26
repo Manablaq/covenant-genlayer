@@ -14,7 +14,7 @@ MANDATES = REPO / "contracts" / "covenant_mandates.py"
 AUTHORIZATION = REPO / "contracts" / "covenant_authorization.py"
 
 EXPECTED_MANDATES_SHA = "c921da40757968260e7acb0555db93d2ba4c3ca9ce81760ca51f6087d494333f"
-EXPECTED_AUTH_SHA = "09e5f5493f02d94fad1601128330a4a1572a87a833f6278f5133c2d81ee5faf2"
+EXPECTED_AUTH_SHA = "89b5311d0bb6adb6dac0868f8c90355fc5082b00f444d91baacb07439d58e19b"
 SDK = "v0.2.16"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
