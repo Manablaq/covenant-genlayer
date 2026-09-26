@@ -13,8 +13,8 @@ REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 AUTHORIZATION = REPO / "contracts" / "covenant_authorization.py"
 
-EXPECTED_MANDATES_SHA = "a561a7a76a612cae8cae044452619e966f549baede471a59f6e08033e9d05cd4"
-EXPECTED_AUTH_SHA = "aa788a90711c6c2a67a810c86ee21f77d53caa019c2a1d7518712e8166175a03"
+EXPECTED_MANDATES_SHA = "c921da40757968260e7acb0555db93d2ba4c3ca9ce81760ca51f6087d494333f"
+EXPECTED_AUTH_SHA = "09e5f5493f02d94fad1601128330a4a1572a87a833f6278f5133c2d81ee5faf2"
 SDK = "v0.2.16"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 

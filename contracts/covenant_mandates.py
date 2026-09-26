@@ -157,21 +157,18 @@ class CovenantMandates(gl.Contract):
 
     def _store_bytes_array(self, key: str, values: list[bytes], target: TreeMap[str, DynArray[bytes]]) -> None:
         stored = target.get_or_insert_default(key)
-        stored.clear()
         for value in values:
             stored.append(value)
         target[key] = stored
 
     def _store_u256_array(self, key: str, values: list[u256], target: TreeMap[str, DynArray[u256]]) -> None:
         stored = target.get_or_insert_default(key)
-        stored.clear()
         for value in values:
             stored.append(value)
         target[key] = stored
 
     def _store_str_array(self, key: str, values: list[str], target: TreeMap[str, DynArray[str]]) -> None:
         stored = target.get_or_insert_default(key)
-        stored.clear()
         for value in values:
             stored.append(value)
         target[key] = stored

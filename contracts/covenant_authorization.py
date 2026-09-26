@@ -2,6 +2,7 @@
 # pyright: reportUnknownMemberType=false
 
 import hashlib
+import typing
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -409,6 +410,99 @@ class CovenantAuthorization(gl.Contract):
             + evidence_set_commitment
         )
 
+    def _normalize_evidence_input(
+        self,
+        item: typing.Any,
+    ) -> EvidenceInput:
+        # Public calldata preserves composite values only as list/dict.
+        # Direct Mode may still pass an EvidenceInput instance in-process.
+        if isinstance(item, EvidenceInput):
+            return item
+
+        if not isinstance(item, dict):
+            raise gl.vm.UserError("evidence item must be a calldata mapping")
+
+        evidence_map = typing.cast(dict[str, object], item)
+
+        required_keys = [
+            "authority_id",
+            "role",
+            "publisher_name",
+            "record_id",
+            "immutable_reference",
+            "version",
+            "content_digest",
+            "published_at",
+            "observed_at",
+            "expires_at",
+        ]
+
+        if len(evidence_map) != len(required_keys):
+            raise gl.vm.UserError("evidence item keys invalid")
+
+        for key in required_keys:
+            if key not in evidence_map:
+                raise gl.vm.UserError("evidence item keys invalid")
+
+        authority_id = evidence_map["authority_id"]
+        role = evidence_map["role"]
+        publisher_name = evidence_map["publisher_name"]
+        record_id = evidence_map["record_id"]
+        immutable_reference = evidence_map["immutable_reference"]
+        version = evidence_map["version"]
+        content_digest = evidence_map["content_digest"]
+        published_at = evidence_map["published_at"]
+        observed_at = evidence_map["observed_at"]
+        expires_at = evidence_map["expires_at"]
+
+        if not isinstance(authority_id, bytes):
+            raise gl.vm.UserError("authority_id must be bytes")
+        if not isinstance(content_digest, bytes):
+            raise gl.vm.UserError("content_digest must be bytes")
+
+        if (
+            not isinstance(role, int)
+            or isinstance(role, bool)
+            or role < 0
+        ):
+            raise gl.vm.UserError("evidence role must be unsigned integer")
+
+        for value in (
+            published_at,
+            observed_at,
+            expires_at,
+        ):
+            if (
+                not isinstance(value, int)
+                or isinstance(value, bool)
+                or value < 0
+            ):
+                raise gl.vm.UserError(
+                    "evidence timestamp must be unsigned integer"
+                )
+
+        for value, label in (
+            (publisher_name, "publisher_name"),
+            (record_id, "record_id"),
+            (immutable_reference, "immutable_reference"),
+            (version, "version"),
+        ):
+            if not isinstance(value, str):
+                raise gl.vm.UserError(label + " must be text")
+
+        return EvidenceInput(
+            authority_id=authority_id,
+            role=u256(role),
+            publisher_name=publisher_name,
+            record_id=record_id,
+            immutable_reference=immutable_reference,
+            version=version,
+            content_digest=content_digest,
+            published_at=u256(published_at),
+            observed_at=u256(observed_at),
+            expires_at=u256(expires_at),
+        )
+
     def _evidence_input_valid_shape(self, item: EvidenceInput) -> None:
         _require_bytes32(item.authority_id, "authority_id")
         _require_bytes32(item.content_digest, "content_digest")
@@ -430,7 +524,8 @@ class CovenantAuthorization(gl.Contract):
     ) -> tuple[bytes, bytes]:
         commitments: list[bytes] = []
         records: list[EvidenceRecord] = []
-        for item in evidence:
+        for evidence_item in evidence:
+            item = self._normalize_evidence_input(evidence_item)
             self._evidence_input_valid_shape(item)
             commitment = self._evidence_commitment(action_subject, item)
             commitments.append(commitment)

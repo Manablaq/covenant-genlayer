@@ -13,7 +13,7 @@ if str(TESTS) not in sys.path:
 
 base = importlib.import_module("test_covenant_authorization_glsim")
 
-EXPECTED_BASE_AUTH_TEST_SHA = "eaa9fef2af837fd1e442d9f29b194d85a677385ea4c1f082063c26dba6968aa5"
+EXPECTED_BASE_AUTH_TEST_SHA = "6f0542032e30f78fdc002308f0691f2caba64ea53f182a1f52393aa0696383c8"
 BASE_TEST_PATH = TESTS / "test_covenant_authorization_glsim.py"
 
 assert hashlib.sha256(BASE_TEST_PATH.read_bytes()).hexdigest() == EXPECTED_BASE_AUTH_TEST_SHA
