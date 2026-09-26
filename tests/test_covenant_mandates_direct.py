@@ -9,7 +9,7 @@ pytest_plugins = ("gltest.direct.pytest_plugin",)
 REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])).resolve()
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 SDK = "v0.2.16"
-EXPECTED_SHA = "6ecd7028ff8428b246aca8d320ac43b17e070d3136f17d86af08fe6fe6598ae8"
+EXPECTED_SHA = "9c715d57731a031d2c217b3845ba74f08bf3fd7e3dcaa1bb44ffd6e2dc9896d6"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
 

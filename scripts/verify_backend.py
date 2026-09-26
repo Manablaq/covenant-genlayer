@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 AUTHORIZATION = ROOT / "contracts" / "covenant_authorization.py"
 MANDATES = ROOT / "contracts" / "covenant_mandates.py"
 MANIFEST = ROOT / "deployments" / "release-manifest.json"
+RUNTIME_PATCH = ROOT / "runtime" / "patches" / "genvm-v0.2.16-no-redirect.patch"
+RUNTIME_README = ROOT / "runtime" / "README.md"
 
 
 def sha256(path: Path) -> str:
@@ -56,6 +58,8 @@ def main() -> int:
 
     authorization_source = AUTHORIZATION.read_text(encoding="utf-8")
     mandates_source = MANDATES.read_text(encoding="utf-8")
+    runtime_patch = RUNTIME_PATCH.read_text(encoding="utf-8")
+    runtime_readme = RUNTIME_README.read_text(encoding="utf-8")
     authorization_tree = ast.parse(authorization_source)
     mandates_tree = ast.parse(mandates_source)
 
@@ -79,6 +83,8 @@ def main() -> int:
     assert "criteria = policy.semantic_criteria" in authorization_source
     assert "self._validate_mandate_policy(policy)" in authorization_source
     assert "if len(body) > int(policy.max_evidence_body_bytes):" in authorization_source
+    assert "387e1a66e920cb2dfadcdce40ab2d28da02efd1e" in runtime_readme
+    assert "reqwest::redirect::Policy::none()" in runtime_patch
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     assert manifest["status"] == "UNRELEASED"
@@ -93,6 +99,7 @@ def main() -> int:
             "covenant_mandates.py": sha256(MANDATES),
             "covenant_authorization.py": sha256(AUTHORIZATION),
         },
+        "runtime_patch_sha256": sha256(RUNTIME_PATCH),
         "policy_reads_in_evidence_helpers": 0,
         "evidence_body_limit_bytes": 8192,
         "manifest_status": manifest["status"],

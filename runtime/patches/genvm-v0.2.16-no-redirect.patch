@@ -1,0 +1,17 @@
+diff --git a/modules/implementation/src/common/mod.rs b/modules/implementation/src/common/mod.rs
+index 2049f33..a60d2e0 100644
+--- a/modules/implementation/src/common/mod.rs
++++ b/modules/implementation/src/common/mod.rs
+@@ -535,6 +535,12 @@ where
+ pub fn create_client() -> anyhow::Result<reqwest::Client> {
+     reqwest::ClientBuilder::new()
+         .user_agent("reqwest")
++        // Web evidence must never cross an unobserved HTTP redirect.  The
++        // response adapter exposes the original 3xx status and Location
++        // header to the contract, which can then fail closed.  Following the
++        // redirect here would hide the effective origin from the contract and
++        // make approved-host provenance unenforceable.
++        .redirect(reqwest::redirect::Policy::none())
+         .build()
+         .map_err(Into::into)
+ }

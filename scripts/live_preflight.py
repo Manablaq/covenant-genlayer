@@ -9,6 +9,7 @@ deployment/G11 runner is authorized.
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import urllib.error
@@ -76,16 +77,16 @@ def main() -> int:
         args.rpc,
         args.output,
         "mandates-code",
-        "eth_getCode",
-        [args.mandates, "latest"],
+        "gen_getContractCode",
+        [args.mandates],
         8103,
     )
     authorization_code = rpc_call(
         args.rpc,
         args.output,
         "authorization-code",
-        "eth_getCode",
-        [args.authorization, "latest"],
+        "gen_getContractCode",
+        [args.authorization],
         8104,
     )
     sender_nonce_latest = None
@@ -111,10 +112,20 @@ def main() -> int:
                 8106,
             )
         )
-    if not isinstance(mandates_code, str) or mandates_code in ("0x", "0x0"):
+    if not isinstance(mandates_code, str) or not mandates_code:
         raise SystemExit("mandates address has no deployed code")
-    if not isinstance(authorization_code, str) or authorization_code in ("0x", "0x0"):
+    if not isinstance(authorization_code, str) or not authorization_code:
         raise SystemExit("authorization address has no deployed code")
+
+    try:
+        mandates_code_bytes = base64.b64decode(mandates_code, validate=True)
+        authorization_code_bytes = base64.b64decode(authorization_code, validate=True)
+    except Exception as exc:
+        raise SystemExit(f"contract source is not valid base64: {exc}") from exc
+    if not mandates_code_bytes:
+        raise SystemExit("mandates address has empty deployed source")
+    if not authorization_code_bytes:
+        raise SystemExit("authorization address has empty deployed source")
 
     summary = {
         "status": "READ_ONLY_PREFLIGHT_PASS",
@@ -122,8 +133,9 @@ def main() -> int:
         "validator_count": validator_count,
         "mandates": args.mandates,
         "authorization": args.authorization,
-        "mandates_code_sha256": hashlib.sha256(bytes.fromhex(mandates_code[2:])).hexdigest(),
-        "authorization_code_sha256": hashlib.sha256(bytes.fromhex(authorization_code[2:])).hexdigest(),
+        "mandates_code_sha256": hashlib.sha256(mandates_code_bytes).hexdigest(),
+        "authorization_code_sha256": hashlib.sha256(authorization_code_bytes).hexdigest(),
+        "contract_code_encoding": "base64 UTF-8 GenLayer Python source via gen_getContractCode",
         "sender": args.sender,
         "sender_nonce_latest": sender_nonce_latest,
         "sender_nonce_pending": sender_nonce_pending,

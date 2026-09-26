@@ -41,7 +41,12 @@ jobs:
         run: |
           pytest -q tests/test_covenant_authorization_adversarial.py
           pytest -q tests/test_covenant_authorization_runtime_calldata.py
-          pytest -q tests/test_covenant_gate_d_closure_glsim.py
+      - name: Gate D closure GLSim tests
+        env:
+          COVENANT_REPO: ${{ github.workspace }}
+          GENVM_VERSION: v0.2.16
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+        run: pytest -q tests/test_covenant_gate_d_closure_glsim.py
       - name: Pure canonicalization and closure vectors
         env:
           COVENANT_REPO: ${{ github.workspace }}

@@ -36,19 +36,23 @@ Changing a consequential field invalidates the authorization.
 
 ## Current release status
 
-**UNRELEASED — backend hardening and deterministic verification are in progress.**
+**PRODUCTION UNRELEASED — the backend source candidate is being published and
+the local candidate is live-verified.**
 
-The current candidate has mandate-bound evidence-body limits, bounded
-user-controlled inputs, one-time verified mandate-policy loading, and
-deterministic/adversarial/GLSim/runtime-calldata coverage. The historical
-runtime deployment and failed/indeterminate G11 evidence are retained as
-diagnostic records only; they do not prove source parity, successful G11
-execution, approval/rejection finality, timeout behavior, redirect safety, or
-receipt consumption for this candidate.
+The repaired candidate has mandate-bound evidence-body limits, bounded
+user-controlled inputs, one-time verified mandate-policy loading, and complete
+deterministic/adversarial/GLSim/runtime-calldata coverage. The supported local
+runtime also now has source-parity deployments and persisted proofs for
+successful request creation, approval finality, rejection finality, evidence
+repair, timeout expiry, restart recovery, redirect refusal, and one-time
+receipt consumption. See `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` and the
+machine-readable evidence retained in the operator's ignored local `work/`
+directory.
 
-Do not use `deployments/release-manifest.json` as a production deployment
-certificate. It intentionally records `UNRELEASED` until every live gate is
-proven.
+`deployments/release-manifest.json` remains `UNRELEASED` deliberately: it
+describes production deployment, which still requires the patched GenVM binary
+to be rebuilt, mounted across every runtime component, and verified from a
+clean checkout. Publishing this source repository does not bypass that gate.
 
 ## Verification
 

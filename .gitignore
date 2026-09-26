@@ -23,3 +23,7 @@ htmlcov/
 
 node_modules/
 .next/
+
+# Local runtime transcripts and proof outputs are operator evidence, not
+# release-source artifacts.  Keep them out of commits and clean checkouts.
+/work/
