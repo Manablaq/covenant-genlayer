@@ -1,6 +1,19 @@
 {
   "manifest_version": 1,
-  "status": "UNRELEASED",
+  "status": "RELEASED",
+  "release_scope": "backend source and pinned local runtime candidate",
+  "production_deployment": {
+    "status": "UNRELEASED",
+    "reason": "No public or Bradbury production deployment is claimed by this repository release.",
+    "genvm_source_commit": "387e1a66e920cb2dfadcdce40ab2d28da02efd1e",
+    "runtime_patch_sha256": "3cf216b1aa38daa6ff3024a0045b5a36c61e38abefa51274803ce6dfb8483d17",
+    "runtime_binary_sha256": "625d2c1a027221c88051d12d8381bad643f4bfb2d5ff67a3e725c31999547336",
+    "runtime_configuration_sha256": "b3499f5307c7eb1f181cc7944f8d9383ec9ad9dd3cad1aba1d94589ed263fa28",
+    "mounted_components": [
+      "jsonrpc",
+      "consensus-worker"
+    ]
+  },
   "chain": {
     "chain_id": 61999,
     "validator_count": 5,
@@ -31,6 +44,6 @@
   "notes": [
     "The historical diagnostic deployment is not source-parity evidence for this candidate.",
     "The listed addresses and transactions are source-parity local-runtime evidence recorded in docs/GATE_F_LIVE_CLOSURE_2026-09-27.md.",
-    "Do not treat this manifest as a production deployment certificate until repository freeze, clean-checkout CI, and upstream publication are complete."
+    "The top-level RELEASED status covers the backend source and pinned local runtime candidate. The nested production_deployment status must remain UNRELEASED until a public or Bradbury deployment is separately authorized and verified."
   ]
 }

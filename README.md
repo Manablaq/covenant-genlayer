@@ -36,8 +36,8 @@ Changing a consequential field invalidates the authorization.
 
 ## Current release status
 
-**PRODUCTION UNRELEASED — the backend source candidate is being published and
-the local candidate is live-verified.**
+**RELEASED — backend source and the pinned local runtime candidate. Production
+deployment remains UNRELEASED.**
 
 The repaired candidate has mandate-bound evidence-body limits, bounded
 user-controlled inputs, one-time verified mandate-policy loading, and complete
@@ -49,10 +49,11 @@ receipt consumption. See `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` and the
 machine-readable evidence retained in the operator's ignored local `work/`
 directory.
 
-`deployments/release-manifest.json` remains `UNRELEASED` deliberately: it
-describes production deployment, which still requires the patched GenVM binary
-to be rebuilt, mounted across every runtime component, and verified from a
-clean checkout. Publishing this source repository does not bypass that gate.
+`deployments/release-manifest.json` now reports the backend release as
+`RELEASED` and records the runtime source, patch, binary, configuration, and
+mount identities. Its nested `production_deployment.status` remains
+`UNRELEASED` until a public or Bradbury deployment is separately authorized
+and verified.
 
 ## Verification
 

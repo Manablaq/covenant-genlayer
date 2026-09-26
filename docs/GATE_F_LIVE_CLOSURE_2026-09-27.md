@@ -4,8 +4,9 @@ This addendum supersedes the earlier Gate F blocker for the repaired source
 candidate. It records local-runtime evidence only. The raw machine-readable
 proof directories are retained in the operator's ignored local `work/`
 directory; this document records their finalized results and identities.
-The release manifest stays `UNRELEASED` until the production runtime binary
-and deployment gates close.
+The backend release manifest is `RELEASED` for the source and pinned local
+runtime candidate. Its nested `production_deployment` status stays
+`UNRELEASED` until public deployment gates close.
 
 ## Frozen identity
 
@@ -18,6 +19,8 @@ and deployment gates close.
 - Authorization source SHA-256: `3a96887d4118c37602f379811e1486fe317a036d6b6f193a9f8a0fdca8f5d8b0`
 - Runtime no-redirect patch SHA-256:
   `3cf216b1aa38daa6ff3024a0045b5a36c61e38abefa51274803ce6dfb8483d17`
+- Runtime modules binary SHA-256:
+  `625d2c1a027221c88051d12d8381bad643f4bfb2d5ff67a3e725c31999547336`
 - Active web-module configuration SHA-256:
   `b3499f5307c7eb1f181cc7944f8d9383ec9ad9dd3cad1aba1d94589ed263fa28`
 

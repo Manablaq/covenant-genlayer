@@ -16,11 +16,9 @@ a 3xx response with its `Location` header, and Covenant repairs it as
 `REPAIR_EVIDENCE_REFERENCE_INVALID`.
 
 For this local candidate, the no-redirect behavior was active in JSON-RPC and
-the consensus workers during the persisted redirect probe; the active web
-configuration hash is recorded in
-`docs/GATE_F_LIVE_CLOSURE_2026-09-27.md`. Before public release, the patched
-GenVM modules binary must still be rebuilt from the pinned commit, mounted
-into every runtime component, and its source commit, patch hash, binary hash,
-and validator configuration must be recorded. A source patch file alone is
-not a production deployment certificate, so the release manifest remains
-`UNRELEASED`.
+the consensus workers during the persisted redirect probe. The pinned source
+commit, patch hash, built modules binary hash, active web configuration hash,
+and mounted components are recorded in
+`deployments/release-manifest.json`. The backend source release is therefore
+`RELEASED`; the nested `production_deployment` status remains `UNRELEASED`
+until a public or Bradbury deployment is separately authorized and verified.

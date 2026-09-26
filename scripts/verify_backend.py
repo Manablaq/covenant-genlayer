@@ -87,7 +87,13 @@ def main() -> int:
     assert "reqwest::redirect::Policy::none()" in runtime_patch
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["status"] == "UNRELEASED"
+    assert manifest["status"] == "RELEASED"
+    production = manifest["production_deployment"]
+    assert production["status"] == "UNRELEASED"
+    assert production["genvm_source_commit"] == "387e1a66e920cb2dfadcdce40ab2d28da02efd1e"
+    assert production["runtime_patch_sha256"] == sha256(RUNTIME_PATCH)
+    assert production["runtime_configuration_sha256"] == "b3499f5307c7eb1f181cc7944f8d9383ec9ad9dd3cad1aba1d94589ed263fa28"
+    assert production["mounted_components"] == ["jsonrpc", "consensus-worker"]
     assert manifest["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert manifest["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
 
@@ -100,9 +106,11 @@ def main() -> int:
             "covenant_authorization.py": sha256(AUTHORIZATION),
         },
         "runtime_patch_sha256": sha256(RUNTIME_PATCH),
+        "runtime_binary_sha256": production["runtime_binary_sha256"],
         "policy_reads_in_evidence_helpers": 0,
         "evidence_body_limit_bytes": 8192,
         "manifest_status": manifest["status"],
+        "production_deployment_status": production["status"],
     }
 
     encoded = json.dumps(result, indent=2, sort_keys=True) + "\n"
