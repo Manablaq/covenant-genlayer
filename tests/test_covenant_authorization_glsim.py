@@ -13,8 +13,8 @@ REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 AUTHORIZATION = REPO / "contracts" / "covenant_authorization.py"
 
-EXPECTED_MANDATES_SHA = "c921da40757968260e7acb0555db93d2ba4c3ca9ce81760ca51f6087d494333f"
-EXPECTED_AUTH_SHA = "89b5311d0bb6adb6dac0868f8c90355fc5082b00f444d91baacb07439d58e19b"
+EXPECTED_MANDATES_SHA = "6ecd7028ff8428b246aca8d320ac43b17e070d3136f17d86af08fe6fe6598ae8"
+EXPECTED_AUTH_SHA = "ce2f47c0152100a06dd1f464ee1a75a8e6745ee3505a27b4d90eb08a99bb518c"
 SDK = "v0.2.16"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
@@ -154,6 +154,7 @@ REPAIR_EVIDENCE_AUTHORITY_INVALID = 6
 REPAIR_EVIDENCE_REFERENCE_INVALID = 7
 REPAIR_CORROBORATION_MISSING = 8
 REPAIR_HUMAN_APPROVAL_MISSING = 9
+REPAIR_EVIDENCE_BODY_TOO_LARGE = 10
 
 
 def sha(path: Path) -> str:
@@ -237,6 +238,7 @@ def new_context(*, human_mode=0):
         u256(900),
         u256(1800),
         u256(8),
+        u256(8_192),
         [u256(1), u256(2), u256(2)],
         authority_ids,
         publishers,
@@ -397,7 +399,18 @@ def make_evidence(ctx, *, missing_c=False, authority_bad=False, reference_bad=Fa
     return values, bodies
 
 
-def create_request(ctx, *, nonce, evidence=None, value=250000, expires_at=NOW + 1800, target=TARGET):
+def create_request(
+    ctx,
+    *,
+    nonce,
+    evidence=None,
+    value=250000,
+    expires_at=NOW + 1800,
+    target=TARGET,
+    action_type="PAYMENT",
+    recipient=RECIPIENT,
+    payload=PAYLOAD,
+):
     if evidence is None:
         evidence, _ = make_evidence(ctx)
     return ctx.engine.call_method(
@@ -408,11 +421,11 @@ def create_request(ctx, *, nonce, evidence=None, value=250000, expires_at=NOW + 
             ctx.mandate_id,
             ctx.mandate_version,
             ctx.mandate_commitment,
-            "PAYMENT",
+            action_type,
             target,
-            RECIPIENT,
+            recipient,
             ctx.u256(value),
-            PAYLOAD,
+            payload,
             ctx.consumer,
             ctx.u256(nonce),
             ctx.u256(expires_at),
@@ -431,6 +444,7 @@ def set_mocks(
     statuses=None,
     body_overrides=None,
     web_limit=None,
+    response_headers=None,
 ):
     ctx.engine.vm.clear_mocks()
     ctx.engine.vm.clear_validators()
@@ -440,14 +454,21 @@ def set_mocks(
     selected = evidence if web_limit is None else evidence[:web_limit]
     for index, item in enumerate(selected):
         body_key = ("a", "b", "c")[index]
-        ctx.engine.vm.mock_web(
-            re.escape(item.immutable_reference),
-            {
-                "status": statuses.get(index, 200),
-                "body": body_overrides.get(index, bodies[body_key]),
+        response = {
+            "status": statuses.get(index, 200),
+            "body": body_overrides.get(index, bodies[body_key]),
+            "method": "GET",
+        }
+        if index in (response_headers or {}):
+            response = {
                 "method": "GET",
-            },
-        )
+                "response": {
+                    "status": response["status"],
+                    "headers": response_headers[index],
+                    "body": response["body"],
+                },
+            }
+        ctx.engine.vm.mock_web(re.escape(item.immutable_reference), response)
 
     if llm is not None:
         ctx.engine.vm.mock_llm(r"COVENANT V1 AUTHORIZATION DECISION", llm)
@@ -744,6 +765,140 @@ def test_g15_strict_utf8_failure_is_repairable_malformed_source():
         ctx.engine.call_method(ctx.authorization_address, "evaluate_request", args=[request_id])
         assert state_of(ctx, request_id) == STATE_REPAIR_REQUIRED
         assert repair_of(ctx, request_id) == REPAIR_SOURCE_MALFORMED
+    finally:
+        close_context(ctx)
+
+
+def test_g15a_evidence_body_limit_is_repairable_and_not_authorized():
+    ctx = new_context()
+    try:
+        oversized_body = b"x" * 8_193
+        evidence, bodies = make_evidence(ctx, a_body=oversized_body)
+        request_id = create_request(ctx, nonce=1501, evidence=evidence)
+        set_mocks(ctx, evidence, bodies, llm=None, web_limit=1)
+        ctx.engine.call_method(
+            ctx.authorization_address,
+            "evaluate_request",
+            args=[request_id],
+        )
+        assert state_of(ctx, request_id) == STATE_REPAIR_REQUIRED
+        assert repair_of(ctx, request_id) == REPAIR_EVIDENCE_BODY_TOO_LARGE
+        assert ctx.engine.call_method(
+            ctx.authorization_address,
+            "get_request_receipt_id",
+            args=[request_id],
+        ) == b""
+    finally:
+        close_context(ctx)
+
+
+@pytest.mark.parametrize(
+    ("body_size", "expected_reason"),
+    [
+        (8_191, REPAIR_SOURCE_UNAVAILABLE),
+        (8_192, REPAIR_SOURCE_UNAVAILABLE),
+        (8_193, REPAIR_EVIDENCE_BODY_TOO_LARGE),
+    ],
+)
+def test_g15aa_evidence_body_runtime_boundaries(body_size, expected_reason):
+    ctx = new_context()
+    try:
+        evidence, bodies = make_evidence(ctx, a_body=b"x" * body_size)
+        request_id = create_request(ctx, nonce=1510 + body_size, evidence=evidence)
+        set_mocks(ctx, evidence, bodies, llm=None, web_limit=1)
+        ctx.engine.call_method(
+            ctx.authorization_address,
+            "evaluate_request",
+            args=[request_id],
+        )
+        assert state_of(ctx, request_id) == STATE_REPAIR_REQUIRED
+        assert repair_of(ctx, request_id) == expected_reason
+    finally:
+        close_context(ctx)
+
+
+def test_g15ab_redirect_location_header_is_repairable():
+    ctx = new_context()
+    try:
+        evidence, bodies = make_evidence(ctx)
+        request_id = create_request(ctx, nonce=1514, evidence=evidence)
+        set_mocks(
+            ctx,
+            evidence,
+            bodies,
+            llm=None,
+            web_limit=1,
+            response_headers={0: {"location": b"https://evil.example/"}},
+        )
+        ctx.engine.call_method(
+            ctx.authorization_address,
+            "evaluate_request",
+            args=[request_id],
+        )
+        assert state_of(ctx, request_id) == STATE_REPAIR_REQUIRED
+        assert repair_of(ctx, request_id) == REPAIR_EVIDENCE_REFERENCE_INVALID
+    finally:
+        close_context(ctx)
+
+
+@pytest.mark.parametrize(
+    ("kind", "size", "should_pass"),
+    [
+        ("action_type", 127, True),
+        ("action_type", 128, True),
+        ("action_type", 129, False),
+        ("target", 2_047, True),
+        ("target", 2_048, True),
+        ("target", 2_049, False),
+        ("recipient", 63, True),
+        ("recipient", 64, True),
+        ("recipient", 65, False),
+        ("payload", 8_191, True),
+        ("payload", 8_192, True),
+        ("payload", 8_193, False),
+        ("publisher_name", 255, True),
+        ("publisher_name", 256, True),
+        ("publisher_name", 257, False),
+        ("record_id", 255, True),
+        ("record_id", 256, True),
+        ("record_id", 257, False),
+        ("immutable_reference", 2_047, True),
+        ("immutable_reference", 2_048, True),
+        ("immutable_reference", 2_049, False),
+        ("version", 255, True),
+        ("version", 256, True),
+        ("version", 257, False),
+    ],
+)
+def test_g15b_user_input_size_boundaries(kind, size, should_pass):
+    ctx = new_context()
+    try:
+        evidence, _ = make_evidence(ctx)
+        kwargs = {}
+        if kind == "action_type":
+            kwargs["action_type"] = "x" * size
+        elif kind == "target":
+            kwargs["target"] = b"x" * size
+        elif kind == "recipient":
+            kwargs["recipient"] = b"x" * size
+        elif kind == "payload":
+            kwargs["payload"] = b"x" * size
+        else:
+            item = evidence[0]
+            if kind == "publisher_name":
+                item.publisher_name = "x" * size
+            elif kind == "record_id":
+                item.record_id = "x" * size
+            elif kind == "immutable_reference":
+                item.immutable_reference = "https://" + "x" * max(0, size - 8)
+            elif kind == "version":
+                item.version = "x" * size
+
+        if should_pass:
+            create_request(ctx, nonce=1502 + size, evidence=evidence, **kwargs)
+        else:
+            with pytest.raises(Exception):
+                create_request(ctx, nonce=1502 + size, evidence=evidence, **kwargs)
     finally:
         close_context(ctx)
 

@@ -8,21 +8,10 @@ Covenant is a GenLayer-native authorization protocol for autonomous agents. It d
 
 ## Backend-first rule
 
-The frontend does not begin until the backend has passed all release gates:
-
-1. Current GenLayer constraints researched and frozen.
-2. Protocol, state machine, trust model and threat model frozen.
-3. Contracts completely implemented.
-4. GenVM lint, validation, typecheck and ABI/schema gates pass.
-5. Deterministic and adversarial test suites pass.
-6. Full-runtime consensus tests prove authorization and denial.
-7. Exact reviewed artifacts deploy successfully.
-8. Bradbury deployment completes.
-9. Source/configuration parity and contract wiring are proven.
-10. Live consensus, finality, recovery and receipt-consumption behavior are verified.
-11. Backend release evidence is frozen.
-
-Only then may a frontend directory be introduced.
+The frontend remains out of scope until the backend release gates are closed.
+Deterministic tests and repository checks are automated in
+`.github/workflows/backend.yml`. Live deployment is a separate, explicitly
+authorized stage; an accepted transaction is not treated as finality.
 
 ## Core thesis
 
@@ -45,9 +34,46 @@ It authorizes an exact action commitment bound to:
 
 Changing a consequential field invalidates the authorization.
 
-## Current phase
+## Current release status
 
-**Phase 0 — GenLayer research and backend specification.**
+**UNRELEASED — backend hardening and deterministic verification are in progress.**
 
-No production contract is complete.
-No Bradbury deployment has been attempted.
+The current candidate has mandate-bound evidence-body limits, bounded
+user-controlled inputs, one-time verified mandate-policy loading, and
+deterministic/adversarial/GLSim/runtime-calldata coverage. The historical
+runtime deployment and failed/indeterminate G11 evidence are retained as
+diagnostic records only; they do not prove source parity, successful G11
+execution, approval/rejection finality, timeout behavior, redirect safety, or
+receipt consumption for this candidate.
+
+Do not use `deployments/release-manifest.json` as a production deployment
+certificate. It intentionally records `UNRELEASED` until every live gate is
+proven.
+
+## Verification
+
+Use Python 3.12 and install the exact pinned toolchain from
+`requirements-lock.txt`.
+
+```bash
+python scripts/verify_backend.py
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 GENVM_VERSION=v0.2.16 pytest -q tests/test_covenant_mandates_direct.py
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 GENVM_VERSION=v0.2.16 pytest -q tests/test_covenant_authorization_glsim.py
+```
+
+The Direct and GLSim surfaces run in separate pytest processes because their
+plugins cannot safely share one interpreter. The supported-runtime procedure
+must preserve raw responses before decoding and must never resubmit a timed-out
+write; its live evidence remains a release gate, not a mocked-test result.
+
+The safe runtime starting point is read-only:
+
+```bash
+python scripts/live_preflight.py \
+  --output /tmp/covenant-runtime-preflight \
+  --mandates 0x... \
+  --authorization 0x...
+```
+
+The preflight refuses to overwrite evidence and has no transaction-signing or
+submission path.

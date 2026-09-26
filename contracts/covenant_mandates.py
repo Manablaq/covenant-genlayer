@@ -22,6 +22,14 @@ ROLE_BOTH = u256(3)
 
 ZERO_ADDRESS_BYTES = b"\x00" * 20
 
+# Resource limits are protocol constants.  The evidence body limit is also
+# stored in and committed by every mandate version so Authorization cannot
+# silently substitute a different bound.
+MAX_EVIDENCE_BODY_BYTES = 8192
+MAX_SEMANTIC_CRITERIA_BYTES = 4096
+MAX_AUTHORITY_PUBLISHER_NAME_BYTES = 256
+MAX_AUTHORITY_SOURCE_PREFIX_BYTES = 2048
+
 
 def _hash(value: bytes) -> bytes:
     return hashlib.sha256(value).digest()
@@ -33,6 +41,11 @@ def _u256_bytes(value: u256) -> bytes:
 
 def _text_hash(value: str) -> bytes:
     return _hash(value.encode("utf-8"))
+
+
+def _require_text_limit(value: str, field_name: str, maximum: int) -> None:
+    if len(value.encode("utf-8")) > maximum:
+        raise gl.vm.UserError(field_name + " exceeds protocol size limit")
 
 
 def _require_digest(value: bytes, field_name: str) -> None:
@@ -123,6 +136,7 @@ class CovenantMandates(gl.Contract):
     max_observation_ages: TreeMap[str, u256]
     max_publish_observe_gaps: TreeMap[str, u256]
     max_evidence_records_values: TreeMap[str, u256]
+    max_evidence_body_bytes_values: TreeMap[str, u256]
 
     authority_role_masks: TreeMap[str, DynArray[u256]]
     authority_ids: TreeMap[str, DynArray[bytes]]
@@ -191,6 +205,7 @@ class CovenantMandates(gl.Contract):
         max_observation_age_seconds: u256,
         max_publish_observe_gap_seconds: u256,
         max_evidence_records: u256,
+        max_evidence_body_bytes: u256,
         authority_role_masks: list[u256],
         authority_ids: list[bytes],
         authority_publisher_names: list[str],
@@ -228,6 +243,16 @@ class CovenantMandates(gl.Contract):
 
         if semantic_criteria == "":
             raise gl.vm.UserError("semantic_criteria must not be empty")
+        _require_text_limit(
+            semantic_criteria,
+            "semantic_criteria",
+            MAX_SEMANTIC_CRITERIA_BYTES,
+        )
+
+        if int(max_evidence_body_bytes) <= 0:
+            raise gl.vm.UserError("max_evidence_body_bytes must be positive")
+        if int(max_evidence_body_bytes) > MAX_EVIDENCE_BODY_BYTES:
+            raise gl.vm.UserError("max_evidence_body_bytes exceeds protocol limit")
 
         if int(required_primary_count) != 1:
             raise gl.vm.UserError("Covenant v1 requires exactly one primary authority")
@@ -276,6 +301,17 @@ class CovenantMandates(gl.Contract):
 
             if publisher_name == "":
                 raise gl.vm.UserError("publisher_name must not be empty")
+            _require_text_limit(
+                publisher_name,
+                "publisher_name",
+                MAX_AUTHORITY_PUBLISHER_NAME_BYTES,
+            )
+
+            _require_text_limit(
+                source_prefix,
+                "authority source prefix",
+                MAX_AUTHORITY_SOURCE_PREFIX_BYTES,
+            )
 
             if not source_prefix.startswith("https://"):
                 raise gl.vm.UserError("authority source prefix must begin with lowercase https://")
@@ -337,6 +373,7 @@ class CovenantMandates(gl.Contract):
             + _u256_bytes(max_observation_age_seconds)
             + _u256_bytes(max_publish_observe_gap_seconds)
             + _u256_bytes(max_evidence_records)
+            + _u256_bytes(max_evidence_body_bytes)
             + _u256_bytes(u256(len(canonical_rule_hashes)))
             + b"".join(canonical_rule_hashes)
         )
@@ -396,6 +433,7 @@ class CovenantMandates(gl.Contract):
         self.max_observation_ages[key] = max_observation_age_seconds
         self.max_publish_observe_gaps[key] = max_publish_observe_gap_seconds
         self.max_evidence_records_values[key] = max_evidence_records
+        self.max_evidence_body_bytes_values[key] = max_evidence_body_bytes
 
         self._store_u256_array(key, authority_role_masks, self.authority_role_masks)
         self._store_bytes_array(key, authority_ids, self.authority_ids)
@@ -425,6 +463,7 @@ class CovenantMandates(gl.Contract):
         max_observation_age_seconds: u256,
         max_publish_observe_gap_seconds: u256,
         max_evidence_records: u256,
+        max_evidence_body_bytes: u256,
         authority_role_masks: list[u256],
         authority_ids: list[bytes],
         authority_publisher_names: list[str],
@@ -469,6 +508,7 @@ class CovenantMandates(gl.Contract):
             max_observation_age_seconds,
             max_publish_observe_gap_seconds,
             max_evidence_records,
+            max_evidence_body_bytes,
             authority_role_masks,
             authority_ids,
             authority_publisher_names,
@@ -502,6 +542,7 @@ class CovenantMandates(gl.Contract):
         max_observation_age_seconds: u256,
         max_publish_observe_gap_seconds: u256,
         max_evidence_records: u256,
+        max_evidence_body_bytes: u256,
         authority_role_masks: list[u256],
         authority_ids: list[bytes],
         authority_publisher_names: list[str],
@@ -531,6 +572,7 @@ class CovenantMandates(gl.Contract):
             max_observation_age_seconds,
             max_publish_observe_gap_seconds,
             max_evidence_records,
+            max_evidence_body_bytes,
             authority_role_masks,
             authority_ids,
             authority_publisher_names,
@@ -680,6 +722,11 @@ class CovenantMandates(gl.Contract):
     def get_max_evidence_records(self, mandate_id: bytes, version: u256) -> u256:
         key = self._require_version(mandate_id, version)
         return self.max_evidence_records_values[key]
+
+    @gl.public.view
+    def get_max_evidence_body_bytes(self, mandate_id: bytes, version: u256) -> u256:
+        key = self._require_version(mandate_id, version)
+        return self.max_evidence_body_bytes_values[key]
 
     @gl.public.view
     def get_authority_role_masks(self, mandate_id: bytes, version: u256) -> DynArray[u256]:

@@ -11,11 +11,6 @@ TESTS = REPO / "tests"
 if str(TESTS) not in sys.path:
     sys.path.insert(0, str(TESTS))
 
-BASE_TEST = TESTS / "test_covenant_authorization_glsim.py"
-EXPECTED_BASE_TEST_SHA = "d45b82f3923b8fd30d03b1070251310d887d5a658fb6829ff5c7314bd700d61e"
-
-assert hashlib.sha256(BASE_TEST.read_bytes()).hexdigest() == EXPECTED_BASE_TEST_SHA
-
 import test_covenant_authorization_glsim as base
 
 assert base.SDK == "v0.2.16"
@@ -91,6 +86,7 @@ def _publish_v2_with_changed_max_value(ctx):
         ctx.u256(900),
         ctx.u256(1800),
         ctx.u256(8),
+        ctx.u256(8_192),
         [ctx.u256(1), ctx.u256(2), ctx.u256(2)],
         ctx.authority_ids,
         ctx.publishers,

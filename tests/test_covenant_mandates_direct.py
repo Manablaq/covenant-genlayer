@@ -9,7 +9,7 @@ pytest_plugins = ("gltest.direct.pytest_plugin",)
 REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])).resolve()
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 SDK = "v0.2.16"
-EXPECTED_SHA = "c921da40757968260e7acb0555db93d2ba4c3ca9ce81760ca51f6087d494333f"
+EXPECTED_SHA = "6ecd7028ff8428b246aca8d320ac43b17e070d3136f17d86af08fe6fe6598ae8"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
 
@@ -17,7 +17,17 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def policy_args(Address, u256, *, nonce=9, max_value=1_000_000):
+def policy_args(
+    Address,
+    u256,
+    *,
+    nonce=9,
+    max_value=1_000_000,
+    semantic_criteria=None,
+    max_evidence_body_bytes=8_192,
+    publisher_name=None,
+    source_prefix=None,
+):
     zero = Address(bytes(20))
     target = b"contract://merchant/42"
     recipient = bytes.fromhex("66" * 20)
@@ -26,6 +36,11 @@ def policy_args(Address, u256, *, nonce=9, max_value=1_000_000):
         hashlib.sha256(b"covenant-authority-b").digest(),
         hashlib.sha256(b"covenant-authority-c").digest(),
     ]
+    semantic_criteria = semantic_criteria or (
+        "AUTHORIZE only when verified evidence proves the exact payment is permitted."
+    )
+    publisher_name = publisher_name or "Authority A"
+    source_prefix = source_prefix or "https://a.example/evidence/"
     return [
         u256(nonce),
         u256(max_value),
@@ -34,18 +49,19 @@ def policy_args(Address, u256, *, nonce=9, max_value=1_000_000):
         [hashlib.sha256(b"PAYMENT").digest()],
         [hashlib.sha256(target).digest()],
         [hashlib.sha256(recipient).digest()],
-        "AUTHORIZE only when verified evidence proves the exact payment is permitted.",
+        semantic_criteria,
         u256(1),
         u256(2),
         u256(3600),
         u256(900),
         u256(1800),
         u256(8),
+        u256(max_evidence_body_bytes),
         [u256(1), u256(2), u256(2)],
         authority_ids,
-        ["Authority A", "Authority B", "Authority C"],
+        [publisher_name, "Authority B", "Authority C"],
         [
-            "https://a.example/evidence/",
+            source_prefix,
             "https://b.example/evidence/",
             "https://c.example/evidence/",
         ],
@@ -120,3 +136,74 @@ def test_m05_publish_is_append_only(direct_vm, direct_deploy):
     assert contract.version_exists(mandate_id, u256(2))
     assert contract.get_mandate_commitment(mandate_id, u256(1)) == old_commitment
     assert contract.get_mandate_commitment(mandate_id, u256(2)) != old_commitment
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "should_pass"),
+    [
+        ("max_evidence_body_bytes", 8_191, True),
+        ("max_evidence_body_bytes", 8_192, True),
+        ("max_evidence_body_bytes", 8_193, False),
+        ("semantic_criteria", "x" * 4_095, True),
+        ("semantic_criteria", "x" * 4_096, True),
+        ("semantic_criteria", "x" * 4_097, False),
+        ("publisher_name", "x" * 255, True),
+        ("publisher_name", "x" * 256, True),
+        ("publisher_name", "x" * 257, False),
+        (
+            "source_prefix",
+            "https://" + "x" * (2_047 - len("https://") - 1) + "/",
+            True,
+        ),
+        (
+            "source_prefix",
+            "https://" + "x" * (2_048 - len("https://") - 1) + "/",
+            True,
+        ),
+        (
+            "source_prefix",
+            "https://" + "x" * (2_049 - len("https://") - 1) + "/",
+            False,
+        ),
+    ],
+)
+def test_m06_protocol_size_boundaries(
+    direct_vm,
+    direct_deploy,
+    field,
+    value,
+    should_pass,
+):
+    contract, Address, u256 = deployed(direct_vm, direct_deploy)
+    kwargs = {field: value}
+    if should_pass:
+        contract.create_mandate(*policy_args(Address, u256, **kwargs))
+    else:
+        with pytest.raises(Exception):
+            contract.create_mandate(*policy_args(Address, u256, **kwargs))
+
+
+def test_m07_body_limit_is_stored_and_commitment_bound(direct_vm, direct_deploy):
+    contract, Address, u256 = deployed(direct_vm, direct_deploy)
+    first = contract.create_mandate(
+        *policy_args(
+            Address,
+            u256,
+            nonce=880,
+            max_evidence_body_bytes=8_191,
+        )
+    )
+    second = contract.create_mandate(
+        *policy_args(
+            Address,
+            u256,
+            nonce=881,
+            max_evidence_body_bytes=8_192,
+        )
+    )
+    assert int(contract.get_max_evidence_body_bytes(first, u256(1))) == 8_191
+    assert int(contract.get_max_evidence_body_bytes(second, u256(1))) == 8_192
+    assert contract.get_mandate_commitment(first, u256(1)) != contract.get_mandate_commitment(
+        second,
+        u256(1),
+    )

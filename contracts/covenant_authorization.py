@@ -38,11 +38,26 @@ REPAIR_EVIDENCE_AUTHORITY_INVALID = u256(6)
 REPAIR_EVIDENCE_REFERENCE_INVALID = u256(7)
 REPAIR_CORROBORATION_MISSING = u256(8)
 REPAIR_HUMAN_APPROVAL_MISSING = u256(9)
+REPAIR_EVIDENCE_BODY_TOO_LARGE = u256(10)
+
+# These bounds apply before hashing, storing, or placing user-controlled data
+# in a semantic prompt.  They are protocol limits rather than VM assumptions.
+MAX_ACTION_TYPE_BYTES = 128
+MAX_TARGET_BYTES = 2048
+MAX_RECIPIENT_BYTES = 64
+MAX_PAYLOAD_BYTES = 8192
+MAX_EVIDENCE_PUBLISHER_NAME_BYTES = 256
+MAX_EVIDENCE_RECORD_ID_BYTES = 256
+MAX_EVIDENCE_REFERENCE_BYTES = 2048
+MAX_EVIDENCE_VERSION_BYTES = 256
+MAX_EVIDENCE_BODY_BYTES = 8192
+MAX_SEMANTIC_CRITERIA_BYTES = 4096
 
 ROLE_PRIMARY = u256(1)
 ROLE_CORROBORATION = u256(2)
 ROLE_MASK_PRIMARY = u256(1)
 ROLE_MASK_CORROBORATION = u256(2)
+ROLE_MASK_BOTH = u256(3)
 
 HUMAN_NONE = u256(0)
 HUMAN_SINGLE_ADDRESS = u256(1)
@@ -61,6 +76,16 @@ def _text(value: str) -> bytes:
 
 def _blob(value: bytes) -> bytes:
     return _hash(value)
+
+
+def _require_text_limit(value: str, label: str, maximum: int) -> None:
+    if len(value.encode("utf-8")) > maximum:
+        raise gl.vm.UserError(label + " exceeds protocol size limit")
+
+
+def _require_blob_limit(value: bytes, label: str, maximum: int) -> None:
+    if len(value) > maximum:
+        raise gl.vm.UserError(label + " exceeds protocol size limit")
 
 
 def _require_bytes32(value: bytes, label: str) -> None:
@@ -277,6 +302,8 @@ class MandatePolicy:
     max_observation_age_seconds: u256
     max_publish_observe_gap_seconds: u256
     max_evidence_records: u256
+    max_evidence_body_bytes: u256
+    semantic_criteria: str
     authority_role_masks: DynArray[u256]
     authority_ids: DynArray[bytes]
     authority_publisher_names: DynArray[str]
@@ -308,6 +335,7 @@ class CovenantMandatesIface:
         def get_max_observation_age_seconds(self, mandate_id: bytes, version: u256) -> u256: ...
         def get_max_publish_observe_gap_seconds(self, mandate_id: bytes, version: u256) -> u256: ...
         def get_max_evidence_records(self, mandate_id: bytes, version: u256) -> u256: ...
+        def get_max_evidence_body_bytes(self, mandate_id: bytes, version: u256) -> u256: ...
         def get_authority_role_masks(self, mandate_id: bytes, version: u256) -> DynArray[u256]: ...
         def get_authority_ids(self, mandate_id: bytes, version: u256) -> DynArray[bytes]: ...
         def get_authority_publisher_names(self, mandate_id: bytes, version: u256) -> DynArray[str]: ...
@@ -339,9 +367,10 @@ class CovenantAuthorization(gl.Contract):
 
     def _require_registry_binding(self) -> None:
         registry = CovenantMandatesIface(self.mandates_address)
-        if Address(registry.view().get_contract_address()) != self.mandates_address:
+        view = registry.view()
+        if Address(view.get_contract_address()) != self.mandates_address:
             raise gl.vm.UserError("mandates contract address mismatch")
-        if registry.view().get_chain_id() != gl.message.chain_id:
+        if view.get_chain_id() != gl.message.chain_id:
             raise gl.vm.UserError("mandates chain mismatch")
 
     def _load_mandate_policy(
@@ -352,7 +381,7 @@ class CovenantAuthorization(gl.Contract):
     ) -> MandatePolicy:
         """Load the immutable policy exactly once for this execution path."""
         view = registry.view()
-        return MandatePolicy(
+        policy = MandatePolicy(
             max_value=view.get_max_value(mandate_id, mandate_version),
             max_request_lifetime_seconds=view.get_max_request_lifetime_seconds(
                 mandate_id,
@@ -398,6 +427,14 @@ class CovenantAuthorization(gl.Contract):
                 mandate_id,
                 mandate_version,
             ),
+            max_evidence_body_bytes=view.get_max_evidence_body_bytes(
+                mandate_id,
+                mandate_version,
+            ),
+            semantic_criteria=view.get_semantic_criteria(
+                mandate_id,
+                mandate_version,
+            ),
             authority_role_masks=view.get_authority_role_masks(
                 mandate_id,
                 mandate_version,
@@ -423,6 +460,59 @@ class CovenantAuthorization(gl.Contract):
                 view.get_human_approver(mandate_id, mandate_version)
             ),
         )
+        self._validate_mandate_policy(policy)
+        return policy
+
+    def _validate_mandate_policy(self, policy: MandatePolicy) -> None:
+        """Validate the materialized policy before any evidence is inspected."""
+        authority_ids = policy.authority_ids
+        if (
+            policy.max_evidence_body_bytes <= u256(0)
+            or policy.max_evidence_body_bytes > u256(MAX_EVIDENCE_BODY_BYTES)
+        ):
+            raise gl.vm.UserError("mandates evidence body limit invalid")
+        if policy.semantic_criteria == "":
+            raise gl.vm.UserError("mandates semantic criteria missing")
+        if len(policy.semantic_criteria.encode("utf-8")) > MAX_SEMANTIC_CRITERIA_BYTES:
+            raise gl.vm.UserError("mandates semantic criteria exceeds protocol limit")
+        if policy.max_evidence_records <= u256(0):
+            raise gl.vm.UserError("mandates evidence record limit invalid")
+        if (
+            len(authority_ids) != len(policy.authority_role_masks)
+            or len(authority_ids) != len(policy.authority_publisher_names)
+            or len(authority_ids) != len(policy.authority_source_prefixes)
+            or len(authority_ids) != len(policy.authority_rule_hashes)
+        ):
+            raise gl.vm.UserError("mandates authority arrays mismatch")
+        if len(authority_ids) == 0:
+            raise gl.vm.UserError("mandates authority rules missing")
+
+        for index in range(len(authority_ids)):
+            if policy.authority_role_masks[index] not in (
+                ROLE_MASK_PRIMARY,
+                ROLE_MASK_CORROBORATION,
+                ROLE_MASK_BOTH,
+            ):
+                raise gl.vm.UserError("mandates authority role mask invalid")
+            _require_bytes32(authority_ids[index], "authority_id")
+            _require_text_limit(
+                policy.authority_publisher_names[index],
+                "publisher_name",
+                MAX_EVIDENCE_PUBLISHER_NAME_BYTES,
+            )
+            _require_text_limit(
+                policy.authority_source_prefixes[index],
+                "authority source prefix",
+                MAX_EVIDENCE_REFERENCE_BYTES,
+            )
+            recomputed_rule = _hash(
+                _u256_bytes(policy.authority_role_masks[index])
+                + authority_ids[index]
+                + _text(policy.authority_publisher_names[index])
+                + _text(policy.authority_source_prefixes[index])
+            )
+            if recomputed_rule != policy.authority_rule_hashes[index]:
+                raise gl.vm.UserError("mandates authority rule integrity failure")
 
     def _action_subject(
         self,
@@ -605,7 +695,6 @@ class CovenantAuthorization(gl.Contract):
         record_id = typing.cast(str, record_id)
         immutable_reference = typing.cast(str, immutable_reference)
         version = typing.cast(str, version)
-        role = typing.cast(int, role)
         published_at = typing.cast(int, published_at)
         observed_at = typing.cast(int, observed_at)
         expires_at = typing.cast(int, expires_at)
@@ -635,6 +724,26 @@ class CovenantAuthorization(gl.Contract):
             raise gl.vm.UserError("immutable_reference must be non-empty")
         if item.version == "":
             raise gl.vm.UserError("evidence version must be non-empty")
+        _require_text_limit(
+            item.publisher_name,
+            "publisher_name",
+            MAX_EVIDENCE_PUBLISHER_NAME_BYTES,
+        )
+        _require_text_limit(
+            item.record_id,
+            "record_id",
+            MAX_EVIDENCE_RECORD_ID_BYTES,
+        )
+        _require_text_limit(
+            item.immutable_reference,
+            "immutable_reference",
+            MAX_EVIDENCE_REFERENCE_BYTES,
+        )
+        _require_text_limit(
+            item.version,
+            "evidence version",
+            MAX_EVIDENCE_VERSION_BYTES,
+        )
 
     def _store_evidence(
         self,
@@ -704,26 +813,10 @@ class CovenantAuthorization(gl.Contract):
         role_masks = policy.authority_role_masks
         publisher_names = policy.authority_publisher_names
         source_prefixes = policy.authority_source_prefixes
-        rule_hashes = policy.authority_rule_hashes
-        if (
-            len(authority_ids) != len(role_masks)
-            or len(authority_ids) != len(publisher_names)
-            or len(authority_ids) != len(source_prefixes)
-            or len(authority_ids) != len(rule_hashes)
-        ):
-            raise gl.vm.UserError("mandates authority arrays mismatch")
 
         requested_bit = _role_mask_bit(record.role)
         identity_and_role_match = False
         for index in range(len(authority_ids)):
-            recomputed_rule = _hash(
-                _u256_bytes(role_masks[index])
-                + authority_ids[index]
-                + _text(publisher_names[index])
-                + _text(source_prefixes[index])
-            )
-            if recomputed_rule != rule_hashes[index]:
-                raise gl.vm.UserError("mandates authority rule integrity failure")
             if authority_ids[index] != record.authority_id:
                 continue
             if publisher_names[index] != record.publisher_name:
@@ -836,7 +929,7 @@ class CovenantAuthorization(gl.Contract):
         transition_time: u256,
         policy: MandatePolicy,
     ) -> None:
-        if reason == REPAIR_NONE or reason > REPAIR_HUMAN_APPROVAL_MISSING:
+        if reason == REPAIR_NONE or reason > REPAIR_EVIDENCE_BODY_TOO_LARGE:
             raise gl.vm.UserError("invalid repair reason")
         request = self.requests[request_id]
         request.repair_deadline = self._fixed_repair_deadline(
@@ -857,13 +950,10 @@ class CovenantAuthorization(gl.Contract):
     def _run_semantic_consensus(
         self,
         request: RequestRecord,
+        policy: MandatePolicy,
     ) -> str:
         request_memory = gl.storage.copy_to_memory(request)
-        registry = CovenantMandatesIface(self.mandates_address)
-        criteria = registry.view().get_semantic_criteria(
-            request.mandate_id,
-            request.mandate_version,
-        )
+        criteria = policy.semantic_criteria
         evidence_memory = self._copy_evidence_to_memory(request)
 
         authorize_result = _decision_result(
@@ -902,6 +992,14 @@ class CovenantAuthorization(gl.Contract):
                         REPAIR_SOURCE_UNAVAILABLE,
                     )
 
+                for header_name in response.headers:
+                    if header_name.lower() == "location":
+                        return _decision_result(
+                            request_memory.request_id,
+                            request_memory.action_intent,
+                            DECISION_REPAIR,
+                            REPAIR_EVIDENCE_REFERENCE_INVALID,
+                        )
                 if response.status < 200 or response.status >= 300:
                     return _decision_result(
                         request_memory.request_id,
@@ -916,6 +1014,13 @@ class CovenantAuthorization(gl.Contract):
                         request_memory.action_intent,
                         DECISION_REPAIR,
                         REPAIR_SOURCE_UNAVAILABLE,
+                    )
+                if len(body) > int(policy.max_evidence_body_bytes):
+                    return _decision_result(
+                        request_memory.request_id,
+                        request_memory.action_intent,
+                        DECISION_REPAIR,
+                        REPAIR_EVIDENCE_BODY_TOO_LARGE,
                     )
 
                 digest = hashlib.sha256(body).digest()
@@ -1061,6 +1166,14 @@ class CovenantAuthorization(gl.Contract):
         _require_bytes32(mandate_commitment, "mandate_commitment")
         if action_type == "":
             raise gl.vm.UserError("action_type must be non-empty")
+        _require_text_limit(
+            action_type,
+            "action_type",
+            MAX_ACTION_TYPE_BYTES,
+        )
+        _require_blob_limit(target, "target", MAX_TARGET_BYTES)
+        _require_blob_limit(recipient, "recipient", MAX_RECIPIENT_BYTES)
+        _require_blob_limit(payload, "payload", MAX_PAYLOAD_BYTES)
 
         registry = CovenantMandatesIface(self.mandates_address)
         self._require_registry_binding()
@@ -1208,7 +1321,7 @@ class CovenantAuthorization(gl.Contract):
             self._enter_repair(request_id, reason, now, policy)
             return
 
-        consensus = self._run_semantic_consensus(request)
+        consensus = self._run_semantic_consensus(request, policy)
 
         current = self._require_request(request_id)
         if current.state != STATE_PENDING:
@@ -1253,6 +1366,8 @@ class CovenantAuthorization(gl.Contract):
             REPAIR_SOURCE_TIMEOUT,
             REPAIR_SOURCE_MALFORMED,
             REPAIR_EVIDENCE_INTEGRITY_MISMATCH,
+            REPAIR_EVIDENCE_REFERENCE_INVALID,
+            REPAIR_EVIDENCE_BODY_TOO_LARGE,
         ):
             repair_result = _decision_result(
                 current.request_id,
@@ -1300,7 +1415,7 @@ class CovenantAuthorization(gl.Contract):
             self._enter_repair(request_id, reason, now, policy)
             return
 
-        consensus = self._run_semantic_consensus(request)
+        consensus = self._run_semantic_consensus(request, policy)
 
         current = self._require_request(request_id)
         if current.state != STATE_REPAIR_REQUIRED:
@@ -1351,6 +1466,8 @@ class CovenantAuthorization(gl.Contract):
             REPAIR_SOURCE_TIMEOUT,
             REPAIR_SOURCE_MALFORMED,
             REPAIR_EVIDENCE_INTEGRITY_MISMATCH,
+            REPAIR_EVIDENCE_REFERENCE_INVALID,
+            REPAIR_EVIDENCE_BODY_TOO_LARGE,
         ):
             repair_result = _decision_result(
                 current.request_id,
@@ -1373,7 +1490,17 @@ class CovenantAuthorization(gl.Contract):
         request = self._require_request(request_id)
         if request.state != STATE_REPAIR_REQUIRED:
             raise gl.vm.UserError("request is not repair-required")
-        if request.repair_reason < REPAIR_SOURCE_UNAVAILABLE or request.repair_reason > REPAIR_CORROBORATION_MISSING:
+        if request.repair_reason not in (
+            REPAIR_SOURCE_UNAVAILABLE,
+            REPAIR_SOURCE_TIMEOUT,
+            REPAIR_SOURCE_MALFORMED,
+            REPAIR_EVIDENCE_INTEGRITY_MISMATCH,
+            REPAIR_EVIDENCE_BODY_TOO_LARGE,
+            REPAIR_EVIDENCE_STALE,
+            REPAIR_EVIDENCE_AUTHORITY_INVALID,
+            REPAIR_EVIDENCE_REFERENCE_INVALID,
+            REPAIR_CORROBORATION_MISSING,
+        ):
             raise gl.vm.UserError("repair reason is not evidence-remediable")
         if gl.message.sender_address != request.agent:
             raise gl.vm.UserError("evidence replacement caller must equal agent")

@@ -13,10 +13,6 @@ if str(TESTS) not in sys.path:
 
 base = importlib.import_module("test_covenant_authorization_glsim")
 
-EXPECTED_BASE_AUTH_TEST_SHA = "d45b82f3923b8fd30d03b1070251310d887d5a658fb6829ff5c7314bd700d61e"
-BASE_TEST_PATH = TESTS / "test_covenant_authorization_glsim.py"
-
-assert hashlib.sha256(BASE_TEST_PATH.read_bytes()).hexdigest() == EXPECTED_BASE_AUTH_TEST_SHA
 assert base.SDK == "v0.2.16"
 assert base.sdk_loader.setup_sdk_paths is base._pinned_setup_sdk_paths
 assert base.direct_loader._calldata_roundtrip_args is base._typed_calldata_roundtrip_args

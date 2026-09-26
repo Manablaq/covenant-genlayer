@@ -142,6 +142,12 @@ The current reviewed Web Access documentation does not establish a redirect/fina
 
 Therefore runtime implementation and tests must prove the transport behavior before redirected evidence can be accepted.
 
+Authorization conservatively refuses any returned `Location` header with
+`REPAIR_EVIDENCE_REFERENCE_INVALID`. This rejects an exposed redirect response,
+but it is not an effective-URL proof if the supported runtime follows a
+redirect and omits the final URL and redirect history from `Response`. That
+runtime behavior remains a hard live-release gate.
+
 Until such proof exists, an implementation must not deliberately treat a transition to an unapproved publisher origin as authoritative evidence.
 
 Bradbury is not used to discover this behavior by trial and error.
@@ -243,6 +249,15 @@ It must be at least:
 `required_primary_count + required_corroboration_count`
 
 The cap prevents unbounded evidence growth and does not weaken the distinct-authority requirement.
+
+## Evidence body bound
+
+Each mandate version also commits `max_evidence_body_bytes`. It must be
+positive and no greater than `8,192` bytes. Authorization rejects a fetched
+response body above that mandate-bound limit with
+`REPAIR_EVIDENCE_BODY_TOO_LARGE` before hashing, decoding or placing the body
+in the semantic prompt. The limit is part of the evidence-policy commitment,
+so it cannot be changed without publishing a new mandate version.
 
 ## Freshness policy
 
@@ -471,12 +486,12 @@ Once the deadline is reached, repair and approval attempts are rejected and the 
 
 A source fetch failure, timeout, malformed response, correctable integrity failure, stale replaceable evidence, invalid replaceable authority/reference, missing corroboration or missing human approval must not be silently mislabeled as semantic denial while the repair window remains open.
 
-## Policy reference vectors
+## Historical policy reference vectors
 
 The reference policy-model probe freezes:
 
 - deterministic policy hash: `d38e38d6e9fec4476f52d92a20b2bed139b46c6d431c41416d085bb6392bc57f`;
-- evidence policy hash: `85d37b6ed0b45a20bed81f90aea4b13cd7d9ab4709ef7ca47ba064055bae512d`;
+- evidence policy hash: `85d37b6ed0b45a20bed81f90aea4b13cd7d9ab4709ef7ca47ba064055bae512d` (historical; superseded by the body-limit field);
 - human NONE policy hash: `0f8507fca3fa51f0b6826f09b7ba23db7e099c6ae016559257b9d3af4cb3aa45`;
 - human SINGLE_ADDRESS policy hash: `d78747c780416c71fe56d8f00e030a008c374d6683a74573be5c2130f3e1635b`.
 

@@ -878,7 +878,8 @@ Repair/source-failure behavior must also be exercised at the full-runtime layer 
 The following additional invariants are frozen:
 
 1. repair reason `NONE` is never an active `REPAIR_REQUIRED` reason;
-2. only codes `1..9` may explain `REPAIR_REQUIRED`;
+2. only codes `1..10` may explain `REPAIR_REQUIRED`; code `10` means the
+   fetched evidence body exceeded the mandate-bound resource limit;
 3. unchanged-evidence permissionless retry is limited to source unavailable, timeout or malformed;
 4. evidence replacement is agent-only;
 5. evidence replacement never changes Request ID or Action Subject;

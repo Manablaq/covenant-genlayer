@@ -1,0 +1,34 @@
+{
+  "manifest_version": 1,
+  "status": "UNRELEASED",
+  "chain": {
+    "chain_id": 61999,
+    "validator_count": 5,
+    "runtime": "local GenLayer runtime; live release finality is unproven"
+  },
+  "source_hashes": {
+    "covenant_authorization.py": "ce2f47c0152100a06dd1f464ee1a75a8e6745ee3505a27b4d90eb08a99bb518c",
+    "covenant_mandates.py": "6ecd7028ff8428b246aca8d320ac43b17e070d3136f17d86af08fe6fe6598ae8"
+  },
+  "deployed_addresses": {
+    "mandates": null,
+    "authorization": null
+  },
+  "diagnostic_deployment": {
+    "mandates": "0x5346943019730Ff7C193D75e6067e1d317a09777",
+    "authorization": "0x4d8Cd6Caa7D7681AeF2E3B6e21FFB3238eCb4814",
+    "deployment_transaction": "0x79995bc51bed6a8e7930412e7b018141d70a751a3618127d28839d0f154950dc",
+    "source_parity": false
+  },
+  "transactions": {
+    "authorization_deployment": null,
+    "g11_create_request": null,
+    "approval": null,
+    "rejection": null
+  },
+  "notes": [
+    "The historical diagnostic deployment is not source-parity evidence for this candidate.",
+    "No release address or transaction is asserted until reviewed source is deployed and finalized.",
+    "Do not treat this manifest as a production deployment certificate."
+  ]
+}

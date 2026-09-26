@@ -418,7 +418,7 @@ Its exact policy commitments are:
 
 - deterministic policy: `d38e38d6e9fec4476f52d92a20b2bed139b46c6d431c41416d085bb6392bc57f`;
 - semantic criteria: `a9aef1d6bea6c93475eaa8d3d5c8695ff83317e41902ccc229afb1dc630ebbdc`;
-- evidence policy: `85d37b6ed0b45a20bed81f90aea4b13cd7d9ab4709ef7ca47ba064055bae512d`;
+- evidence policy: `85d37b6ed0b45a20bed81f90aea4b13cd7d9ab4709ef7ca47ba064055bae512d` (historical; superseded by the body-limit field);
 - human policy: `0f8507fca3fa51f0b6826f09b7ba23db7e099c6ae016559257b9d3af4cb3aa45`;
 - risk tier: `2`.
 
@@ -650,15 +650,14 @@ U256(2)
 || U256(max_observation_age_seconds)
 || U256(max_publish_observe_gap_seconds)
 || U256(max_evidence_records)
+|| U256(max_evidence_body_bytes)
 || U256(authority_rule_count)
 || sorted_authority_rule_hashes[32 each]
 ```
 
-The reference evidence-policy preimage is 352 bytes.
-
-Reference evidence-policy hash:
-
-`85d37b6ed0b45a20bed81f90aea4b13cd7d9ab4709ef7ca47ba064055bae512d`
+The previous reference preimage/hash is superseded because the committed body
+limit is now part of the evidence policy. Its length is `384` bytes for the
+three-rule reference shape.
 
 ### Human co-authorization policy encoding
 
