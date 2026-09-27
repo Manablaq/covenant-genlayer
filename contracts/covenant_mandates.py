@@ -30,13 +30,13 @@ def _text_hash(value:str)->bytes:
     return _hash(value.encode("utf-8"))
 def _require_text_limit(value:str,field_name:str,maximum:int)->None:
     if len(value.encode("utf-8"))>maximum:
-        raise gl.vm.UserError(field_name+" exceeds protocol size limit")
+        raise gl.vm.UserError(field_name+" LEN")
 def _require_positive(value:u256,field_name:str)->None:
     if int(value)<=0:
-        raise gl.vm.UserError(field_name+" must be positive")
+        raise gl.vm.UserError(field_name+" POS")
 def _require_collection_limit(values:typing.Any,field_name:str)->None:
     if len(values)>MAX_POLICY_COLLECTION_ITEMS:
-        raise gl.vm.UserError(field_name+" exceeds protocol item limit")
+        raise gl.vm.UserError(field_name+" ITEMS")
 def _safe_https_reference(value:str,require_trailing_slash:bool)->bool:
     if not value.startswith("https://"):
         return False
@@ -58,19 +58,19 @@ def _safe_https_reference(value:str,require_trailing_slash:bool)->bool:
     return True
 def _require_digest(value:bytes,field_name:str)->None:
     if len(value)!=32:
-        raise gl.vm.UserError(field_name+" must be exactly 32 bytes")
+        raise gl.vm.UserError(field_name+" DIGEST")
 def _canonical_digest_list(values:list[bytes],field_name:str,require_non_empty:bool)->list[bytes]:
     copied:list[bytes]=[]
     for value in values:
         _require_digest(value,field_name)
         copied.append(value)
     if require_non_empty and len(copied)==0:
-        raise gl.vm.UserError(field_name+" must not be empty")
+        raise gl.vm.UserError(field_name+" EMPTY")
     copied.sort()
     index=1
     while index<len(copied):
         if copied[index]==copied[index-1]:
-            raise gl.vm.UserError(field_name+" contains a duplicate commitment")
+            raise gl.vm.UserError(field_name+" DUP")
         index+=1
     return copied
 def _mandate_key(mandate_id:bytes)->str:
@@ -121,18 +121,18 @@ class CovenantMandates(gl.Contract):
     def _require_mandate(self,mandate_id:bytes)->str:
         key=_mandate_key(mandate_id)
         if not self.a.get(key,False):
-            raise gl.vm.UserError("unknown mandate")
+            raise gl.vm.UserError("M_UNKNOWN")
         return key
     def _require_version(self,mandate_id:bytes,version:u256)->str:
         self._require_mandate(mandate_id)
         key=_version_key(mandate_id,version)
         if not self.e.get(key,False):
-            raise gl.vm.UserError("unknown mandate version")
+            raise gl.vm.UserError("V_UNKNOWN")
         return key
     def _require_issuer(self,mandate_id:bytes)->str:
         key=self._require_mandate(mandate_id)
         if gl.message.sender_address!=self.b[key]:
-            raise gl.vm.UserError("only the mandate issuer may perform this operation")
+            raise gl.vm.UserError("ISSUER_ONLY")
         return key
     def _version_value(self,mandate_id:bytes,version:u256,target:typing.Any)->typing.Any:
         return target[self._require_version(mandate_id,version)]
@@ -145,7 +145,7 @@ class CovenantMandates(gl.Contract):
         _require_positive(e,"max_request_lifetime_seconds")
         _require_positive(f,"repair_window_seconds")
         if int(f)>int(e):
-            raise gl.vm.UserError("repair_window_seconds exceeds request lifetime")
+            raise gl.vm.UserError("REPAIR_WINDOW")
         _require_collection_limit(g,"allowed_action_hashes")
         _require_collection_limit(h,"allowed_target_commitments")
         _require_collection_limit(i,"allowed_recipient_commitments")
@@ -153,28 +153,28 @@ class CovenantMandates(gl.Contract):
         targets=_canonical_digest_list(h,"allowed_target_commitments",False,)
         recipients=_canonical_digest_list(i,"allowed_recipient_commitments",False,)
         if j=="":
-            raise gl.vm.UserError("semantic_criteria must not be empty")
+            raise gl.vm.UserError("SEMANTIC_EMPTY")
         _require_text_limit(j,"semantic_criteria",MAX_SEMANTIC_CRITERIA_BYTES,)
         _require_positive(q,"max_evidence_body_bytes")
         if int(q)>MAX_EVIDENCE_BODY_BYTES:
-            raise gl.vm.UserError("max_evidence_body_bytes exceeds protocol limit")
+            raise gl.vm.UserError("BODY_MAX")
         if int(k)!=1:
-            raise gl.vm.UserError("Covenant v1 requires exactly one primary authority")
+            raise gl.vm.UserError("PRIMARY_COUNT")
         for value,field_name in((m,"max_publication_age_seconds"),(n,"max_observation_age_seconds"),(o,"max_publish_observe_gap_seconds")):
             _require_positive(value,field_name)
         minimum_records=int(k)+int(l)
         if int(p)<minimum_records:
-            raise gl.vm.UserError("max_evidence_records is below required authority count")
+            raise gl.vm.UserError("RECORDS_MIN")
         if int(p)>MAX_EVIDENCE_RECORDS:
-            raise gl.vm.UserError("max_evidence_records exceeds protocol limit")
+            raise gl.vm.UserError("RECORDS_MAX")
         _require_collection_limit(r,"authority_role_masks")
         _require_collection_limit(s,"authority_ids")
         _require_collection_limit(t,"authority_publisher_names")
         _require_collection_limit(u,"authority_source_prefixes")
         rule_count=len(s)
         if rule_count==0:
-            raise gl.vm.UserError("at least one authority rule is required")
-        for values,error in((r,"authority role-mask count mismatch"),(t,"authority publisher-name count mismatch"),(u,"authority source-prefix count mismatch")):
+            raise gl.vm.UserError("RULES_EMPTY")
+        for values,error in((r,"ROLE_COUNT"),(t,"PUBLISHER_COUNT"),(u,"SOURCE_COUNT")):
             if len(values)!=rule_count:
                 raise gl.vm.UserError(error)
         rule_hashes:list[bytes]=[]
@@ -185,25 +185,25 @@ class CovenantMandates(gl.Contract):
             publisher_name=t[index]
             source_prefix=u[index]
             if role_mask not in(ROLE_PRIMARY,ROLE_CORROBORATION,ROLE_BOTH):
-                raise gl.vm.UserError("invalid authority role mask")
+                raise gl.vm.UserError("ROLE_INVALID")
             _require_digest(authority_id,"authority_id")
             if publisher_name=="":
-                raise gl.vm.UserError("publisher_name must not be empty")
+                raise gl.vm.UserError("PUBLISHER_EMPTY")
             _require_text_limit(publisher_name,"publisher_name",MAX_AUTHORITY_PUBLISHER_NAME_BYTES,)
             _require_text_limit(source_prefix,"authority source prefix",MAX_AUTHORITY_SOURCE_PREFIX_BYTES,)
             if not _safe_https_reference(source_prefix,True):
-                raise gl.vm.UserError("authority source prefix is not canonical safe HTTPS")
+                raise gl.vm.UserError("SOURCE_INVALID")
             rule_hashes.append(_authority_rule_hash(role_mask,authority_id,publisher_name,source_prefix,))
             index+=1
         canonical_rule_hashes=_canonical_digest_list(rule_hashes,"authority_rule_hashes",True,)
         if v==HUMAN_NONE:
             if w.as_bytes!=ZERO_ADDRESS_BYTES:
-                raise gl.vm.UserError("human NONE mode requires zero approver address")
+                raise gl.vm.UserError("HUMAN_ZERO")
         elif v==HUMAN_SINGLE_ADDRESS:
             if w.as_bytes==ZERO_ADDRESS_BYTES:
-                raise gl.vm.UserError("human SINGLE_ADDRESS mode requires non-zero approver")
+                raise gl.vm.UserError("HUMAN_ADDRESS")
         else:
-            raise gl.vm.UserError("invalid human co-authorization mode")
+            raise gl.vm.UserError("HUMAN_MODE")
         deterministic_preimage=(_u256_bytes(POLICY_DETERMINISTIC)+_u256_bytes(d)+_u256_bytes(e)+_u256_bytes(f)+_u256_bytes(u256(len(actions)))+b"".join(actions)+_u256_bytes(u256(len(targets)))+b"".join(targets)+_u256_bytes(u256(len(recipients)))+b"".join(recipients))
         deterministic_policy_hash=_hash(deterministic_preimage)
         semantic_criteria_hash=_text_hash(j)
@@ -215,7 +215,7 @@ class CovenantMandates(gl.Contract):
         mandate_commitment=_hash(mandate_preimage)
         key=_version_key(a,b)
         if self.e.get(key,False):
-            raise gl.vm.UserError("mandate version already exists")
+            raise gl.vm.UserError("VERSION_EXISTS")
         self.e[key]=True
         self.f[key]=True
         self.g[key]=mandate_commitment
@@ -251,11 +251,11 @@ class CovenantMandates(gl.Contract):
         issuer=gl.message.sender_address
         nonce_key=_issuer_nonce_key(issuer,issuer_nonce)
         if self.d.get(nonce_key,False):
-            raise gl.vm.UserError("issuer nonce already used")
+            raise gl.vm.UserError("NONCE_USED")
         mandate_id=_hash(DOMAIN_MANDATE_ID+_u256_bytes(gl.message.chain_id)+gl.message.contract_address.as_bytes+issuer.as_bytes+_u256_bytes(issuer_nonce))
         mandate_key=_mandate_key(mandate_id)
         if self.a.get(mandate_key,False):
-            raise gl.vm.UserError("mandate identifier collision")
+            raise gl.vm.UserError("ID_COLLISION")
         self._publish_version_data(mandate_id,u256(1),issuer,max_value,max_request_lifetime_seconds,repair_window_seconds,allowed_action_hashes,allowed_target_commitments,allowed_recipient_commitments,semantic_criteria,required_primary_count,required_corroboration_count,max_publication_age_seconds,max_observation_age_seconds,max_publish_observe_gap_seconds,max_evidence_records,max_evidence_body_bytes,authority_role_masks,authority_ids,authority_publisher_names,authority_source_prefixes,human_mode,human_approver,risk_tier,)
         self.d[nonce_key]=True
         self.a[mandate_key]=True
