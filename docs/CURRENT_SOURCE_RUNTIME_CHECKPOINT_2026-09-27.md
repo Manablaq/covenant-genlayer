@@ -1,8 +1,9 @@
 # Current-source supported-runtime checkpoint — 2026-09-27
 
-This checkpoint records the exact current-source backend through complete
-supported-local-runtime behavioral closure. It does not claim a public or
-Bradbury deployment, production release, or Gate J freeze.
+This checkpoint records the pre-redesign source through complete supported-local
+runtime behavioral closure. It is historical after the deployment-size redesign
+and does not claim that the redesigned source has local or Bradbury deployment
+parity, production release, or Gate J freeze.
 
 ## Frozen source identity
 
@@ -16,6 +17,11 @@ Bradbury deployment, production release, or Gate J freeze.
 - Authorization: `0xEBb2863137Dff7e96886090D303373E8Ec9CF5B8`
 
 The live contract source hashes match the frozen repository source hashes.
+
+That statement applies to the pre-redesign source recorded below. The redesigned
+repository candidate is recorded in `deployments/release-manifest.json` with
+Mandates SHA-256
+`76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244`.
 
 ## Deployment and mandate setup
 
@@ -93,9 +99,10 @@ under `work/phase6d-current-redirect-probe-20260927-current/`.
 
 ## Release boundary
 
-The backend contract implementation and all supported-local-runtime behavioral
-gates are complete for this source candidate. The repository remains
-`UNRELEASED` because the following are external release gates, not bypassed:
+The pre-redesign backend contract implementation and supported-local-runtime
+behavioral gates were complete. The repository remains `UNRELEASED` because the
+redesigned source must first be redeployed and re-certified, followed by these
+external release gates:
 
 - Bradbury runtime provenance and redirect compatibility;
 - Bradbury deployment and Gate I live verification;
@@ -103,17 +110,18 @@ gates are complete for this source candidate. The repository remains
 
 The exact release state is machine-readable in
 `deployments/release-manifest.json`. Historical predecessor-source evidence is
-not used as current-source proof. Two current-source Bradbury deployment paths
+not used as current-source proof. Two pre-redesign Bradbury deployment paths
 were rejected before acceptance because the network reported `gas limit too
 high`; the returned identities were not visible through
 `eth_getTransactionByHash`, the sender nonce remained unchanged, and no
 Bradbury transaction or deployment address is recorded as successful.
 
-The exact current-source signed transaction used gas limit `17,060,259` and
+The pre-redesign exact-source signed transaction used gas limit `17,060,259` and
 was bound to fingerprint
 `1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399`. A
 read-only probe returned `execution reverted` for gas caps through
 `16,777,216`, so lowering the gas limit would be an unsafe out-of-gas guess,
-not a valid deployment recovery. Bradbury deployment and Gate I therefore
-remain externally blocked pending a supported network deployment envelope or a
-separately reviewed source-size/gas reduction.
+not a valid deployment recovery. The redesigned source was subsequently
+estimated read-only at `16,516,600` gas, below the observed `16,777,216` ceiling;
+no signing or submission was performed for that estimate. Local redeployment
+and full live re-certification are still required.

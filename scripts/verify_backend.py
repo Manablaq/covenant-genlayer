@@ -100,15 +100,20 @@ def main() -> int:
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
     current = manifest["current_candidate"]
-    assert current["live_source_parity"] is True
-    assert current["source_commit"] == "3601eb4c1715afe9a607a4685ec290338913bf7c"
-    assert current["parity_scope"] == "supported local runtime only; not public/Bradbury"
+    assert current["live_source_parity"] is False
+    assert current["source_commit"] == "1f2c26e07785ef2d1d9095c804334a2382b47e9c"
+    assert current["parity_scope"] == "redesigned repository candidate; live deployment parity must be re-established before release"
     assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
+    redesign = manifest["bradbury_deployment_attempts"]["redesign_candidate_estimate"]
+    assert redesign["source_sha256"] == sha256(MANDATES)
+    assert redesign["eth_estimateGas"] < redesign["observed_submission_ceiling"]
+    assert redesign["signing_performed"] is False
+    assert redesign["submission_performed"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
-    assert checkpoint["status"] == "CURRENT_SOURCE_LIVE_BEHAVIORAL_CLOSURE_COMPLETE_LOCAL_ONLY"
-    assert checkpoint["source_commit"] == current["source_commit"]
+    assert checkpoint["status"] == "PRE_REDESIGN_HISTORICAL_LOCAL_RUNTIME_CLOSURE"
+    assert checkpoint["source_commit"] == "3601eb4c1715afe9a607a4685ec290338913bf7c"
     assert checkpoint["chain_id"] == 61999
     assert checkpoint["validator_count"] == 5
     assert checkpoint["deployed_addresses"]["mandates"] == "0xdFEce9C4ae3124B8de273B75227F6DC1DE30297C"

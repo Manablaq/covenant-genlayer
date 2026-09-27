@@ -36,16 +36,17 @@ Changing a consequential field invalidates the authorization.
 
 ## Current release status
 
-**UNRELEASED CURRENT CANDIDATE — exact-source deployment parity is now proven
-on the supported local runtime, and a current mandate has finalized with stored
-state parity. Current-source request/evaluation behavioral closure and
-Production/Bradbury deployment are still pending.**
+**UNRELEASED CURRENT CANDIDATE — the Mandates source has been redesigned to fit
+Bradbury’s observed gas ceiling without removing protocol features. Deterministic
+and adversarial parity passes; local redeployment, live behavioral re-certification,
+and Production/Bradbury deployment remain pending.**
 
-The repaired candidate has mandate-bound evidence-body limits, bounded
-user-controlled inputs, one-time verified mandate-policy loading, and complete
-deterministic/adversarial/GLSim/runtime-calldata coverage. The exact current
-Mandates and Authorization sources are deployed on the supported local runtime
-and their wiring is proven. A current mandate also finalized successfully.
+The candidate retains mandate-bound evidence-body limits, bounded user-controlled
+inputs, one-time verified mandate-policy loading, all public Mandates methods,
+validation branches, commitment preimages, storage values, and state transitions.
+The compact diagnostic-code redesign passes Direct, GLSim, adversarial,
+runtime-calldata, reference-vector, and Gate D coverage. The redesigned source
+has not yet been redeployed to the local runtime.
 
 The first current-source approval `create_request` candidate did **not** reach
 the chain: mandatory pre-sign freshness revalidation found evidence observation

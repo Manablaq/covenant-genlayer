@@ -1,8 +1,8 @@
 {
-  "manifest_version": 5,
+  "manifest_version": 6,
   "status": "UNRELEASED",
-  "release_scope": "current backend source candidate; exact-source supported-local-runtime deployment and behavioral closure proven; Bradbury/public release remains separately gated",
-  "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_BEHAVIORAL_CLOSURE_COMPLETE_BRADBURY_PENDING",
+  "release_scope": "redesigned backend source candidate; deterministic and adversarial parity proven; local redeployment and Bradbury/public release remain separately gated",
+  "candidate_state": "CURRENT_SOURCE_BRADBURY_FIT_REDESIGN_LOCAL_REDEPLOY_PENDING",
   "production_deployment": {
     "status": "UNRELEASED",
     "reason": "No public or Bradbury deployment is claimed for the current source candidate.",
@@ -50,16 +50,28 @@
       "cap_17060259_estimate_result": 17060259,
       "conclusion": "The exact current-source deployment requires more gas than the accepted Bradbury deployment envelope. No lower-gas submission is safe or release-valid."
     },
+    "redesign_candidate_estimate": {
+      "source_sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+      "source_bytes": 19852,
+      "payload_bytes": 39722,
+      "eth_estimateGas": 16516600,
+      "observed_submission_ceiling": 16777216,
+      "margin_below_ceiling": 26616,
+      "status": "READ_ONLY_ESTIMATE_PASS",
+      "signing_performed": false,
+      "submission_performed": false,
+      "feature_parity": "all public methods, validation branches, commitment preimages, storage values, and state transitions retained; only revert diagnostics were compacted"
+    },
     "release_effect": "Bradbury deployment and Gate I remain unproven; production status must remain UNRELEASED."
   },
   "current_candidate": {
     "source_hashes": {
       "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
-      "covenant_mandates.py": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
+      "covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
     },
-    "live_source_parity": true,
-    "source_commit": "3601eb4c1715afe9a607a4685ec290338913bf7c",
-    "parity_scope": "supported local runtime only; not public/Bradbury"
+    "live_source_parity": false,
+    "source_commit": "1f2c26e07785ef2d1d9095c804334a2382b47e9c",
+    "parity_scope": "redesigned repository candidate; live deployment parity must be re-established before release"
   },
   "historical_local_live_proof": {
     "status": "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY",
@@ -96,17 +108,17 @@
   },
   "notes": [
     "Historical local-runtime transactions prove the predecessor source only.",
-    "Current source now has exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity.",
-    "Current-source approval, rejection, repair/replacement, timeout/expiry, receipt consumption, replay rejection, and redirect provenance are closed on the supported local runtime with persisted finality/state evidence under the operator work roots.",
+    "The pre-redesign source had exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity; those deployments are historical after the deployment-size redesign.",
+    "The redesigned source retains the public surface, validation branches, commitment preimages, storage values, and state transitions. Deterministic, GLSim, runtime-calldata, adversarial, and Gate D tests pass against the redesigned source; live closure must be rerun after local redeployment.",
     "The first current-source approval request entered repair because its evidence became stale; a later finalized approval request reached AUTHORIZED, and a separate finalized request reached DENIED.",
     "The supported runtime redirect probe returned status 302 and Location without following the redirect; this is local runtime provenance only.",
     "Two exact/current-source Bradbury Mandates deployment paths were rejected before acceptance with gas limit too high; returned identities 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 and 0xdfa2ed87220298fccc574bbe747ed52ec006d46e6e62045f51cf4202b4fb608d were not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
     "The exact current-source deployment fingerprint 1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399 was authorized, signed once, and submitted once; the network rejected it before acceptance. The sender nonce remained 1369, proving no accepted deployment transaction.",
-    "Read-only Bradbury gas probing showed execution reverted through a 16,777,216 gas cap while the exact-source estimate was approximately 17.06M; lowering gas would risk an out-of-gas deployment and is not used.",
+    "The redesigned source was estimated read-only on Bradbury at 16,516,600 gas, below the observed 16,777,216 ceiling; no signing or submission was performed for this estimate.",
     "Bradbury/public deployment remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {
-    "status": "CURRENT_SOURCE_LIVE_BEHAVIORAL_CLOSURE_COMPLETE_LOCAL_ONLY",
+    "status": "PRE_REDESIGN_HISTORICAL_LOCAL_RUNTIME_CLOSURE",
     "source_commit": "3601eb4c1715afe9a607a4685ec290338913bf7c",
     "chain_id": 61999,
     "validator_count": 5,
