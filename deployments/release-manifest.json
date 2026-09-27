@@ -1,5 +1,5 @@
 {
-  "manifest_version": 4,
+  "manifest_version": 5,
   "status": "UNRELEASED",
   "release_scope": "current backend source candidate; exact-source supported-local-runtime deployment and behavioral closure proven; Bradbury/public release remains separately gated",
   "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_BEHAVIORAL_CLOSURE_COMPLETE_BRADBURY_PENDING",
@@ -11,6 +11,46 @@
       "Bradbury deployment and Gate I live verification",
       "Gate J reviewer evidence freeze"
     ]
+  },
+  "bradbury_deployment_attempts": {
+    "network": "https://rpc-bradbury.genlayer.com",
+    "chain_id": 4221,
+    "consensus": "0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D",
+    "source_sha256": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2",
+    "status": "BLOCKED_PRE_ACCEPTANCE",
+    "attempts": [
+      {
+        "method": "genlayer_cli_deploy",
+        "status": "REJECTED_PRE_ACCEPTANCE",
+        "rpc_error": "gas limit too high",
+        "rpc_error_identity": "0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403",
+        "eth_getTransactionByHash": null,
+        "deployment_address": null
+      },
+      {
+        "method": "exact_source_signed_raw_transaction",
+        "status": "REJECTED_PRE_ACCEPTANCE",
+        "sender": "0x1f87Ae197af539253978d435aD45cCf28Fb95024",
+        "nonce": 1369,
+        "gas_estimate": 17060259,
+        "gas_limit": 17060259,
+        "unsigned_fingerprint_sha256": "1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399",
+        "rpc_error": "gas limit too high",
+        "rpc_error_identity": "0xdfa2ed87220298fccc574bbe747ed52ec006d46e6e62045f51cf4202b4fb608d",
+        "eth_getTransactionByHash": null,
+        "deployment_address": null
+      }
+    ],
+    "read_only_limits_probe": {
+      "latest_nonce_after_attempt": 1369,
+      "pending_nonce_after_attempt": 1369,
+      "latest_block_gas_limit": 100000000,
+      "eth_estimateGas_without_cap": 17076600,
+      "caps_reverting_with_execution_reverted": [15000000, 15900000, 16000000, 16777216],
+      "cap_17060259_estimate_result": 17060259,
+      "conclusion": "The exact current-source deployment requires more gas than the accepted Bradbury deployment envelope. No lower-gas submission is safe or release-valid."
+    },
+    "release_effect": "Bradbury deployment and Gate I remain unproven; production status must remain UNRELEASED."
   },
   "current_candidate": {
     "source_hashes": {
@@ -60,7 +100,9 @@
     "Current-source approval, rejection, repair/replacement, timeout/expiry, receipt consumption, replay rejection, and redirect provenance are closed on the supported local runtime with persisted finality/state evidence under the operator work roots.",
     "The first current-source approval request entered repair because its evidence became stale; a later finalized approval request reached AUTHORIZED, and a separate finalized request reached DENIED.",
     "The supported runtime redirect probe returned status 302 and Location without following the redirect; this is local runtime provenance only.",
-    "A Bradbury Mandates deployment attempt was rejected before acceptance with gas limit too high; returned identity 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 was not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
+    "Two exact/current-source Bradbury Mandates deployment paths were rejected before acceptance with gas limit too high; returned identities 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 and 0xdfa2ed87220298fccc574bbe747ed52ec006d46e6e62045f51cf4202b4fb608d were not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
+    "The exact current-source deployment fingerprint 1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399 was authorized, signed once, and submitted once; the network rejected it before acceptance. The sender nonce remained 1369, proving no accepted deployment transaction.",
+    "Read-only Bradbury gas probing showed execution reverted through a 16,777,216 gas cap while the exact-source estimate was approximately 17.06M; lowering gas would risk an out-of-gas deployment and is not used.",
     "Bradbury/public deployment remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {

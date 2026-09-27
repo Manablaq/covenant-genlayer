@@ -103,6 +103,17 @@ gates are complete for this source candidate. The repository remains
 
 The exact release state is machine-readable in
 `deployments/release-manifest.json`. Historical predecessor-source evidence is
-not used as current-source proof. A Bradbury deployment attempt was rejected
-before acceptance because the network reported `gas limit too high`; no
+not used as current-source proof. Two current-source Bradbury deployment paths
+were rejected before acceptance because the network reported `gas limit too
+high`; the returned identities were not visible through
+`eth_getTransactionByHash`, the sender nonce remained unchanged, and no
 Bradbury transaction or deployment address is recorded as successful.
+
+The exact current-source signed transaction used gas limit `17,060,259` and
+was bound to fingerprint
+`1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399`. A
+read-only probe returned `execution reverted` for gas caps through
+`16,777,216`, so lowering the gas limit would be an unsafe out-of-gas guess,
+not a valid deployment recovery. Bradbury deployment and Gate I therefore
+remain externally blocked pending a supported network deployment envelope or a
+separately reviewed source-size/gas reduction.
