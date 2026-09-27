@@ -19,6 +19,6 @@ For this local candidate, the no-redirect behavior was active in JSON-RPC and
 the consensus workers during the persisted redirect probe. The pinned source
 commit, patch hash, built modules binary hash, active web configuration hash,
 and mounted components are recorded in
-`deployments/release-manifest.json`. The backend source release is therefore
-`RELEASED`; the nested `production_deployment` status remains `UNRELEASED`
-until a public or Bradbury deployment is separately authorized and verified.
+`deployments/release-manifest.json`. The historical local-runtime proof is retained, but the current source candidate
+is `UNRELEASED` until exact-source full-runtime parity is re-established. Public
+or Bradbury deployment remains separately gated.

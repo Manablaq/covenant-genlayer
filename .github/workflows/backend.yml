@@ -21,12 +21,16 @@ jobs:
         run: python scripts/verify_backend.py
       - name: Compile Python sources
         run: python -m compileall -q contracts tests scripts
-      - name: Direct Mandates tests
+      - name: Direct Mandates tests and exact SDK cache
         env:
           COVENANT_REPO: ${{ github.workspace }}
           GENVM_VERSION: v0.2.16
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
         run: pytest -q tests/test_covenant_mandates_direct.py
+      - name: Gate C exact-source verification
+        env:
+          GENVM_VERSION: v0.2.16
+        run: python scripts/gate_c_verify.py --genvm-lint "$(command -v genvm-lint)" --pyright "$(command -v pyright)"
       - name: GLSim Authorization tests
         env:
           COVENANT_REPO: ${{ github.workspace }}

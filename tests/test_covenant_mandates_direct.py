@@ -9,7 +9,7 @@ pytest_plugins = ("gltest.direct.pytest_plugin",)
 REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])).resolve()
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 SDK = "v0.2.16"
-EXPECTED_SHA = "3c44201f0591d25f4e6c22507e3854de382b81e5ea5299e75d2cb27e5295097b"
+EXPECTED_SHA = "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
 
@@ -181,6 +181,52 @@ def test_m06_protocol_size_boundaries(
     else:
         with pytest.raises(Exception):
             contract.create_mandate(*policy_args(Address, u256, **kwargs))
+
+
+
+def test_m08_protocol_collection_limits(direct_vm, direct_deploy):
+    contract, Address, u256 = deployed(direct_vm, direct_deploy)
+
+    args = policy_args(Address, u256, nonce=890)
+    args[13] = u256(8)
+    contract.create_mandate(*args)
+
+    args = policy_args(Address, u256, nonce=891)
+    args[13] = u256(9)
+    with pytest.raises(Exception):
+        contract.create_mandate(*args)
+
+    args = policy_args(Address, u256, nonce=892)
+    args[4] = [hashlib.sha256(f"ACTION-{i}".encode()).digest() for i in range(9)]
+    with pytest.raises(Exception):
+        contract.create_mandate(*args)
+
+    args = policy_args(Address, u256, nonce=893)
+    ids = [hashlib.sha256(f"AUTH-{i}".encode()).digest() for i in range(9)]
+    args[15] = [u256(1)] + [u256(2)] * 8
+    args[16] = ids
+    args[17] = [f"Authority {i}" for i in range(9)]
+    args[18] = [f"https://a{i}.example/evidence/" for i in range(9)]
+    with pytest.raises(Exception):
+        contract.create_mandate(*args)
+
+
+@pytest.mark.parametrize(
+    "source_prefix",
+    [
+        "https://a.example/evidence/../escape/",
+        "https://a.example/evidence/%2e%2e/escape/",
+        "https://user@a.example/evidence/",
+        "https://a.example/evidence/?query=1",
+        "https://a.example/evidence/#fragment",
+    ],
+)
+def test_m09_ambiguous_source_prefixes_are_rejected(direct_vm, direct_deploy, source_prefix):
+    contract, Address, u256 = deployed(direct_vm, direct_deploy)
+    with pytest.raises(Exception):
+        contract.create_mandate(
+            *policy_args(Address, u256, nonce=900 + len(source_prefix), source_prefix=source_prefix)
+        )
 
 
 def test_m07_body_limit_is_stored_and_commitment_bound(direct_vm, direct_deploy):

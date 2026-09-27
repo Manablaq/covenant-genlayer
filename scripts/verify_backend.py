@@ -64,6 +64,12 @@ def main() -> int:
     mandates_tree = ast.parse(mandates_source)
 
     assert "MAX_EVIDENCE_BODY_BYTES=8192" in mandates_source
+    assert "MAX_POLICY_COLLECTION_ITEMS=8" in mandates_source
+    assert "MAX_EVIDENCE_RECORDS=8" in mandates_source
+    assert "MAX_POLICY_COLLECTION_ITEMS=8" in authorization_source
+    assert "MAX_EVIDENCE_RECORDS=8" in authorization_source
+    assert "_safe_https_reference" in mandates_source
+    assert "def _sr(" in authorization_source
     assert "# pyright: reportUnknownMemberType=false" in mandates_source
     assert "# pyright: reportUnknownMemberType=false" in authorization_source
     assert "max_evidence_body_bytes" in mandates_source
@@ -90,15 +96,21 @@ def main() -> int:
     assert "reqwest::redirect::Policy::none()" in runtime_patch
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["status"] == "RELEASED"
+    assert manifest["status"] == "UNRELEASED"
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
-    assert production["genvm_source_commit"] == "387e1a66e920cb2dfadcdce40ab2d28da02efd1e"
-    assert production["runtime_patch_sha256"] == sha256(RUNTIME_PATCH)
-    assert production["runtime_configuration_sha256"] == "b3499f5307c7eb1f181cc7944f8d9383ec9ad9dd3cad1aba1d94589ed263fa28"
-    assert production["mounted_components"] == ["jsonrpc", "consensus-worker"]
-    assert manifest["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
-    assert manifest["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
+    current = manifest["current_candidate"]
+    assert current["live_source_parity"] is False
+    assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
+    assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
+    historical = manifest["historical_local_live_proof"]
+    assert historical["status"] == "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY"
+    runtime = manifest["runtime_provenance"]
+    assert runtime["local_proof_only"] is True
+    assert runtime["genvm_source_commit"] == "387e1a66e920cb2dfadcdce40ab2d28da02efd1e"
+    assert runtime["runtime_patch_sha256"] == sha256(RUNTIME_PATCH)
+    assert runtime["runtime_configuration_sha256"] == "b3499f5307c7eb1f181cc7944f8d9383ec9ad9dd3cad1aba1d94589ed263fa28"
+    assert runtime["mounted_components"] == ["jsonrpc", "consensus-worker"]
 
     result = {
         "status": "PASS",
@@ -109,10 +121,11 @@ def main() -> int:
             "covenant_authorization.py": sha256(AUTHORIZATION),
         },
         "runtime_patch_sha256": sha256(RUNTIME_PATCH),
-        "runtime_binary_sha256": production["runtime_binary_sha256"],
+        "runtime_binary_sha256": manifest["runtime_provenance"]["runtime_binary_sha256"],
         "policy_reads_in_evidence_helpers": 0,
         "evidence_body_limit_bytes": 8192,
         "manifest_status": manifest["status"],
+        "current_live_source_parity": current["live_source_parity"],
         "production_deployment_status": production["status"],
     }
 

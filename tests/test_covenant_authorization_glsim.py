@@ -13,8 +13,8 @@ REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 AUTHORIZATION = REPO / "contracts" / "covenant_authorization.py"
 
-EXPECTED_MANDATES_SHA = "3c44201f0591d25f4e6c22507e3854de382b81e5ea5299e75d2cb27e5295097b"
-EXPECTED_AUTH_SHA = "b8c055605db7d581b16882cc333940786dcd2f18993de64ebe5c96b480d93ef2"
+EXPECTED_MANDATES_SHA = "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
+EXPECTED_AUTH_SHA = "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed"
 SDK = "v0.2.16"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
@@ -890,7 +890,8 @@ def test_g15b_user_input_size_boundaries(kind, size, should_pass):
             elif kind == "record_id":
                 item.record_id = "x" * size
             elif kind == "immutable_reference":
-                item.immutable_reference = "https://" + "x" * max(0, size - 8)
+                prefix = "https://a.example/evidence/"
+                item.immutable_reference = prefix + "x" * max(0, size - len(prefix))
             elif kind == "version":
                 item.version = "x" * size
 
@@ -899,6 +900,28 @@ def test_g15b_user_input_size_boundaries(kind, size, should_pass):
         else:
             with pytest.raises(Exception):
                 create_request(ctx, nonce=1502 + size, evidence=evidence, **kwargs)
+    finally:
+        close_context(ctx)
+
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "https://a.example/evidence/../escape",
+        "https://a.example/evidence/%2e%2e/escape",
+        "https://user@a.example/evidence/a-1",
+        "https://a.example/evidence/a-1?query=1",
+        "https://a.example/evidence/a-1#fragment",
+    ],
+)
+def test_g15c_ambiguous_evidence_references_fail_closed(reference):
+    ctx = new_context()
+    try:
+        evidence, _ = make_evidence(ctx)
+        evidence[0].immutable_reference = reference
+        with pytest.raises(Exception):
+            create_request(ctx, nonce=1600 + len(reference), evidence=evidence)
     finally:
         close_context(ctx)
 

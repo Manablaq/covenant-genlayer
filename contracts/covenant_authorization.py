@@ -45,6 +45,8 @@ MAX_EVIDENCE_REFERENCE_BYTES=2048
 MAX_EVIDENCE_VERSION_BYTES=256
 MAX_EVIDENCE_BODY_BYTES=8192
 MAX_SEMANTIC_CRITERIA_BYTES=4096
+MAX_POLICY_COLLECTION_ITEMS=8
+MAX_EVIDENCE_RECORDS=8
 ROLE_PRIMARY=u256(1)
 ROLE_CORROBORATION=u256(2)
 ROLE_MASK_PRIMARY=u256(1)
@@ -69,6 +71,25 @@ def _lb(bc:bytes,bd:str,be:int)->None:
 def _l32(bc:bytes,bd:str)->None:
     if len(bc)!=32:
         raise U(bd+" must be 32 bytes")
+def _sr(bc:str,trail:bool)->bool:
+    if not bc.startswith("https://"):
+        return False
+    if any(c in bc for c in ("\\","?","#","%")):
+        return False
+    rest=bc[8:]
+    slash=rest.find("/")
+    if slash<=0:
+        return False
+    authority=rest[:slash]
+    if "@" in authority or any(c.isspace() for c in authority):
+        return False
+    path=bc[8+slash:]
+    if trail and not path.endswith("/"):
+        return False
+    for segment in path.split("/"):
+        if segment in (".",".."):
+            return False
+    return True
 def _rt(role:u256)->str:
     if role==ROLE_PRIMARY:
         return "PRIMARY"
@@ -258,8 +279,12 @@ class CovenantAuthorization(gl.Contract):
             raise U("mandates semantic criteria missing")
         if len(policy.n.encode("utf-8"))>MAX_SEMANTIC_CRITERIA_BYTES:
             raise U("mandates semantic criteria exceeds protocol limit")
-        if policy.l<=u256(0):
+        if policy.l<=u256(0)or policy.l>u256(MAX_EVIDENCE_RECORDS):
             raise U("mandates evidence record limit invalid")
+        if len(policy.d)>MAX_POLICY_COLLECTION_ITEMS or len(policy.e)>MAX_POLICY_COLLECTION_ITEMS or len(policy.f)>MAX_POLICY_COLLECTION_ITEMS:
+            raise U("mandates deterministic collection limit invalid")
+        if len(r)>MAX_POLICY_COLLECTION_ITEMS:
+            raise U("mandates authority collection limit invalid")
         if(len(r)!=len(policy.o)or len(r)!=len(policy.q)or len(r)!=len(policy.r)or len(r)!=len(policy.s)):
             raise U("mandates authority arrays mismatch")
         if len(r)==0:
@@ -270,6 +295,8 @@ class CovenantAuthorization(gl.Contract):
             _l32(r[bf],"authority_id")
             _lt(policy.q[bf],"publisher_name",MAX_EVIDENCE_PUBLISHER_NAME_BYTES,)
             _lt(policy.r[bf],"authority source prefix",MAX_EVIDENCE_REFERENCE_BYTES,)
+            if not _sr(policy.r[bf],True):
+                raise U("mandates authority source prefix is not canonical safe HTTPS")
             recomputed_rule=_h(_b(policy.o[bf])+r[bf]+_t(policy.q[bf])+_t(policy.r[bf]))
             if recomputed_rule!=policy.s[bf]:
                 raise U("mandates authority rule integrity failure")
@@ -347,6 +374,8 @@ class CovenantAuthorization(gl.Contract):
         _lt(bj.publisher_name,"publisher_name",MAX_EVIDENCE_PUBLISHER_NAME_BYTES,)
         _lt(bj.record_id,"record_id",MAX_EVIDENCE_RECORD_ID_BYTES,)
         _lt(bj.immutable_reference,"immutable_reference",MAX_EVIDENCE_REFERENCE_BYTES,)
+        if not _sr(bj.immutable_reference,False):
+            raise U("immutable_reference is not canonical safe HTTPS")
         _lt(bj.version,"evidence version",MAX_EVIDENCE_VERSION_BYTES,)
     def _se(self,a:bytes,b:bytes,q:list[EvidenceInput])->tuple[bytes,bytes]:
         o:list[bytes]=[]
@@ -388,7 +417,7 @@ class CovenantAuthorization(gl.Contract):
             if int(s[bf])&int(v)==0:
                 continue
             w=True
-            if r.e.startswith(u[bf]):
+            if _sr(r.e,False) and _sr(u[bf],True) and r.e.startswith(u[bf]):
                 return REPAIR_NONE
         if w:
             return REPAIR_EVIDENCE_REFERENCE_INVALID

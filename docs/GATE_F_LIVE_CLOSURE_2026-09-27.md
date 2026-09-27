@@ -1,12 +1,18 @@
+> Historical evidence notice: this document proves the source hashes recorded
+> below only. Later source revisions, including compaction/minification or
+> hardening changes, must not inherit these deployment addresses or finality
+> claims without a new exact-source deployment and verification run.
+
 # Gate F live closure — 2026-09-27
 
 This addendum supersedes the earlier Gate F blocker for the repaired source
 candidate. It records local-runtime evidence only. The raw machine-readable
 proof directories are retained in the operator's ignored local `work/`
 directory; this document records their finalized results and identities.
-The backend release manifest is `RELEASED` for the source and pinned local
-runtime candidate. Its nested `production_deployment` status stays
-`UNRELEASED` until public deployment gates close.
+This historical local-runtime proof is retained for its exact recorded source
+hashes. The current repository candidate is `UNRELEASED` until exact-source
+full-runtime parity is re-established; public/Bradbury deployment is also
+`UNRELEASED`.
 
 ## Frozen identity
 
@@ -65,6 +71,6 @@ The isolated suites passed: GLSim `49`, Direct Mandates `18`, adversarial `25`,
 runtime-calldata `3`, Gate D GLSim `2`, closure vectors `1`, and reference
 vectors `9` — `107` tests total. Repository verification reported `PASS`.
 
-The final release is intentionally not labelled complete in Git metadata until
-the clean-checkout CI and upstream synchronization gates are run against this
-closure evidence.
+Do not use this historical closure as source-parity evidence for a later
+repository revision. Every changed contract byte requires a new candidate
+identity and an independent deployment/finality proof before release.

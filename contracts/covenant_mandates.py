@@ -20,6 +20,8 @@ MAX_EVIDENCE_BODY_BYTES=8192
 MAX_SEMANTIC_CRITERIA_BYTES=4096
 MAX_AUTHORITY_PUBLISHER_NAME_BYTES=256
 MAX_AUTHORITY_SOURCE_PREFIX_BYTES=2048
+MAX_POLICY_COLLECTION_ITEMS=8
+MAX_EVIDENCE_RECORDS=8
 def _hash(value:bytes)->bytes:
     return hashlib.sha256(value).digest()
 def _u256_bytes(value:u256)->bytes:
@@ -32,6 +34,28 @@ def _require_text_limit(value:str,field_name:str,maximum:int)->None:
 def _require_positive(value:u256,field_name:str)->None:
     if int(value)<=0:
         raise gl.vm.UserError(field_name+" must be positive")
+def _require_collection_limit(values:typing.Any,field_name:str)->None:
+    if len(values)>MAX_POLICY_COLLECTION_ITEMS:
+        raise gl.vm.UserError(field_name+" exceeds protocol item limit")
+def _safe_https_reference(value:str,require_trailing_slash:bool)->bool:
+    if not value.startswith("https://"):
+        return False
+    if any(c in value for c in ("\\","?","#","%")):
+        return False
+    rest=value[8:]
+    slash=rest.find("/")
+    if slash<=0:
+        return False
+    authority=rest[:slash]
+    if "@" in authority or any(c.isspace() for c in authority):
+        return False
+    path=value[8+slash:]
+    if require_trailing_slash and not path.endswith("/"):
+        return False
+    for segment in path.split("/"):
+        if segment in (".",".."):
+            return False
+    return True
 def _require_digest(value:bytes,field_name:str)->None:
     if len(value)!=32:
         raise gl.vm.UserError(field_name+" must be exactly 32 bytes")
@@ -122,6 +146,9 @@ class CovenantMandates(gl.Contract):
         _require_positive(f,"repair_window_seconds")
         if int(f)>int(e):
             raise gl.vm.UserError("repair_window_seconds exceeds request lifetime")
+        _require_collection_limit(g,"allowed_action_hashes")
+        _require_collection_limit(h,"allowed_target_commitments")
+        _require_collection_limit(i,"allowed_recipient_commitments")
         actions=_canonical_digest_list(g,"allowed_action_hashes",True,)
         targets=_canonical_digest_list(h,"allowed_target_commitments",False,)
         recipients=_canonical_digest_list(i,"allowed_recipient_commitments",False,)
@@ -138,6 +165,12 @@ class CovenantMandates(gl.Contract):
         minimum_records=int(k)+int(l)
         if int(p)<minimum_records:
             raise gl.vm.UserError("max_evidence_records is below required authority count")
+        if int(p)>MAX_EVIDENCE_RECORDS:
+            raise gl.vm.UserError("max_evidence_records exceeds protocol limit")
+        _require_collection_limit(r,"authority_role_masks")
+        _require_collection_limit(s,"authority_ids")
+        _require_collection_limit(t,"authority_publisher_names")
+        _require_collection_limit(u,"authority_source_prefixes")
         rule_count=len(s)
         if rule_count==0:
             raise gl.vm.UserError("at least one authority rule is required")
@@ -158,13 +191,8 @@ class CovenantMandates(gl.Contract):
                 raise gl.vm.UserError("publisher_name must not be empty")
             _require_text_limit(publisher_name,"publisher_name",MAX_AUTHORITY_PUBLISHER_NAME_BYTES,)
             _require_text_limit(source_prefix,"authority source prefix",MAX_AUTHORITY_SOURCE_PREFIX_BYTES,)
-            if not source_prefix.startswith("https://"):
-                raise gl.vm.UserError("authority source prefix must begin with lowercase https://")
-            if not source_prefix.endswith("/"):
-                raise gl.vm.UserError("authority source prefix must end with /")
-            for character in source_prefix:
-                if character.isspace():
-                    raise gl.vm.UserError("authority source prefix must contain no whitespace")
+            if not _safe_https_reference(source_prefix,True):
+                raise gl.vm.UserError("authority source prefix is not canonical safe HTTPS")
             rule_hashes.append(_authority_rule_hash(role_mask,authority_id,publisher_name,source_prefix,))
             index+=1
         canonical_rule_hashes=_canonical_digest_list(rule_hashes,"authority_rule_hashes",True,)

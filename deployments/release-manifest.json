@@ -1,10 +1,50 @@
 {
-  "manifest_version": 1,
-  "status": "RELEASED",
-  "release_scope": "backend source and pinned local runtime candidate",
+  "manifest_version": 2,
+  "status": "UNRELEASED",
+  "release_scope": "current backend source candidate; deterministic verification only",
+  "candidate_state": "CURRENT_SOURCE_REQUIRES_NEW_FULL_RUNTIME_SOURCE_PARITY_PROOF",
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "No public or Bradbury production deployment is claimed by this repository release.",
+    "reason": "No public or Bradbury deployment is claimed for the current source candidate.",
+    "required_before_release": [
+      "complete Gate C against exact source bytes",
+      "source-parity full-runtime deployment",
+      "Bradbury runtime provenance and redirect compatibility",
+      "Bradbury deployment and Gate I live verification",
+      "Gate J reviewer evidence freeze"
+    ]
+  },
+  "current_candidate": {
+    "source_hashes": {
+      "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
+      "covenant_mandates.py": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
+    },
+    "live_source_parity": false
+  },
+  "historical_local_live_proof": {
+    "status": "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY",
+    "source_commit": "57dd722570d992cf9a754597ca50c2a95169e394",
+    "chain_id": 61999,
+    "validator_count": 5,
+    "source_hashes": {
+      "covenant_authorization.py": "3a96887d4118c37602f379811e1486fe317a036d6b6f193a9f8a0fdca8f5d8b0",
+      "covenant_mandates.py": "9c715d57731a031d2c217b3845ba74f08bf3fd7e3dcaa1bb44ffd6e2dc9896d6"
+    },
+    "deployed_addresses": {
+      "mandates": "0x3fA4E6e03Fbd434A577387924aF39efd3b4b50F2",
+      "authorization": "0xf72aa51B6350C18966923073d3609e1356a3fbBA"
+    },
+    "transactions": {
+      "mandates_deployment": "0x030d2657e9b0d470b46fdfc654fa0a0191de70463c0728daf9e5844eda4b4e7f",
+      "authorization_deployment": "0xf5e95d227f3f7cdd397a1e8d00b4982c14118d10541a747d5d75822980ec02d6",
+      "g11_create_request": "0x59c0f1f033d6da8c932f28dee654b57935dc979921cb3fcd414eb1601dee3ad1",
+      "approval": "0x0038c65c9ff1aa80e99fc1a9c3067af6b111c64a3b1e3bb1a725ac9ffd92184e",
+      "rejection": "0xd72225eb58e255d3e8ffa6c5c22bda9a1105d58f4253f31558b5cf3b37a09551",
+      "receipt_consumption": "0x30ce3c18b42e57a4dfa6081c422ee6b338693696e06f8075fb1feaf62e3165ed"
+    }
+  },
+  "runtime_provenance": {
+    "local_proof_only": true,
     "genvm_source_commit": "387e1a66e920cb2dfadcdce40ab2d28da02efd1e",
     "runtime_patch_sha256": "3cf216b1aa38daa6ff3024a0045b5a36c61e38abefa51274803ce6dfb8483d17",
     "runtime_binary_sha256": "625d2c1a027221c88051d12d8381bad643f4bfb2d5ff67a3e725c31999547336",
@@ -14,36 +54,9 @@
       "consensus-worker"
     ]
   },
-  "chain": {
-    "chain_id": 61999,
-    "validator_count": 5,
-    "runtime": "local GenLayer runtime; source-parity live candidate finality proven"
-  },
-  "source_hashes": {
-    "covenant_authorization.py": "b8c055605db7d581b16882cc333940786dcd2f18993de64ebe5c96b480d93ef2",
-    "covenant_mandates.py": "3c44201f0591d25f4e6c22507e3854de382b81e5ea5299e75d2cb27e5295097b"
-  },
-  "deployed_addresses": {
-    "mandates": "0x3fA4E6e03Fbd434A577387924aF39efd3b4b50F2",
-    "authorization": "0xf72aa51B6350C18966923073d3609e1356a3fbBA"
-  },
-  "diagnostic_deployment": {
-    "mandates": "0x5346943019730Ff7C193D75e6067e1d317a09777",
-    "authorization": "0x4d8Cd6Caa7D7681AeF2E3B6e21FFB3238eCb4814",
-    "deployment_transaction": "0x79995bc51bed6a8e7930412e7b018141d70a751a3618127d28839d0f154950dc",
-    "source_parity": false
-  },
-  "transactions": {
-    "mandates_deployment": "0x030d2657e9b0d470b46fdfc654fa0a0191de70463c0728daf9e5844eda4b4e7f",
-    "authorization_deployment": "0xf5e95d227f3f7cdd397a1e8d00b4982c14118d10541a747d5d75822980ec02d6",
-    "g11_create_request": "0x59c0f1f033d6da8c932f28dee654b57935dc979921cb3fcd414eb1601dee3ad1",
-    "approval": "0x0038c65c9ff1aa80e99fc1a9c3067af6b111c64a3b1e3bb1a725ac9ffd92184e",
-    "rejection": "0xd72225eb58e255d3e8ffa6c5c22bda9a1105d58f4253f31558b5cf3b37a09551",
-    "receipt_consumption": "0x30ce3c18b42e57a4dfa6081c422ee6b338693696e06f8075fb1feaf62e3165ed"
-  },
   "notes": [
-    "The historical diagnostic deployment is not source-parity evidence for this candidate.",
-    "The listed addresses and transactions are source-parity local-runtime evidence recorded in docs/GATE_F_LIVE_CLOSURE_2026-09-27.md.",
-    "The top-level RELEASED status covers the backend source and pinned local runtime candidate. The nested production_deployment status must remain UNRELEASED until a public or Bradbury deployment is separately authorized and verified."
+    "Historical local-runtime transactions prove the predecessor source only.",
+    "Current source must not inherit source-parity, finality, or production claims from historical proof.",
+    "Bradbury/public deployment remains blocked until the current candidate is independently rebound and verified."
   ]
 }
