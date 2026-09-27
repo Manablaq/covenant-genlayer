@@ -101,13 +101,13 @@ def main() -> int:
     assert production["status"] == "UNRELEASED"
     current = manifest["current_candidate"]
     assert current["live_source_parity"] is True
-    assert current["source_commit"] == "78280f3e82e056424342b3233f420332d6e2a71f"
+    assert current["source_commit"] == "3601eb4c1715afe9a607a4685ec290338913bf7c"
     assert current["parity_scope"] == "supported local runtime only; not public/Bradbury"
     assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
-    assert checkpoint["status"] == "PARTIAL_CURRENT_SOURCE_LIVE_PROOF"
+    assert checkpoint["status"] == "CURRENT_SOURCE_LIVE_BEHAVIORAL_CLOSURE_COMPLETE_LOCAL_ONLY"
     assert checkpoint["source_commit"] == current["source_commit"]
     assert checkpoint["chain_id"] == 61999
     assert checkpoint["validator_count"] == 5
@@ -116,29 +116,23 @@ def main() -> int:
     assert checkpoint["mandate"]["mandate_id"] == "0xcc8506d1809fc4664c5f9287816f8c51198c250fe995cc505c340d4b12de8ab7"
     assert checkpoint["mandate"]["version"] == 1
     assert checkpoint["mandate"]["state_parity"] == "PASS"
-    phase6d = checkpoint["phase6d_approval_create_request"]
-    assert phase6d["status"] == "STOP_BEFORE_SIGNING_FRESHNESS_OBSERVATION_AGE_EXCEEDED"
-    assert phase6d["submission_count"] == 0
-    assert phase6d["chain_write_performed"] is False
-    assert phase6d["request_created"] is False
-    assert phase6d["observation_age_seconds"] == 1352
-    assert phase6d["max_observation_age_seconds"] == 900
-    fresh = checkpoint["phase6d_r1_fresh_approval_preparation"]
-    assert fresh["status"] == "PASS_UNSIGNED_ONLY"
-    assert fresh["preparation_now"] == 1790491733
-    assert fresh["evm_nonce"] == 39
-    assert fresh["covenant_request_nonce"] == 1
-    assert fresh["fresh_unsigned_fingerprint"] == "45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838"
-    assert fresh["old_stopped_fingerprint_reused"] is False
-    assert fresh["freshness_at_preparation"] == "PASS"
-    assert fresh["submission_count"] == 0
-    assert fresh["signing_performed"] is False
-    assert fresh["submission_performed"] is False
-    assert fresh["chain_write_performed"] is False
+    proofs = checkpoint["live_proofs"]
+    assert proofs["approval"]["terminal_state"] == "AUTHORIZED"
+    assert proofs["rejection"]["terminal_state"] == "DENIED"
+    assert proofs["repair_replacement"]["terminal_state"] == "AUTHORIZED"
+    assert proofs["timeout_recovery"]["terminal_state"] == "EXPIRED"
+    assert proofs["receipt_consumption"]["terminal_state"] == "CONSUMED"
+    assert proofs["redirect_provenance"]["status"] == "PASS_LOCAL_ONLY"
     boundary = checkpoint["proof_boundary"]
     assert boundary["current_source_deployment_parity"] is True
     assert boundary["current_mandate_created"] is True
-    assert boundary["current_approval_request_created"] is False
+    assert boundary["current_approval_request_created"] is True
+    assert boundary["current_approval_evaluated"] is True
+    assert boundary["current_rejection_proven"] is True
+    assert boundary["current_repair_replacement_proven"] is True
+    assert boundary["current_timeout_recovery_proven"] is True
+    assert boundary["current_receipt_consumption_proven"] is True
+    assert boundary["current_redirect_provenance_proven"] is True
     assert boundary["production_or_bradbury_release"] is False
 
     historical = manifest["historical_local_live_proof"]

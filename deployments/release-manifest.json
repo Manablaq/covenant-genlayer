@@ -1,13 +1,12 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 4,
   "status": "UNRELEASED",
-  "release_scope": "current backend source candidate; exact-source supported-local-runtime deployment parity and mandate setup proven; fresh unsigned approval request prepared; current-source request/evaluation closure pending",
-  "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_FRESH_APPROVAL_REQUEST_PREPARED_AWAITING_AUTHORIZATION",
+  "release_scope": "current backend source candidate; exact-source supported-local-runtime deployment and behavioral closure proven; Bradbury/public release remains separately gated",
+  "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_BEHAVIORAL_CLOSURE_COMPLETE_BRADBURY_PENDING",
   "production_deployment": {
     "status": "UNRELEASED",
     "reason": "No public or Bradbury deployment is claimed for the current source candidate.",
     "required_before_release": [
-      "complete current-source supported-runtime request/evaluation behavioral closure",
       "Bradbury runtime provenance and redirect compatibility",
       "Bradbury deployment and Gate I live verification",
       "Gate J reviewer evidence freeze"
@@ -19,7 +18,7 @@
       "covenant_mandates.py": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
     },
     "live_source_parity": true,
-    "source_commit": "78280f3e82e056424342b3233f420332d6e2a71f",
+    "source_commit": "3601eb4c1715afe9a607a4685ec290338913bf7c",
     "parity_scope": "supported local runtime only; not public/Bradbury"
   },
   "historical_local_live_proof": {
@@ -58,14 +57,14 @@
   "notes": [
     "Historical local-runtime transactions prove the predecessor source only.",
     "Current source now has exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity.",
-    "The first current-source approval create_request candidate stopped before signing because evidence observation age exceeded the mandate limit; no request transaction was submitted.",
-    "A fresh replacement approval create_request has now been prepared unsigned at nonce 39 with fingerprint 45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838; it has not been signed or submitted.",
-    "Current-source approval/rejection and the remaining behavioral closure are still pending.",
-    "Bradbury/public deployment remains separately gated and UNRELEASED."
+    "Current-source approval, rejection, repair/replacement, timeout/expiry, receipt consumption, replay rejection, and redirect provenance are closed on the supported local runtime with persisted finality/state evidence under the operator work roots.",
+    "The first current-source approval request entered repair because its evidence became stale; a later finalized approval request reached AUTHORIZED, and a separate finalized request reached DENIED.",
+    "The supported runtime redirect probe returned status 302 and Location without following the redirect; this is local runtime provenance only.",
+    "Bradbury/public deployment remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {
-    "status": "PARTIAL_CURRENT_SOURCE_LIVE_PROOF",
-    "source_commit": "78280f3e82e056424342b3233f420332d6e2a71f",
+    "status": "CURRENT_SOURCE_LIVE_BEHAVIORAL_CLOSURE_COMPLETE_LOCAL_ONLY",
+    "source_commit": "3601eb4c1715afe9a607a4685ec290338913bf7c",
     "chain_id": 61999,
     "validator_count": 5,
     "source_hashes": {
@@ -87,41 +86,63 @@
       "version": 1,
       "state_parity": "PASS"
     },
-    "phase6d_approval_create_request": {
-      "status": "STOP_BEFORE_SIGNING_FRESHNESS_OBSERVATION_AGE_EXCEEDED",
-      "stopped_unsigned_fingerprint": "440bb1c43323dc138fe1bac7458d99165affa63f4ce4f68a6572f2d7d100b620",
-      "submission_count": 0,
-      "chain_write_performed": false,
-      "observation_age_seconds": 1352,
-      "max_observation_age_seconds": 900,
-      "request_created": false,
-      "next_required_step": "prepare a fresh unsigned nonce-39 approval create_request and obtain separate exact authorization"
-    },
-    "phase6d_r1_fresh_approval_preparation": {
-      "status": "PASS_UNSIGNED_ONLY",
-      "preparation_now": 1790491733,
-      "evm_nonce": 39,
-      "covenant_request_nonce": 1,
-      "fresh_unsigned_fingerprint": "45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838",
-      "old_stopped_fingerprint_reused": false,
-      "freshness_at_preparation": "PASS",
-      "gas_estimate": 500000,
-      "submission_count": 0,
-      "signing_performed": false,
-      "submission_performed": false,
-      "chain_write_performed": false,
-      "next_required_step": "obtain exact transaction-level authorization for this fresh fingerprint before any signing"
+    "live_proofs": {
+      "approval": {
+        "create_request": "0x819e5ecbe813fd570145d6e8b6b29d89816ac43c0993c28704ac271a042c760a",
+        "request_id": "0x8bfd66e1166ebd047919d45e3c13a6a27d075dff219093e6635e7a7f598e59e8",
+        "evaluate_request": "0x3cef554f5954d63f94c8756de86c87c33eb2087de2950f22cca6ff76b2b09761",
+        "terminal_state": "AUTHORIZED",
+        "result": "FINALIZED / MAJORITY_AGREE"
+      },
+      "rejection": {
+        "create_request": "0xce41bada44665e5176df386a26ea5f07488ea0087323aae5a36c6ae6e68edef1",
+        "request_id": "0xa93a5026d5a339d9a9729da90d6b2965fd4b54c05c43748aff25781dc62418e0",
+        "evaluate_request": "0xaab35ae6b5b2f9453305bcf2278874c6372240b417ea1d29322100ca628a568e",
+        "terminal_state": "DENIED",
+        "result": "FINALIZED / MAJORITY_AGREE"
+      },
+      "repair_replacement": {
+        "create_request": "0xa3d9c20e1480042a1e295f0414d4fbd138326138769d897ab0e356ff4aaf130e",
+        "request_id": "0x691309a9fc6a3f8f69dde6be838649c926167200f3ec0f37a74988bc25e8872f",
+        "evaluate_to_repair_required": "0x1552e4249614a54b324bcb0cdb807baf9e3cac891fed1679241cbae172bd2253",
+        "replacement": "0xda06c3d9dceebe07c0a25871ae03153623a24b8bf97bb6117465e9b27cde9178",
+        "repaired_evaluate_request": "0x930dfa24b47fb729b2e9350e9a95e2ee0c56a0fd062ae3d4b797dcddb7a17e1f",
+        "terminal_state": "AUTHORIZED",
+        "result": "all writes FINALIZED / MAJORITY_AGREE"
+      },
+      "timeout_recovery": {
+        "request_id": "0x8722ea20195a5b559c6f826d1eba5631ac4c091dc8755d0cf655ff97ef51e921",
+        "expired_request": "0x38c7939fa7c4c9ddfd59fb98d344eb81fbd92ec409370352e1a848b7ab5ba6f7",
+        "terminal_state": "EXPIRED",
+        "result": "FINALIZED / MAJORITY_AGREE",
+        "prior_deadline_rejection": "0x2d65db44997c64e937572780ca22350437b75406fffe186371ca7210e58260db",
+        "resubmission_policy": "no automatic resend or replacement"
+      },
+      "receipt_consumption": {
+        "create_request": "0xbe531abe20fd25a7b2d8e5e773cc9843085953e963c6a7b0acb0f28424bf93ae",
+        "request_id": "0x73552aa5e65d451bac6a2e9ca162ec410891c8ecc650f671189b5c4abf896df1",
+        "evaluate_request": "0x0185a4230dd8a3e7ed203078edd376c39814eedcdfdb57a08a17310b02d596c6",
+        "consume_receipt": "0x8a0a175b5dab5bfd150945ca8d9159b96d3ad1abdf11e1f01528d31e9b328bc2",
+        "replay_rejection": "0x07ad4b8ae6d4a6cdfb3d878f0da79e9a8d2eca22ddc774ed5561f3866388afd7",
+        "terminal_state": "CONSUMED",
+        "result": "consumption FINALIZED / MAJORITY_AGREE; replay finalized with terminal-state rejection"
+      },
+      "redirect_provenance": {
+        "status": "PASS_LOCAL_ONLY",
+        "decoded_result": "status=302;location=b'/final'",
+        "evidence": "work/phase6d-current-redirect-probe-20260927-current/redirect-probe-summary.json"
+      }
     },
     "proof_boundary": {
       "current_source_deployment_parity": true,
       "current_mandate_created": true,
-      "current_approval_request_created": false,
-      "current_approval_evaluated": false,
-      "current_rejection_proven": false,
-      "current_repair_replacement_proven": false,
-      "current_timeout_recovery_proven": false,
-      "current_receipt_consumption_proven": false,
-      "current_redirect_provenance_proven": false,
+      "current_approval_request_created": true,
+      "current_approval_evaluated": true,
+      "current_rejection_proven": true,
+      "current_repair_replacement_proven": true,
+      "current_timeout_recovery_proven": true,
+      "current_receipt_consumption_proven": true,
+      "current_redirect_provenance_proven": true,
       "production_or_bradbury_release": false
     }
   }

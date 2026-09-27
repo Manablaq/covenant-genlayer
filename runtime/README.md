@@ -21,12 +21,10 @@ commit, patch hash, built modules binary hash, active web configuration hash,
 and mounted components are recorded in
 `deployments/release-manifest.json`.
 
-Exact current-source Mandates and Authorization deployment parity has now been
-re-established on this supported local runtime, including exact cross-contract
-binding and a successfully finalized current mandate. This is **local proof
-only**. Current-source request/evaluation behavioral closure is still pending:
-the first approval `create_request` candidate stopped before signing when its
-evidence exceeded the mandate observation-age limit. A fresh replacement is now
-prepared unsigned at nonce `39`; no request write has yet occurred. Public/
-Bradbury deployment and final release remain separately gated. See
-`docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
+Exact current-source Mandates and Authorization deployment parity, approval,
+rejection, repair/replacement, timeout/expiry, receipt consumption, replay
+rejection, and redirect provenance are now closed on this supported local
+runtime. This is **local proof only**. Public/Bradbury deployment and final
+release remain separately gated. See
+`docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md` and
+`deployments/release-manifest.json`.

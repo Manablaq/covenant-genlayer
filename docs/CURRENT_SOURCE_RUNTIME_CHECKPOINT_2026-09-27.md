@@ -1,13 +1,13 @@
 # Current-source supported-runtime checkpoint — 2026-09-27
 
-This checkpoint records the exact current-source backend state through the
-Phase 6D-R1 fresh unsigned approval preparation. It does **not** claim backend
-completion, transaction authorization, Bradbury deployment, or production
-release.
+This checkpoint records the exact current-source backend through complete
+supported-local-runtime behavioral closure. It does not claim a public or
+Bradbury deployment, production release, or Gate J freeze.
 
 ## Frozen source identity
 
-- Source commit: `78280f3e82e056424342b3233f420332d6e2a71f`
+- Source commit: `3601eb4c1715afe9a607a4685ec290338913bf7c`
+- Source tree: `9436b3a12861c63c30105cd2b1f485b6c5780aa0`
 - Authorization SHA-256: `24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed`
 - Mandates SHA-256: `aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2`
 - Chain ID: `61999`
@@ -15,136 +15,92 @@ release.
 - Mandates: `0xdFEce9C4ae3124B8de273B75227F6DC1DE30297C`
 - Authorization: `0xEBb2863137Dff7e96886090D303373E8Ec9CF5B8`
 
-The contract bytes are unchanged by this checkpoint commit.
+The live contract source hashes match the frozen repository source hashes.
 
-## Completed current-source runtime work
+## Deployment and mandate setup
 
-### Phase 6A — Mandates deployment
-
-- Result: `FINALIZED / MAJORITY_AGREE`
-- Transaction: `0x4f8814f7f84db106f47a947ddefcb902f2f782dc1c703e4a370c72aea1e6922b`
-- Source parity: `PASS`
-- Submission count: `1`
-
-### Phase 6B — Authorization deployment
-
-- Result: `FINALIZED / MAJORITY_AGREE`
-- Transaction: `0x32687d2ff5b61f1ab8a4bfcb59ba9d3685c1e6e806ce737425d78276b1fdb2bb`
-- Authorization source parity: `PASS`
-- Authorization -> Mandates binding: `PASS`
-- Submission count: `1`
-
-### Phase 6C initial create_mandate attempt
-
-- Result: `FINALIZED / NO_MAJORITY`
-- Transaction: `0xba95cfa6b46895e7b0533b3230ae40233a0580b4b2f4f70402a798e1bd3d9c63`
-- Submission count: `1`
-- No automatic resubmission occurred.
-- This terminal unsuccessful attempt is retained as evidence and is not counted
-  as successful mandate creation.
-
-### Phase 6C-R2 — successful mandate creation
-
-- Result: `FINALIZED / MAJORITY_AGREE`
-- Transaction: `0xd2a0e3cf3461c96af3cbbdb06f14eb971fddcbb58d4f845824eefca58008b727`
+- Mandates deployment: `0x4f8814f7f84db106f47a947ddefcb902f2f782dc1c703e4a370c72aea1e6922b`
+- Authorization deployment: `0x32687d2ff5b61f1ab8a4bfcb59ba9d3685c1e6e806ce737425d78276b1fdb2bb`
+- Mandate creation: `0xd2a0e3cf3461c96af3cbbdb06f14eb971fddcbb58d4f845824eefca58008b727`
 - Mandate ID: `0xcc8506d1809fc4664c5f9287816f8c51198c250fe995cc505c340d4b12de8ab7`
-- Version: `1`
+- Mandate version: `1`
 - Mandate state parity: `PASS`
-- Submission count: `1`
-- Authorized unsigned fingerprint: `d5333afb1cb1cc86d2e20a08ef76d4bce0cb0bdb2fd8f6eca62ad2a5002ef033`
-- No additional chain write occurred after the authorized transaction.
+- Authorization → Mandates binding: `PASS`
 
-## Phase 6D — approval create_request STOP
+All successful writes below reached `FINALIZED / MAJORITY_AGREE`. Each was
+prepared from a persisted unsigned transaction, bound to an exact fingerprint,
+signed once, submitted once, and recovered by transaction ID. Failed or
+expired attempts were not blindly retried.
 
-The frozen approval request candidate had unsigned fingerprint:
+## Current-source live closure
 
-`440bb1c43323dc138fe1bac7458d99165affa63f4ce4f68a6572f2d7d100b620`
+### Approval
 
-Pre-sign revalidation passed repository/source/runtime/nonce/database/calldata and
-mandate-state checks, but freshness failed before signing:
+- Create request: `0x819e5ecbe813fd570145d6e8b6b29d89816ac43c0993c28704ac271a042c760a`
+- Request ID: `0x8bfd66e1166ebd047919d45e3c13a6a27d075dff219093e6635e7a7f598e59e8`
+- Evaluation: `0x3cef554f5954d63f94c8756de86c87c33eb2087de2950f22cca6ff76b2b09761`
+- Result: `AUTHORIZED`; request/evidence/action/receipt parity passed.
 
-- evidence observation age: `1352` seconds;
-- mandate maximum observation age: `900` seconds;
-- signer operation performed: `NO`;
-- transaction submission performed: `NO`;
-- submission count: `0`;
-- chain write performed: `NO`;
-- request created: `NO`.
+### Independent rejection
 
-The stopped fingerprint must not be reused.
+- Create request: `0xce41bada44665e5176df386a26ea5f07488ea0087323aae5a36c6ae6e68edef1`
+- Request ID: `0xa93a5026d5a339d9a9729da90d6b2965fd4b54c05c43748aff25781dc62418e0`
+- Evaluation: `0xaab35ae6b5b2f9453305bcf2278874c6372240b417ea1d29322100ca628a568e`
+- Result: terminal `DENIED`; action identity and evidence parity passed; no receipt.
 
-## Phase 6D-R1 — fresh approval preparation
+### Repair and replacement
 
-A new approval-path request was prepared **unsigned only** after refreshing only
-the temporal evidence metadata while preserving the semantic vector and evidence
-body bytes.
+- Create request: `0xa3d9c20e1480042a1e295f0414d4fbd138326138769d897ab0e356ff4aaf130e`
+- Request ID: `0x691309a9fc6a3f8f69dde6be838649c926167200f3ec0f37a74988bc25e8872f`
+- Evaluation to `REPAIR_REQUIRED`: `0x1552e4249614a54b324bcb0cdb807baf9e3cac891fed1679241cbae172bd2253`
+- Evidence replacement: `0xda06c3d9dceebe07c0a25871ae03153623a24b8bf97bb6117465e9b27cde9178`
+- Re-evaluation: `0x930dfa24b47fb729b2e9350e9a95e2ee0c56a0fd062ae3d4b797dcddb7a17e1f`
+- Result: `AUTHORIZED`; revision advanced to `1`, request ID/action subject stayed fixed,
+  action intent matched the replacement, and the repair deadline stayed fixed.
 
-- Preparation time: `1790491733`
-- EVM nonce: `39`
-- Covenant request nonce: `1`
-- Gas estimate: `500000`
-- Freshness at preparation: `PASS`
-- Method-call SHA-256: `eb6d2c9bb2fa597ca76215c41214b5acda805a7fc0e2dba224a00160e2f4ab50`
-- Supported inner txData SHA-256: `ce72ed8b2ab1a2fa7fac63e0703fb35d0f68422ac782f978b56f94c8238b33cf`
-- Outer calldata SHA-256: `6144eac3743d167dc9cfbc6daa6fef7e0e4e1a956ab891fdf18cee9556a47781`
-- New unsigned fingerprint: `45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838`
-- Old stopped fingerprint reused: `NO`
-- Signing performed: `NO`
-- Submission performed: `NO`
-- Submission count: `0`
-- Chain write performed: `NO`
-- Sender latest/pending nonce remained `39/39`
-- Covenant request nonce `1` remained unused
-- Read-only DB rows for sender nonce >=39 remained `0`
+### Timeout and recovery
 
-The fresh fingerprint is **prepared, not authorized**. Signing/submission requires
-separate exact transaction-level authorization.
+- Request ID: `0x8722ea20195a5b559c6f826d1eba5631ac4c091dc8755d0cf655ff97ef51e921`
+- A replacement submitted after its fixed repair deadline was finalized as an
+  execution error: `0x2d65db44997c64e937572780ca22350437b75406fffe186371ca7210e58260db`.
+- No resend or replacement was performed after that error.
+- After the persisted deadline and request expiry passed, explicit expiry finalized:
+  `0x38c7939fa7c4c9ddfd59fb98d344eb81fbd92ec409370352e1a848b7ab5ba6f7`.
+- Result: terminal `EXPIRED`; repair reason cleared; no receipt.
 
-## Evidence roots
+### Receipt consumption and replay protection
 
-Operator evidence is retained outside tracked source in the following frozen
-roots:
+- Request ID: `0x73552aa5e65d451bac6a2e9ca162ec410891c8ecc650f671189b5c4abf896df1`
+- Create request: `0xbe531abe20fd25a7b2d8e5e773cc9843085953e963c6a7b0acb0f28424bf93ae`
+- Evaluation: `0x0185a4230dd8a3e7ed203078edd376c39814eedcdfdb57a08a17310b02d596c6`
+- Authorized consumption: `0x8a0a175b5dab5bfd150945ca8d9159b96d3ad1abdf11e1f01528d31e9b328bc2`
+- Result: terminal `CONSUMED`; `receipt_consumed=true`.
+- Fresh replay attempt: `0x07ad4b8ae6d4a6cdfb3d878f0da79e9a8d2eca22ddc774ed5561f3866388afd7`.
+- Replay result: finalized terminal-state rejection; request remained `CONSUMED`.
 
-- `covenant-phase6a-mandates-20260927-045218`
-- `covenant-phase6b-authorization-20260927-052158`
-- `covenant-phase6c-create-mandate-20260927-055329`
-- `covenant-phase6c-r2-create-mandate-20260927-065642`
-- `work/phase6d-approval-create-request-20260927-072012`
-- `covenant-phase6d-r1-fresh-approval-prep-20260927-074028`
+### Redirect/effective-origin provenance
 
-Evidence inventories were verified before this checkpoint was written. The
-legacy Phase 6B launcher stderr is append-only, so its exact manifest-sized
-frozen prefix is hash-bound and later diagnostics are outside the proof
-boundary. The Phase 6D STOP has an empty manifest but a complete checksum
-ledger, so every ledger-bound file plus the critical no-sign/no-submit
-certificates is verified directly. Phase 6D-R1 accidentally self-listed its
-manifest; the final manifest bytes are bound by `SHA256SUMS.txt`, while every
-non-self artifact remains exact hash/size bound.
+The active local JSON-RPC GenVM manager was probed against the deterministic
+302 fixture using the mounted current runtime. The result was:
 
-## Exact release boundary
+`status=302;location=b'/final'`
 
-Completed for the **current source**:
+This proves the active runtime exposed the redirect response and `Location`
+header instead of following `/final`. Runtime source, patch, binary,
+configuration, and mounted-component hashes remain recorded in
+`deployments/release-manifest.json`. The machine-readable probe summary is
+under `work/phase6d-current-redirect-probe-20260927-current/`.
 
-- deterministic/static gates;
-- exact-source supported-local-runtime Mandates deployment;
-- exact-source supported-local-runtime Authorization deployment;
-- exact Authorization -> Mandates wiring;
-- current mandate creation and stored-state parity;
-- fresh unsigned approval-path `create_request` preparation at nonce `39`.
+## Release boundary
 
-Still pending for the **current source**:
+The backend contract implementation and all supported-local-runtime behavioral
+gates are complete for this source candidate. The repository remains
+`UNRELEASED` because the following are external release gates, not bypassed:
 
-- exact authorization and successful submission/finality of the fresh approval-path `create_request`;
-- approval `evaluate_request`;
-- independent rejection path;
-- repair/replacement live closure;
-- timeout/recovery live closure without automatic resubmission;
-- one-time receipt-consumption live closure;
-- redirect/effective-origin provenance live closure;
-- Bradbury/public deployment and verification;
-- final reviewer evidence freeze.
+- Bradbury runtime provenance and redirect compatibility;
+- Bradbury deployment and Gate I live verification;
+- Gate J reviewer evidence freeze and final certification.
 
-Historical predecessor-source closure remains useful historical evidence only
-and must not be substituted for these remaining current-source proofs.
-
-Backend status: **UNRELEASED / NOT COMPLETE**.
+The exact release state is machine-readable in
+`deployments/release-manifest.json`. Historical predecessor-source evidence is
+not used as current-source proof.
