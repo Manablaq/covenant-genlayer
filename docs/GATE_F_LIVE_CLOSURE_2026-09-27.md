@@ -5,6 +5,11 @@
 
 # Gate F live closure — 2026-09-27
 
+> Current-source status is tracked separately in
+> `docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`. This file remains
+> predecessor-source historical evidence and must not be read as the current
+> candidate's behavioral closure.
+
 This addendum supersedes the earlier Gate F blocker for the repaired source
 candidate. It records local-runtime evidence only. The raw machine-readable
 proof directories are retained in the operator's ignored local `work/`

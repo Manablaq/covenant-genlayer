@@ -1,14 +1,13 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "status": "UNRELEASED",
-  "release_scope": "current backend source candidate; deterministic verification only",
-  "candidate_state": "CURRENT_SOURCE_REQUIRES_NEW_FULL_RUNTIME_SOURCE_PARITY_PROOF",
+  "release_scope": "current backend source candidate; exact-source supported-local-runtime deployment parity and mandate setup proven; fresh unsigned approval request prepared; current-source request/evaluation closure pending",
+  "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_FRESH_APPROVAL_REQUEST_PREPARED_AWAITING_AUTHORIZATION",
   "production_deployment": {
     "status": "UNRELEASED",
     "reason": "No public or Bradbury deployment is claimed for the current source candidate.",
     "required_before_release": [
-      "complete Gate C against exact source bytes",
-      "source-parity full-runtime deployment",
+      "complete current-source supported-runtime request/evaluation behavioral closure",
       "Bradbury runtime provenance and redirect compatibility",
       "Bradbury deployment and Gate I live verification",
       "Gate J reviewer evidence freeze"
@@ -19,7 +18,9 @@
       "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
       "covenant_mandates.py": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
     },
-    "live_source_parity": false
+    "live_source_parity": true,
+    "source_commit": "78280f3e82e056424342b3233f420332d6e2a71f",
+    "parity_scope": "supported local runtime only; not public/Bradbury"
   },
   "historical_local_live_proof": {
     "status": "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY",
@@ -56,7 +57,72 @@
   },
   "notes": [
     "Historical local-runtime transactions prove the predecessor source only.",
-    "Current source must not inherit source-parity, finality, or production claims from historical proof.",
-    "Bradbury/public deployment remains blocked until the current candidate is independently rebound and verified."
-  ]
+    "Current source now has exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity.",
+    "The first current-source approval create_request candidate stopped before signing because evidence observation age exceeded the mandate limit; no request transaction was submitted.",
+    "A fresh replacement approval create_request has now been prepared unsigned at nonce 39 with fingerprint 45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838; it has not been signed or submitted.",
+    "Current-source approval/rejection and the remaining behavioral closure are still pending.",
+    "Bradbury/public deployment remains separately gated and UNRELEASED."
+  ],
+  "current_local_runtime_checkpoint": {
+    "status": "PARTIAL_CURRENT_SOURCE_LIVE_PROOF",
+    "source_commit": "78280f3e82e056424342b3233f420332d6e2a71f",
+    "chain_id": 61999,
+    "validator_count": 5,
+    "source_hashes": {
+      "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
+      "covenant_mandates.py": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2"
+    },
+    "deployed_addresses": {
+      "mandates": "0xdFEce9C4ae3124B8de273B75227F6DC1DE30297C",
+      "authorization": "0xEBb2863137Dff7e96886090D303373E8Ec9CF5B8"
+    },
+    "transactions": {
+      "mandates_deployment": "0x4f8814f7f84db106f47a947ddefcb902f2f782dc1c703e4a370c72aea1e6922b",
+      "authorization_deployment": "0x32687d2ff5b61f1ab8a4bfcb59ba9d3685c1e6e806ce737425d78276b1fdb2bb",
+      "initial_create_mandate_terminal_no_majority": "0xba95cfa6b46895e7b0533b3230ae40233a0580b4b2f4f70402a798e1bd3d9c63",
+      "successful_create_mandate": "0xd2a0e3cf3461c96af3cbbdb06f14eb971fddcbb58d4f845824eefca58008b727"
+    },
+    "mandate": {
+      "mandate_id": "0xcc8506d1809fc4664c5f9287816f8c51198c250fe995cc505c340d4b12de8ab7",
+      "version": 1,
+      "state_parity": "PASS"
+    },
+    "phase6d_approval_create_request": {
+      "status": "STOP_BEFORE_SIGNING_FRESHNESS_OBSERVATION_AGE_EXCEEDED",
+      "stopped_unsigned_fingerprint": "440bb1c43323dc138fe1bac7458d99165affa63f4ce4f68a6572f2d7d100b620",
+      "submission_count": 0,
+      "chain_write_performed": false,
+      "observation_age_seconds": 1352,
+      "max_observation_age_seconds": 900,
+      "request_created": false,
+      "next_required_step": "prepare a fresh unsigned nonce-39 approval create_request and obtain separate exact authorization"
+    },
+    "phase6d_r1_fresh_approval_preparation": {
+      "status": "PASS_UNSIGNED_ONLY",
+      "preparation_now": 1790491733,
+      "evm_nonce": 39,
+      "covenant_request_nonce": 1,
+      "fresh_unsigned_fingerprint": "45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838",
+      "old_stopped_fingerprint_reused": false,
+      "freshness_at_preparation": "PASS",
+      "gas_estimate": 500000,
+      "submission_count": 0,
+      "signing_performed": false,
+      "submission_performed": false,
+      "chain_write_performed": false,
+      "next_required_step": "obtain exact transaction-level authorization for this fresh fingerprint before any signing"
+    },
+    "proof_boundary": {
+      "current_source_deployment_parity": true,
+      "current_mandate_created": true,
+      "current_approval_request_created": false,
+      "current_approval_evaluated": false,
+      "current_rejection_proven": false,
+      "current_repair_replacement_proven": false,
+      "current_timeout_recovery_proven": false,
+      "current_receipt_consumption_proven": false,
+      "current_redirect_provenance_proven": false,
+      "production_or_bradbury_release": false
+    }
+  }
 }

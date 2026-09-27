@@ -36,25 +36,37 @@ Changing a consequential field invalidates the authorization.
 
 ## Current release status
 
-**UNRELEASED CURRENT CANDIDATE — deterministic verification is required for the
-exact current source, and historical local-runtime proofs do not establish
-source parity for later source revisions. Production/Bradbury deployment is
-also UNRELEASED.**
+**UNRELEASED CURRENT CANDIDATE — exact-source deployment parity is now proven
+on the supported local runtime, and a current mandate has finalized with stored
+state parity. Current-source request/evaluation behavioral closure and
+Production/Bradbury deployment are still pending.**
 
 The repaired candidate has mandate-bound evidence-body limits, bounded
 user-controlled inputs, one-time verified mandate-policy loading, and complete
-deterministic/adversarial/GLSim/runtime-calldata coverage. The supported local
-runtime also now has source-parity deployments and persisted proofs for
-successful request creation, approval finality, rejection finality, evidence
-repair, timeout expiry, restart recovery, redirect refusal, and one-time
-receipt consumption. See `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` and the
-machine-readable evidence retained in the operator's ignored local `work/`
-directory.
+deterministic/adversarial/GLSim/runtime-calldata coverage. The exact current
+Mandates and Authorization sources are deployed on the supported local runtime
+and their wiring is proven. A current mandate also finalized successfully.
 
-`deployments/release-manifest.json` records the current candidate source hashes
-and historical runtime provenance while keeping the backend and nested
-`production_deployment.status` `UNRELEASED` until exact-source parity and a
-separately authorized public or Bradbury deployment are verified.
+The first current-source approval `create_request` candidate did **not** reach
+the chain: mandatory pre-sign freshness revalidation found evidence observation
+age `1352` seconds against the mandate maximum of `900`, so the runner stopped
+before signing with submission count `0`. That fingerprint is not reusable.
+
+A new request has since been prepared **unsigned only** at EVM nonce `39` with
+freshness `PASS` and fingerprint
+`45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838`.
+It has not been signed or submitted and requires separate exact transaction-level
+authorization. See `docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
+
+`docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` remains historical predecessor-source
+evidence for the older full behavioral closure; those request/approval/rejection/
+repair/timeout/recovery/receipt claims are not inherited by the current source.
+
+`deployments/release-manifest.json` records both the current supported-local
+source-parity checkpoint and the historical predecessor proof. The backend and
+nested `production_deployment.status` remain `UNRELEASED` until the remaining
+current-source behavioral gates and separately authorized Bradbury/public gates
+are closed.
 
 ## Verification
 

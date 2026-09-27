@@ -19,6 +19,14 @@ For this local candidate, the no-redirect behavior was active in JSON-RPC and
 the consensus workers during the persisted redirect probe. The pinned source
 commit, patch hash, built modules binary hash, active web configuration hash,
 and mounted components are recorded in
-`deployments/release-manifest.json`. The historical local-runtime proof is retained, but the current source candidate
-is `UNRELEASED` until exact-source full-runtime parity is re-established. Public
-or Bradbury deployment remains separately gated.
+`deployments/release-manifest.json`.
+
+Exact current-source Mandates and Authorization deployment parity has now been
+re-established on this supported local runtime, including exact cross-contract
+binding and a successfully finalized current mandate. This is **local proof
+only**. Current-source request/evaluation behavioral closure is still pending:
+the first approval `create_request` candidate stopped before signing when its
+evidence exceeded the mandate observation-age limit. A fresh replacement is now
+prepared unsigned at nonce `39`; no request write has yet occurred. Public/
+Bradbury deployment and final release remain separately gated. See
+`docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
