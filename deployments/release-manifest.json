@@ -20,8 +20,8 @@
     "runtime": "local GenLayer runtime; source-parity live candidate finality proven"
   },
   "source_hashes": {
-    "covenant_authorization.py": "3a96887d4118c37602f379811e1486fe317a036d6b6f193a9f8a0fdca8f5d8b0",
-    "covenant_mandates.py": "9c715d57731a031d2c217b3845ba74f08bf3fd7e3dcaa1bb44ffd6e2dc9896d6"
+    "covenant_authorization.py": "b8c055605db7d581b16882cc333940786dcd2f18993de64ebe5c96b480d93ef2",
+    "covenant_mandates.py": "3c44201f0591d25f4e6c22507e3854de382b81e5ea5299e75d2cb27e5295097b"
   },
   "deployed_addresses": {
     "mandates": "0x3fA4E6e03Fbd434A577387924aF39efd3b4b50F2",

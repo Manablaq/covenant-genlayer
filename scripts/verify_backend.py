@@ -63,11 +63,13 @@ def main() -> int:
     authorization_tree = ast.parse(authorization_source)
     mandates_tree = ast.parse(mandates_source)
 
-    assert "MAX_EVIDENCE_BODY_BYTES = 8192" in mandates_source
+    assert "MAX_EVIDENCE_BODY_BYTES=8192" in mandates_source
+    assert "# pyright: reportUnknownMemberType=false" in mandates_source
+    assert "# pyright: reportUnknownMemberType=false" in authorization_source
     assert "max_evidence_body_bytes" in mandates_source
     assert "get_max_evidence_body_bytes" in authorization_source
     assert "REPAIR_EVIDENCE_BODY_TOO_LARGE" in authorization_source
-    assert "hashlib.sha256(body).digest()" in authorization_source
+    assert "hashlib.sha256(bb).digest()" in authorization_source
     assert "gl.vm.run_nondet_unsafe" in authorization_source
     assert "receipt_consumed" in authorization_source
     assert "nonce_used" in authorization_source
@@ -80,9 +82,10 @@ def main() -> int:
     ):
         assert call_count(function_node(authorization_tree, name), "view") == 0
 
-    assert "criteria = policy.semantic_criteria" in authorization_source
-    assert "self._validate_mandate_policy(policy)" in authorization_source
-    assert "if len(body) > int(policy.max_evidence_body_bytes):" in authorization_source
+    assert "policy.n" in authorization_source
+    assert "def _vp(" in authorization_source
+    assert "self._vp(policy)" in authorization_source
+    assert "len(bb)>int(policy.m)" in authorization_source
     assert "387e1a66e920cb2dfadcdce40ab2d28da02efd1e" in runtime_readme
     assert "reqwest::redirect::Policy::none()" in runtime_patch
 
