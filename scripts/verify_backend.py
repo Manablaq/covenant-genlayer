@@ -114,6 +114,19 @@ def main() -> int:
     assert redesign["eth_estimateGas"] < redesign["observed_submission_ceiling"]
     assert redesign["signing_performed"] is False
     assert redesign["submission_performed"] is False
+    bradbury = manifest["bradbury_deployment_attempts"]["finalized_mandates_deployment"]
+    assert bradbury["status"] == "FINALIZED"
+    assert bradbury["status_code"] == 7
+    assert bradbury["consensus_result"] == "AGREE"
+    assert bradbury["execution_result"] == "FINISHED_WITH_RETURN"
+    assert bradbury["source_parity"] is True
+    assert bradbury["deployment_submissions"] == 1
+    assert bradbury["replacement_or_resend"] is False
+    auth_attempt = manifest["bradbury_deployment_attempts"]["authorization_deployment_attempt"]
+    assert auth_attempt["status"] == "REJECTED_PRE_ACCEPTANCE"
+    assert auth_attempt["gas_estimate"] >= auth_attempt["observed_submission_ceiling"]
+    assert auth_attempt["accepted_transaction"] is None
+    assert auth_attempt["nonce_consumed"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
     assert checkpoint["status"] == "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE"

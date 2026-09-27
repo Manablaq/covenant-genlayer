@@ -1,11 +1,11 @@
 {
-  "manifest_version": 7,
+  "manifest_version": 8,
   "status": "UNRELEASED",
-  "release_scope": "redesigned backend source candidate; current-source local full-runtime closure proven; Bradbury/public release remains separately gated",
-  "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE_BRADBURY_DEPLOYMENT_PENDING",
+  "release_scope": "redesigned backend source candidate; current-source local full-runtime closure and finalized Bradbury Mandates deployment proven; Authorization deployment and Gate I/J remain separately gated",
+  "candidate_state": "CURRENT_SOURCE_BRADBURY_MANDATES_FINALIZED_AUTHORIZATION_DEPLOYMENT_PENDING",
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "No public or Bradbury deployment is claimed for the current source candidate.",
+    "reason": "Current-source Mandates is finalized on Bradbury, but Authorization deployment, complete Gate I live behavior, Bradbury runtime provenance, and Gate J evidence freeze are not complete.",
     "required_before_release": [
       "Bradbury runtime provenance and redirect compatibility",
       "Bradbury deployment and Gate I live verification",
@@ -16,8 +16,8 @@
     "network": "https://rpc-bradbury.genlayer.com",
     "chain_id": 4221,
     "consensus": "0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D",
-    "source_sha256": "aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2",
-    "status": "BLOCKED_PRE_ACCEPTANCE",
+    "source_sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+    "status": "MANDATES_FINALIZED_AUTHORIZATION_BLOCKED_PRE_ACCEPTANCE",
     "attempts": [
       {
         "method": "genlayer_cli_deploy",
@@ -54,24 +54,51 @@
       "source_sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
       "source_bytes": 19852,
       "payload_bytes": 39722,
-      "eth_estimateGas": 16516600,
+      "eth_estimateGas": 16516613,
       "observed_submission_ceiling": 16777216,
-      "margin_below_ceiling": 26616,
+      "margin_below_ceiling": 260603,
       "status": "READ_ONLY_ESTIMATE_PASS",
       "signing_performed": false,
       "submission_performed": false,
       "feature_parity": "all public methods, validation branches, commitment preimages, storage values, and state transitions retained; only revert diagnostics were compacted"
     },
+    "finalized_mandates_deployment": {
+      "evidence": "docs/CURRENT_SOURCE_BRADBURY_MANDATES_DEPLOYMENT_2026-09-27.json",
+      "deployment_transaction": "0xac76bf661d59ee0dafaff0c08045dcdfa8ff402f8b9c127270d5b978f7937557",
+      "finalization_transaction": "0xc4ae3ec1c1e2b06f377c32d07196d4243f0179e880b9c4087962584b483536dd",
+      "contract_address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+      "status": "FINALIZED",
+      "status_code": 7,
+      "consensus_result": "AGREE",
+      "execution_result": "FINISHED_WITH_RETURN",
+      "source_parity": true,
+      "deployment_submissions": 1,
+      "replacement_or_resend": false,
+      "finalization_submissions": 1
+    },
+    "authorization_deployment_attempt": {
+      "source_sha256": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
+      "source_bytes": 39673,
+      "constructor_mandates_address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+      "status": "REJECTED_PRE_ACCEPTANCE",
+      "gas_estimate": 31890852,
+      "observed_submission_ceiling": 16777216,
+      "rpc_error": "gas limit too high",
+      "rpc_error_identity": "0x655a6514e4de9178986778567bf8724e0a9502efd9c150efc156fe5be7707119",
+      "accepted_transaction": null,
+      "nonce_consumed": false,
+      "redesign_required": true
+    },
     "access_probe": {
       "network": "https://rpc-bradbury.genlayer.com",
-      "status": "BLOCKED_READ_ONLY_AUTHENTICATION",
-      "http_status": 403,
+      "status": "PASS_WITH_CURL_USER_AGENT_COMPATIBILITY",
+      "http_status": 200,
       "methods_attempted": ["eth_chainId", "sim_countValidators", "eth_getTransactionCount"],
       "signing_performed": false,
       "submission_performed": false,
-      "conclusion": "No Bradbury credential is present in the workspace; no deployment transaction was prepared or signed against an unauthenticated endpoint."
+      "conclusion": "Bradbury RPC accepts the read-only requests with a curl-compatible User-Agent; sim_countValidators is not exposed by the public endpoint. Bearer authentication was not required."
     },
-    "release_effect": "Current-source local closure is complete; Bradbury deployment and Gate I remain unproven, so production status must remain UNRELEASED."
+    "release_effect": "Current-source local closure and finalized Mandates deployment are proven; Authorization deployment, complete Gate I behavior, Bradbury runtime provenance, and Gate J remain open, so production status remains UNRELEASED."
   },
   "current_candidate": {
     "source_hashes": {
@@ -127,8 +154,9 @@
     "The supported current runtime returned status 302 and Location without following the redirect; this is local runtime provenance only and is separately recorded as current-source evidence.",
     "Two exact/current-source Bradbury Mandates deployment paths were rejected before acceptance with gas limit too high; returned identities 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 and 0xdfa2ed87220298fccc574bbe747ed52ec006d46e6e62045f51cf4202b4fb608d were not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
     "The exact current-source deployment fingerprint 1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399 was authorized, signed once, and submitted once; the network rejected it before acceptance. The sender nonce remained 1369, proving no accepted deployment transaction.",
-    "The redesigned source was estimated read-only on Bradbury at 16,516,600 gas, below the observed 16,777,216 ceiling; no signing or submission was performed for this estimate.",
-    "Bradbury/public deployment remains separately gated and UNRELEASED; this manifest does not claim production release."
+    "The redesigned Mandates source was estimated read-only on Bradbury at 16,516,613 gas, below the observed 16,777,216 ceiling, then deployed once and finalized with source parity at 0xd4C0945533C959b094967781815e31ecd0C345F7.",
+    "The current Authorization source was preflighted through the supported deployment path at 31,890,852 gas and rejected before acceptance as gas limit too high; no nonce was consumed. It requires a reviewed size/gas redesign before any further Bradbury write.",
+    "Bradbury/public release remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {
     "status": "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE",

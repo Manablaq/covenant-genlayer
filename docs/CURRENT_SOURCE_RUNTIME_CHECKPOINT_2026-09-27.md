@@ -1,8 +1,9 @@
 # Current-source supported-runtime checkpoint — 2026-09-27
 
-This checkpoint records the redesigned backend after current-source deployment
-and full supported-local runtime closure. It does not claim Bradbury deployment,
-Gate I, or final release certification.
+This checkpoint records the redesigned backend after current-source deployment,
+full supported-local runtime closure, and the finalized current-source Bradbury
+Mandates deployment. It does not claim complete Gate I or final release
+certification.
 
 ## Frozen source and deployments
 
@@ -78,18 +79,28 @@ origin cannot silently inherit approved-host provenance. The tracked summary is
 
 ## Release boundary
 
-The current-source local backend gates are complete. The repository remains
-`UNRELEASED` because the external Bradbury gates are not complete:
+The current-source local backend gates are complete, and the Mandates contract
+has now been deployed and finalized on Bradbury with exact source parity. The
+repository remains `UNRELEASED` because the remaining external gates are not
+complete:
 
+- current-source Authorization deployment and immutable Mandates binding;
 - Bradbury runtime provenance and redirect compatibility;
-- Bradbury deployment and Gate I live verification;
+- Gate I live verification for binding, request behavior, receipt generation,
+  consumption, mutation rejection, replay/wrong-consumer rejection, and
+  recovery/expiry;
 - Gate J reviewer evidence freeze and final certification.
 
-The redesigned source was estimated read-only at `16,516,600` gas against the
-observed `16,777,216` deployment ceiling. A current Bradbury read-only probe
-then returned HTTP `403 Forbidden` for `eth_chainId`, validator count, and
-deployer nonce. No Bradbury credential is present in the workspace, so no
-public deployment transaction was prepared, signed, or submitted.
+The Mandates source was estimated read-only at `16,516,613` gas against the
+observed `16,777,216` deployment ceiling, then deployed once and finalized.
+Bradbury returned contract code with the exact current-source hash. The
+current Authorization source was separately measured at `31,890,852` gas and
+was rejected before acceptance as `gas limit too high`; its nonce was not
+consumed. A reviewed Authorization size/gas redesign is therefore required
+before its Bradbury deployment.
+
+The machine-readable Bradbury deployment evidence is
+`docs/CURRENT_SOURCE_BRADBURY_MANDATES_DEPLOYMENT_2026-09-27.json`.
 
 The machine-readable current proof is
 `docs/CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json`; release status is recorded in

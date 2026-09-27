@@ -1,0 +1,29 @@
+{
+  "network": "https://rpc-bradbury.genlayer.com",
+  "chain_id": 4221,
+  "consensus": "0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D",
+  "source": "contracts/covenant_mandates.py",
+  "source_sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+  "source_bytes": 19852,
+  "sender": "0x1f87Ae197af539253978d435aD45cCf28Fb95024",
+  "deployment_transaction": "0xac76bf661d59ee0dafaff0c08045dcdfa8ff402f8b9c127270d5b978f7937557",
+  "finalization_transaction": "0xc4ae3ec1c1e2b06f377c32d07196d4243f0179e880b9c4087962584b483536dd",
+  "contract_address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+  "status": "Finalized",
+  "status_code": 7,
+  "consensus_result": "AGREE",
+  "execution_result": "FINISHED_WITH_RETURN",
+  "result_hash": "0xcff11dc747192454c4b7bc20e284990f25ed44ee4a05010469fc0189ed0c8f26",
+  "execution_hash": "0x30ef4e513cb7908de781eda139272158ee55209bd872909bf448511319b182c9",
+  "source_parity": {
+    "gen_getContractCode_sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+    "gen_getContractCode_bytes": 19852,
+    "match": true
+  },
+  "submission_policy": {
+    "deployment_submissions": 1,
+    "replacement_or_resend": false,
+    "finalization_submissions": 1
+  },
+  "remaining_gate": "Authorization deployment and Gate I behavioral verification remain open; this evidence does not claim backend release."
+}

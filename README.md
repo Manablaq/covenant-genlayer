@@ -37,9 +37,10 @@ Changing a consequential field invalidates the authorization.
 ## Current release status
 
 **UNRELEASED CURRENT CANDIDATE — the Mandates source has been redesigned to fit
-Bradbury’s observed gas ceiling without removing protocol features. Deterministic,
-adversarial, current-source local deployment, and full local live behavioral
-closure pass. Bradbury deployment, Gate I, and final release certification remain
+Bradbury’s observed gas ceiling without removing protocol features and is now
+deployed/finalized there with exact source parity. The current Authorization
+source still exceeds Bradbury’s observed gas ceiling, so its reviewed size/gas
+redesign, Gate I live verification, and final release certification remain
 pending.**
 
 The candidate retains mandate-bound evidence-body limits, bounded user-controlled
@@ -63,9 +64,10 @@ consumption, replay, wrong-consumer, and redirect provenance are recorded in
 evidence and is not used to establish the current-source claims.
 
 `deployments/release-manifest.json` records the current supported-local
-source-parity checkpoint and the historical predecessor proof. The backend and
-nested `production_deployment.status` remain `UNRELEASED` until the remaining
-Bradbury/public gates are closed.
+source-parity checkpoint, finalized Bradbury Mandates deployment, rejected
+Authorization deployment attempt, and historical predecessor proof. The
+backend and nested `production_deployment.status` remain `UNRELEASED` until
+the remaining Bradbury/public gates are closed.
 
 ## Verification
 
