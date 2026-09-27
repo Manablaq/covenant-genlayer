@@ -1,127 +1,96 @@
 # Current-source supported-runtime checkpoint — 2026-09-27
 
-This checkpoint records the pre-redesign source through complete supported-local
-runtime behavioral closure. It is historical after the deployment-size redesign
-and does not claim that the redesigned source has local or Bradbury deployment
-parity, production release, or Gate J freeze.
+This checkpoint records the redesigned backend after current-source deployment
+and full supported-local runtime closure. It does not claim Bradbury deployment,
+Gate I, or final release certification.
 
-## Frozen source identity
+## Frozen source and deployments
 
-- Source commit: `3601eb4c1715afe9a607a4685ec290338913bf7c`
-- Source tree: `9436b3a12861c63c30105cd2b1f485b6c5780aa0`
+- Source commit: `40417500c938ae59de4fded587e3bfefd562e07c`
 - Authorization SHA-256: `24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed`
-- Mandates SHA-256: `aa38488fb44815a248ffbf5fa9938449a66954bfa94717686bc7b7cf4fdee4b2`
-- Chain ID: `61999`
-- Validators: `5`
-- Mandates: `0xdFEce9C4ae3124B8de273B75227F6DC1DE30297C`
-- Authorization: `0xEBb2863137Dff7e96886090D303373E8Ec9CF5B8`
+- Mandates SHA-256: `76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244`
+- Chain ID: `61999`; validators: `5`
+- Mandates: `0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19`
+- Authorization: `0xCe751D8399639157268a55F12e6f2aB081d49c72`
+- Mandates deployment: `0x093cb27ac4de83a210249b68076e3f262ef6874130d1778161e623b09492811f`
+- Authorization deployment: `0xfa3a4bfc19056a3776490fcc0943ce58054a31dfd1aa426cb80c993a9ccbee66`
+- Mandate creation: `0xf27766dc65cb24ddcaf7c83e043e0e830a5b954959f27ff15026e0837db595fc`
+- Mandate ID: `0x1615e279a430992697a633ad6e63af597be430c52f079d70eb2a641887db4a2c`
+- Mandate commitment: `0x603ea67502d1b4d563cc7a2200d0e71c0a7a457ac169d0d0c9fdad1f784c0d72`
 
-The live contract source hashes match the frozen repository source hashes.
-
-That statement applies to the pre-redesign source recorded below. The redesigned
-repository candidate is recorded in `deployments/release-manifest.json` with
-Mandates SHA-256
-`76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244`.
-
-## Deployment and mandate setup
-
-- Mandates deployment: `0x4f8814f7f84db106f47a947ddefcb902f2f782dc1c703e4a370c72aea1e6922b`
-- Authorization deployment: `0x32687d2ff5b61f1ab8a4bfcb59ba9d3685c1e6e806ce737425d78276b1fdb2bb`
-- Mandate creation: `0xd2a0e3cf3461c96af3cbbdb06f14eb971fddcbb58d4f845824eefca58008b727`
-- Mandate ID: `0xcc8506d1809fc4664c5f9287816f8c51198c250fe995cc505c340d4b12de8ab7`
-- Mandate version: `1`
-- Mandate state parity: `PASS`
-- Authorization → Mandates binding: `PASS`
-
-All successful writes below reached `FINALIZED / MAJORITY_AGREE`. Each was
-prepared from a persisted unsigned transaction, bound to an exact fingerprint,
-signed once, submitted once, and recovered by transaction ID. Failed or
-expired attempts were not blindly retried.
+All successful writes below reached `FINALIZED / MAJORITY_AGREE` with five
+committed and revealed validator votes. Each write was prepared from a
+persisted unsigned transaction, bound to an exact fingerprint, signed once,
+submitted once, and recovered by transaction ID.
 
 ## Current-source live closure
 
 ### Approval
 
-- Create request: `0x819e5ecbe813fd570145d6e8b6b29d89816ac43c0993c28704ac271a042c760a`
-- Request ID: `0x8bfd66e1166ebd047919d45e3c13a6a27d075dff219093e6635e7a7f598e59e8`
-- Evaluation: `0x3cef554f5954d63f94c8756de86c87c33eb2087de2950f22cca6ff76b2b09761`
-- Result: `AUTHORIZED`; request/evidence/action/receipt parity passed.
+- Create request: `0x7ca94d4d04ab94d3860f5b62a6c6c2473da4b728e483f9e41487378d7098b6ee`
+- Request ID: `0x594f617cb3aca07f932b4ccbec34ac99b8d38f3404cd1b12072c921a58b3dec2`
+- Evaluation: `0x08c6660afe722216fd0672449b604f1bcfa139990b3b42daed85c73fe8565247`
+- Result: terminal `AUTHORIZED`; receipt binding and source parity passed.
 
 ### Independent rejection
 
-- Create request: `0xce41bada44665e5176df386a26ea5f07488ea0087323aae5a36c6ae6e68edef1`
-- Request ID: `0xa93a5026d5a339d9a9729da90d6b2965fd4b54c05c43748aff25781dc62418e0`
-- Evaluation: `0xaab35ae6b5b2f9453305bcf2278874c6372240b417ea1d29322100ca628a568e`
-- Result: terminal `DENIED`; action identity and evidence parity passed; no receipt.
+- Create request: `0x96a781b4c7722c4931f72976afc50626f344d3887809b544421af0462754b2df`
+- Request ID: `0x24bdd5c1342e415d65309af4de376e48c352664543afbb2190927bf2e1fdb7d9`
+- Evaluation: `0xb6634e9542f5d982696ada388dceb135e89a2c47a8044ef41c745b480e299f99`
+- Result: terminal `DENIED`; no receipt; source parity passed.
 
 ### Repair and replacement
 
-- Create request: `0xa3d9c20e1480042a1e295f0414d4fbd138326138769d897ab0e356ff4aaf130e`
-- Request ID: `0x691309a9fc6a3f8f69dde6be838649c926167200f3ec0f37a74988bc25e8872f`
-- Evaluation to `REPAIR_REQUIRED`: `0x1552e4249614a54b324bcb0cdb807baf9e3cac891fed1679241cbae172bd2253`
-- Evidence replacement: `0xda06c3d9dceebe07c0a25871ae03153623a24b8bf97bb6117465e9b27cde9178`
-- Re-evaluation: `0x930dfa24b47fb729b2e9350e9a95e2ee0c56a0fd062ae3d4b797dcddb7a17e1f`
-- Result: `AUTHORIZED`; revision advanced to `1`, request ID/action subject stayed fixed,
-  action intent matched the replacement, and the repair deadline stayed fixed.
+- Create request: `0xe8aa4b57e0bc9a7321d85119732f87bd461475d3e88198d306daf52913622616`
+- Request ID: `0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f`
+- Valid replacement: `0x54bbcbf3c5c141697b75f2683897f06122e71854f6272b971de3c71252777873`
+- Repaired evaluation: `0x4cdd2f35e951ca055b236548f06efe4faf0097c5db04d3f7b3bd9217ada04eec`
+- Result: terminal `AUTHORIZED`; evidence revision advanced to `2`; request identity remained fixed.
+- An invalid replacement was separately finalized as `REPAIR_REQUIRED`, proving invalid evidence cannot advance the request.
 
 ### Timeout and recovery
 
-- Request ID: `0x8722ea20195a5b559c6f826d1eba5631ac4c091dc8755d0cf655ff97ef51e921`
-- A replacement submitted after its fixed repair deadline was finalized as an
-  execution error: `0x2d65db44997c64e937572780ca22350437b75406fffe186371ca7210e58260db`.
-- No resend or replacement was performed after that error.
-- After the persisted deadline and request expiry passed, explicit expiry finalized:
-  `0x38c7939fa7c4c9ddfd59fb98d344eb81fbd92ec409370352e1a848b7ab5ba6f7`.
-- Result: terminal `EXPIRED`; repair reason cleared; no receipt.
+- Fresh timeout-case create: `0xda4481914f2df2c986374d6452446b37dc411b90e81e2d0fd7866ec4b9333d8d`
+- Request ID: `0xb0659624dec1feaf4cc5770a22d420a80d08a7f9b049aa2fcf50e684229d4dd7`
+- Evaluation after the fixed expiry: `0x84c2afae5cfe928c2e55b40cfafb7ed5b23ed8c0fa07be0225d2d76b3e29348e`
+- Result: terminal `EXPIRED`; no receipt, no replacement, and no automatic resend.
 
-### Receipt consumption and replay protection
+### Receipt consumption, replay, and wrong consumer
 
-- Request ID: `0x73552aa5e65d451bac6a2e9ca162ec410891c8ecc650f671189b5c4abf896df1`
-- Create request: `0xbe531abe20fd25a7b2d8e5e773cc9843085953e963c6a7b0acb0f28424bf93ae`
-- Evaluation: `0x0185a4230dd8a3e7ed203078edd376c39814eedcdfdb57a08a17310b02d596c6`
-- Authorized consumption: `0x8a0a175b5dab5bfd150945ca8d9159b96d3ad1abdf11e1f01528d31e9b328bc2`
-- Result: terminal `CONSUMED`; `receipt_consumed=true`.
-- Fresh replay attempt: `0x07ad4b8ae6d4a6cdfb3d878f0da79e9a8d2eca22ddc774ed5561f3866388afd7`.
-- Replay result: finalized terminal-state rejection; request remained `CONSUMED`.
+- Request ID: `0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f`
+- Receipt ID: `0x985975c8f7b78d9a8f08a9550b118c3f97b534ec9cf8e3a8290e4cceb4a6afaa`
+- Authorized consumption: `0x9d62334de4af6adf408f3e9a30a524279f413b7b1e1ebd1dc3ce1a08a136b74c`
+- Exact replay rejection: `0xb7b62b795779a480c9c3acc1b78d1ce877b5708dba209939126299d1f04065b6`
+- Wrong-consumer rejection: `0x1aa0bb79318752c2ff749431ab7e2dbf981f647725b759df98774b5a0b425c90`
+- Result: terminal `CONSUMED`; `receipt_consumed=true`; both negative paths finalized authorization errors and left state unchanged.
 
 ### Redirect/effective-origin provenance
 
-The active local JSON-RPC GenVM manager was probed against the deterministic
-302 fixture using the mounted current runtime. The result was:
+The active local GenVM manager was rerun against a deterministic 302 fixture.
+The runtime returned:
 
 `status=302;location=b'/final'`
 
-This proves the active runtime exposed the redirect response and `Location`
-header instead of following `/final`. Runtime source, patch, binary,
-configuration, and mounted-component hashes remain recorded in
-`deployments/release-manifest.json`. The machine-readable probe summary is
-under `work/phase6d-current-redirect-probe-20260927-current/`.
+It exposed the redirect response and `Location` header without fetching `/final`.
+That makes the no-redirect boundary enforceable: body bytes from a redirected
+origin cannot silently inherit approved-host provenance. The tracked summary is
+`docs/CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json`.
 
 ## Release boundary
 
-The pre-redesign backend contract implementation and supported-local-runtime
-behavioral gates were complete. The repository remains `UNRELEASED` because the
-redesigned source must first be redeployed and re-certified, followed by these
-external release gates:
+The current-source local backend gates are complete. The repository remains
+`UNRELEASED` because the external Bradbury gates are not complete:
 
 - Bradbury runtime provenance and redirect compatibility;
 - Bradbury deployment and Gate I live verification;
 - Gate J reviewer evidence freeze and final certification.
 
-The exact release state is machine-readable in
-`deployments/release-manifest.json`. Historical predecessor-source evidence is
-not used as current-source proof. Two pre-redesign Bradbury deployment paths
-were rejected before acceptance because the network reported `gas limit too
-high`; the returned identities were not visible through
-`eth_getTransactionByHash`, the sender nonce remained unchanged, and no
-Bradbury transaction or deployment address is recorded as successful.
+The redesigned source was estimated read-only at `16,516,600` gas against the
+observed `16,777,216` deployment ceiling. A current Bradbury read-only probe
+then returned HTTP `403 Forbidden` for `eth_chainId`, validator count, and
+deployer nonce. No Bradbury credential is present in the workspace, so no
+public deployment transaction was prepared, signed, or submitted.
 
-The pre-redesign exact-source signed transaction used gas limit `17,060,259` and
-was bound to fingerprint
-`1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399`. A
-read-only probe returned `execution reverted` for gas caps through
-`16,777,216`, so lowering the gas limit would be an unsafe out-of-gas guess,
-not a valid deployment recovery. The redesigned source was subsequently
-estimated read-only at `16,516,600` gas, below the observed `16,777,216` ceiling;
-no signing or submission was performed for that estimate. Local redeployment
-and full live re-certification are still required.
+The machine-readable current proof is
+`docs/CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json`; release status is recorded in
+`deployments/release-manifest.json`.

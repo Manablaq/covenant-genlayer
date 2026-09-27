@@ -22,6 +22,8 @@ MANDATES = ROOT / "contracts" / "covenant_mandates.py"
 MANIFEST = ROOT / "deployments" / "release-manifest.json"
 RUNTIME_PATCH = ROOT / "runtime" / "patches" / "genvm-v0.2.16-no-redirect.patch"
 RUNTIME_README = ROOT / "runtime" / "README.md"
+CURRENT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
+CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
 
 
 def sha256(path: Path) -> str:
@@ -100,9 +102,11 @@ def main() -> int:
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
     current = manifest["current_candidate"]
-    assert current["live_source_parity"] is False
-    assert current["source_commit"] == "1f2c26e07785ef2d1d9095c804334a2382b47e9c"
-    assert current["parity_scope"] == "redesigned repository candidate; live deployment parity must be re-established before release"
+    assert current["live_source_parity"] is True
+    assert current["source_commit"] == "40417500c938ae59de4fded587e3bfefd562e07c"
+    assert current["deployed_addresses"]["mandates"] == "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19"
+    assert current["deployed_addresses"]["authorization"] == "0xCe751D8399639157268a55F12e6f2aB081d49c72"
+    assert current["parity_scope"] == "redesigned repository source bytes match both current local deployments; all current-source local behavioral gates are finalized"
     assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
     redesign = manifest["bradbury_deployment_attempts"]["redesign_candidate_estimate"]
@@ -112,22 +116,19 @@ def main() -> int:
     assert redesign["submission_performed"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
-    assert checkpoint["status"] == "PRE_REDESIGN_HISTORICAL_LOCAL_RUNTIME_CLOSURE"
-    assert checkpoint["source_commit"] == "3601eb4c1715afe9a607a4685ec290338913bf7c"
+    assert checkpoint["status"] == "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE"
+    assert checkpoint["source_commit"] == "40417500c938ae59de4fded587e3bfefd562e07c"
     assert checkpoint["chain_id"] == 61999
     assert checkpoint["validator_count"] == 5
-    assert checkpoint["deployed_addresses"]["mandates"] == "0xdFEce9C4ae3124B8de273B75227F6DC1DE30297C"
-    assert checkpoint["deployed_addresses"]["authorization"] == "0xEBb2863137Dff7e96886090D303373E8Ec9CF5B8"
-    assert checkpoint["mandate"]["mandate_id"] == "0xcc8506d1809fc4664c5f9287816f8c51198c250fe995cc505c340d4b12de8ab7"
-    assert checkpoint["mandate"]["version"] == 1
-    assert checkpoint["mandate"]["state_parity"] == "PASS"
+    assert checkpoint["deployed_addresses"]["mandates"] == "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19"
+    assert checkpoint["deployed_addresses"]["authorization"] == "0xCe751D8399639157268a55F12e6f2aB081d49c72"
     proofs = checkpoint["live_proofs"]
     assert proofs["approval"]["terminal_state"] == "AUTHORIZED"
     assert proofs["rejection"]["terminal_state"] == "DENIED"
     assert proofs["repair_replacement"]["terminal_state"] == "AUTHORIZED"
     assert proofs["timeout_recovery"]["terminal_state"] == "EXPIRED"
     assert proofs["receipt_consumption"]["terminal_state"] == "CONSUMED"
-    assert proofs["redirect_provenance"]["status"] == "PASS_LOCAL_ONLY"
+    assert proofs["redirect_provenance"]["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
     boundary = checkpoint["proof_boundary"]
     assert boundary["current_source_deployment_parity"] is True
     assert boundary["current_mandate_created"] is True
@@ -140,8 +141,14 @@ def main() -> int:
     assert boundary["current_redirect_provenance_proven"] is True
     assert boundary["production_or_bradbury_release"] is False
 
-    historical = manifest["historical_local_live_proof"]
-    assert historical["status"] == "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY"
+    current_proof = json.loads(CURRENT_PROOF.read_text(encoding="utf-8"))
+    current_redirect = json.loads(CURRENT_REDIRECT_PROOF.read_text(encoding="utf-8"))
+    assert current_proof["status"] == "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE"
+    assert current_proof["proof_boundary"]["production_or_bradbury_release"] is False
+    assert current_redirect["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
+    assert current_redirect["decoded_result"] == "status=302;location=b'/final'"
+    historical = manifest["historical_pre_redesign_local_runtime_checkpoint"]
+    assert historical["status"] == "PRE_REDESIGN_HISTORICAL_LOCAL_RUNTIME_CLOSURE"
     runtime = manifest["runtime_provenance"]
     assert runtime["local_proof_only"] is True
     assert runtime["genvm_source_commit"] == "387e1a66e920cb2dfadcdce40ab2d28da02efd1e"

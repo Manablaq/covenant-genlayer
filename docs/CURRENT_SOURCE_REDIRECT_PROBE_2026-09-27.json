@@ -1,0 +1,14 @@
+{
+  "status": "PASS_LOCAL_CURRENT_RUNTIME",
+  "probe": "active local JSON-RPC GenVM manager against deterministic 302 fixture",
+  "runtime": "genvm v0.2.16-aarch64-linux-release",
+  "runtime_patch": "runtime/patches/genvm-v0.2.16-no-redirect.patch",
+  "fixture": "work/redirect-probe-server.py",
+  "probe_code_sha256": "b8a1ed91f985c100a5802fc8ca2f485cf0a61a1b58492ec23df89cfcefd43bfc",
+  "execution_result": "ExecutionResultStatus.SUCCESS",
+  "result_code": 0,
+  "decoded_result": "status=302;location=b'/final'",
+  "effective_origin_policy": "redirect response is exposed and /final is not fetched; approved-origin provenance cannot be silently transferred",
+  "chain_state_changed": false,
+  "writes_submitted": 0
+}

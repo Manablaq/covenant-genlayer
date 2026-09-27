@@ -1,8 +1,8 @@
 {
-  "manifest_version": 6,
+  "manifest_version": 7,
   "status": "UNRELEASED",
-  "release_scope": "redesigned backend source candidate; deterministic and adversarial parity proven; local redeployment and Bradbury/public release remain separately gated",
-  "candidate_state": "CURRENT_SOURCE_BRADBURY_FIT_REDESIGN_LOCAL_REDEPLOY_PENDING",
+  "release_scope": "redesigned backend source candidate; current-source local full-runtime closure proven; Bradbury/public release remains separately gated",
+  "candidate_state": "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE_BRADBURY_DEPLOYMENT_PENDING",
   "production_deployment": {
     "status": "UNRELEASED",
     "reason": "No public or Bradbury deployment is claimed for the current source candidate.",
@@ -62,16 +62,29 @@
       "submission_performed": false,
       "feature_parity": "all public methods, validation branches, commitment preimages, storage values, and state transitions retained; only revert diagnostics were compacted"
     },
-    "release_effect": "Bradbury deployment and Gate I remain unproven; production status must remain UNRELEASED."
+    "access_probe": {
+      "network": "https://rpc-bradbury.genlayer.com",
+      "status": "BLOCKED_READ_ONLY_AUTHENTICATION",
+      "http_status": 403,
+      "methods_attempted": ["eth_chainId", "sim_countValidators", "eth_getTransactionCount"],
+      "signing_performed": false,
+      "submission_performed": false,
+      "conclusion": "No Bradbury credential is present in the workspace; no deployment transaction was prepared or signed against an unauthenticated endpoint."
+    },
+    "release_effect": "Current-source local closure is complete; Bradbury deployment and Gate I remain unproven, so production status must remain UNRELEASED."
   },
   "current_candidate": {
     "source_hashes": {
       "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
       "covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
     },
-    "live_source_parity": false,
-    "source_commit": "1f2c26e07785ef2d1d9095c804334a2382b47e9c",
-    "parity_scope": "redesigned repository candidate; live deployment parity must be re-established before release"
+    "live_source_parity": true,
+    "source_commit": "40417500c938ae59de4fded587e3bfefd562e07c",
+    "deployed_addresses": {
+      "mandates": "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19",
+      "authorization": "0xCe751D8399639157268a55F12e6f2aB081d49c72"
+    },
+    "parity_scope": "redesigned repository source bytes match both current local deployments; all current-source local behavioral gates are finalized"
   },
   "historical_local_live_proof": {
     "status": "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY",
@@ -109,15 +122,94 @@
   "notes": [
     "Historical local-runtime transactions prove the predecessor source only.",
     "The pre-redesign source had exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity; those deployments are historical after the deployment-size redesign.",
-    "The redesigned source retains the public surface, validation branches, commitment preimages, storage values, and state transitions. Deterministic, GLSim, runtime-calldata, adversarial, and Gate D tests pass against the redesigned source; live closure must be rerun after local redeployment.",
-    "The first current-source approval request entered repair because its evidence became stale; a later finalized approval request reached AUTHORIZED, and a separate finalized request reached DENIED.",
-    "The supported runtime redirect probe returned status 302 and Location without following the redirect; this is local runtime provenance only.",
+    "The redesigned source retains the public surface, validation branches, commitment preimages, storage values, and state transitions. Deterministic, GLSim, runtime-calldata, adversarial, Gate D, and current-source full-runtime tests pass.",
+    "Current-source approval, rejection, repair/replacement, timeout, receipt consumption, replay, wrong-consumer, and redirect provenance gates are finalized locally with exact request-state parity.",
+    "The supported current runtime returned status 302 and Location without following the redirect; this is local runtime provenance only and is separately recorded as current-source evidence.",
     "Two exact/current-source Bradbury Mandates deployment paths were rejected before acceptance with gas limit too high; returned identities 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 and 0xdfa2ed87220298fccc574bbe747ed52ec006d46e6e62045f51cf4202b4fb608d were not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
     "The exact current-source deployment fingerprint 1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399 was authorized, signed once, and submitted once; the network rejected it before acceptance. The sender nonce remained 1369, proving no accepted deployment transaction.",
     "The redesigned source was estimated read-only on Bradbury at 16,516,600 gas, below the observed 16,777,216 ceiling; no signing or submission was performed for this estimate.",
     "Bradbury/public deployment remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {
+    "status": "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE",
+    "source_commit": "40417500c938ae59de4fded587e3bfefd562e07c",
+    "chain_id": 61999,
+    "validator_count": 5,
+    "source_hashes": {
+      "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
+      "covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
+    },
+    "deployed_addresses": {
+      "mandates": "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19",
+      "authorization": "0xCe751D8399639157268a55F12e6f2aB081d49c72"
+    },
+    "transactions": {
+      "mandates_deployment": "0x093cb27ac4de83a210249b68076e3f262ef6874130d1778161e623b09492811f",
+      "authorization_deployment": "0xfa3a4bfc19056a3776490fcc0943ce58054a31dfd1aa426cb80c993a9ccbee66",
+      "mandate_create": "0xf27766dc65cb24ddcaf7c83e043e0e830a5b954959f27ff15026e0837db595fc"
+    },
+    "live_proofs": {
+      "approval": {
+        "create_request": "0x7ca94d4d04ab94d3860f5b62a6c6c2473da4b728e483f9e41487378d7098b6ee",
+        "request_id": "0x594f617cb3aca07f932b4ccbec34ac99b8d38f3404cd1b12072c921a58b3dec2",
+        "evaluate_request": "0x08c6660afe722216fd0672449b604f1bcfa139990b3b42daed85c73fe8565247",
+        "terminal_state": "AUTHORIZED",
+        "result": "FINALIZED / MAJORITY_AGREE"
+      },
+      "rejection": {
+        "create_request": "0x96a781b4c7722c4931f72976afc50626f344d3887809b544421af0462754b2df",
+        "request_id": "0x24bdd5c1342e415d65309af4de376e48c352664543afbb2190927bf2e1fdb7d9",
+        "evaluate_request": "0xb6634e9542f5d982696ada388dceb135e89a2c47a8044ef41c745b480e299f99",
+        "terminal_state": "DENIED",
+        "result": "FINALIZED / MAJORITY_AGREE"
+      },
+      "repair_replacement": {
+        "create_request": "0xe8aa4b57e0bc9a7321d85119732f87bd461475d3e88198d306daf52913622616",
+        "request_id": "0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f",
+        "valid_replacement": "0x54bbcbf3c5c141697b75f2683897f06122e71854f6272b971de3c71252777873",
+        "repaired_evaluate_request": "0x4cdd2f35e951ca055b236548f06efe4faf0097c5db04d3f7b3bd9217ada04eec",
+        "terminal_state": "AUTHORIZED",
+        "evidence_revision": 2,
+        "result": "FINALIZED / MAJORITY_AGREE"
+      },
+      "timeout_recovery": {
+        "create_request": "0xda4481914f2df2c986374d6452446b37dc411b90e81e2d0fd7866ec4b9333d8d",
+        "request_id": "0xb0659624dec1feaf4cc5770a22d420a80d08a7f9b049aa2fcf50e684229d4dd7",
+        "evaluate_request": "0x84c2afae5cfe928c2e55b40cfafb7ed5b23ed8c0fa07be0225d2d76b3e29348e",
+        "terminal_state": "EXPIRED",
+        "result": "FINALIZED / MAJORITY_AGREE",
+        "resubmission_policy": "no automatic resend or replacement"
+      },
+      "receipt_consumption": {
+        "request_id": "0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f",
+        "consume_receipt": "0x9d62334de4af6adf408f3e9a30a524279f413b7b1e1ebd1dc3ce1a08a136b74c",
+        "replay_rejection": "0xb7b62b795779a480c9c3acc1b78d1ce877b5708dba209939126299d1f04065b6",
+        "wrong_consumer_rejection": "0x1aa0bb79318752c2ff749431ab7e2dbf981f647725b759df98774b5a0b425c90",
+        "terminal_state": "CONSUMED",
+        "result": "FINALIZED / MAJORITY_AGREE; negative paths finalized authorization rejections"
+      },
+      "redirect_provenance": {
+        "status": "PASS_LOCAL_CURRENT_RUNTIME",
+        "decoded_result": "status=302;location=b'/final'",
+        "effective_origin_policy": "redirect response exposed; final URL not fetched",
+        "evidence": "docs/CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
+      }
+    },
+    "proof_boundary": {
+      "current_source_deployment_parity": true,
+      "current_mandate_created": true,
+      "current_approval_request_created": true,
+      "current_approval_evaluated": true,
+      "current_rejection_proven": true,
+      "current_repair_replacement_proven": true,
+      "current_timeout_recovery_proven": true,
+      "current_receipt_consumption_proven": true,
+      "current_redirect_provenance_proven": true,
+      "production_or_bradbury_release": false
+    },
+    "evidence_summary": "docs/CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
+  },
+  "historical_pre_redesign_local_runtime_checkpoint": {
     "status": "PRE_REDESIGN_HISTORICAL_LOCAL_RUNTIME_CLOSURE",
     "source_commit": "3601eb4c1715afe9a607a4685ec290338913bf7c",
     "chain_id": 61999,

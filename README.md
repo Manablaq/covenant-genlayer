@@ -37,37 +37,35 @@ Changing a consequential field invalidates the authorization.
 ## Current release status
 
 **UNRELEASED CURRENT CANDIDATE — the Mandates source has been redesigned to fit
-Bradbury’s observed gas ceiling without removing protocol features. Deterministic
-and adversarial parity passes; local redeployment, live behavioral re-certification,
-and Production/Bradbury deployment remain pending.**
+Bradbury’s observed gas ceiling without removing protocol features. Deterministic,
+adversarial, current-source local deployment, and full local live behavioral
+closure pass. Bradbury deployment, Gate I, and final release certification remain
+pending.**
 
 The candidate retains mandate-bound evidence-body limits, bounded user-controlled
 inputs, one-time verified mandate-policy loading, all public Mandates methods,
 validation branches, commitment preimages, storage values, and state transitions.
 The compact diagnostic-code redesign passes Direct, GLSim, adversarial,
 runtime-calldata, reference-vector, and Gate D coverage. The redesigned source
-has not yet been redeployed to the local runtime.
+has been redeployed to the supported local runtime and matches both deployments
+byte-for-byte.
 
 The first current-source approval `create_request` candidate did **not** reach
 the chain: mandatory pre-sign freshness revalidation found evidence observation
 age `1352` seconds against the mandate maximum of `900`, so the runner stopped
 before signing with submission count `0`. That fingerprint is not reusable.
 
-A new request has since been prepared **unsigned only** at EVM nonce `39` with
-freshness `PASS` and fingerprint
-`45b1b67bd5bf328119646411e4b55f4731997d6e92f08d9ddab5e811a36ae838`.
-It has not been signed or submitted and requires separate exact transaction-level
-authorization. See `docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
+Current-source approval, rejection, repair/replacement, timeout, receipt
+consumption, replay, wrong-consumer, and redirect provenance are recorded in
+`docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
 
 `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` remains historical predecessor-source
-evidence for the older full behavioral closure; those request/approval/rejection/
-repair/timeout/recovery/receipt claims are not inherited by the current source.
+evidence and is not used to establish the current-source claims.
 
-`deployments/release-manifest.json` records both the current supported-local
+`deployments/release-manifest.json` records the current supported-local
 source-parity checkpoint and the historical predecessor proof. The backend and
 nested `production_deployment.status` remain `UNRELEASED` until the remaining
-current-source behavioral gates and separately authorized Bradbury/public gates
-are closed.
+Bradbury/public gates are closed.
 
 ## Verification
 
