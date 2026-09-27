@@ -60,6 +60,7 @@
     "Current-source approval, rejection, repair/replacement, timeout/expiry, receipt consumption, replay rejection, and redirect provenance are closed on the supported local runtime with persisted finality/state evidence under the operator work roots.",
     "The first current-source approval request entered repair because its evidence became stale; a later finalized approval request reached AUTHORIZED, and a separate finalized request reached DENIED.",
     "The supported runtime redirect probe returned status 302 and Location without following the redirect; this is local runtime provenance only.",
+    "A Bradbury Mandates deployment attempt was rejected before acceptance with gas limit too high; returned identity 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 was not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
     "Bradbury/public deployment remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {

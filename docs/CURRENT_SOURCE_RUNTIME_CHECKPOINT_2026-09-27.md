@@ -103,4 +103,6 @@ gates are complete for this source candidate. The repository remains
 
 The exact release state is machine-readable in
 `deployments/release-manifest.json`. Historical predecessor-source evidence is
-not used as current-source proof.
+not used as current-source proof. A Bradbury deployment attempt was rejected
+before acceptance because the network reported `gas limit too high`; no
+Bradbury transaction or deployment address is recorded as successful.
