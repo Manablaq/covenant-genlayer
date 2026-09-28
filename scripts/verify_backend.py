@@ -141,6 +141,16 @@ def main() -> int:
     assert failed_attempt["source_parity"] is False
     assert failed_attempt["deployment_submissions"] == 1
     assert failed_attempt["replacement_or_resend"] is False
+    accepted_attempt = manifest["bradbury_deployment_attempts"]["authorization_format_fix_deployment_attempt"]
+    assert accepted_attempt["source_sha256"] == sha256(AUTHORIZATION)
+    assert accepted_attempt["status"] == "ACCEPTED_NOT_FINALIZED"
+    assert accepted_attempt["gas_estimate"] < accepted_attempt["observed_submission_ceiling"]
+    assert accepted_attempt["tx_execution_result"] == "FINISHED_WITH_RETURN"
+    assert accepted_attempt["genvm_trace_result_code"] == 0
+    assert accepted_attempt["deployment_address"] is None
+    assert accepted_attempt["source_parity"] is False
+    assert accepted_attempt["finalization_submissions"] == 0
+    assert accepted_attempt["finalization_required"] is True
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
     assert checkpoint["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"

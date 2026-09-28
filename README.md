@@ -41,11 +41,11 @@ Bradbury’s observed gas ceiling without removing protocol features and is now
 deployed/finalized there with exact source parity. The authorized compact
 Authorization attempt fit the observed gas ceiling but failed during GenVM
 parsing because its required dependency-header blank line had been removed.
-That format defect is fixed locally in source hash
+That format defect is fixed in source hash
 `306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1`; the
-corrected bytes have not been transmitted, so a fresh exact authorization,
-Bradbury estimate/deployment, Gate I live verification, and final release
-certification remain pending.**
+corrected deployment is accepted with successful GenVM execution but awaits
+separate finalization. Current-source parity, Gate I live verification, and
+final release certification remain pending.**
 
 The candidate retains mandate-bound evidence-body limits, bounded user-controlled
 inputs, one-time verified mandate-policy loading, all public Mandates methods,

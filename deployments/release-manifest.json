@@ -2,7 +2,7 @@
   "manifest_version": 10,
   "status": "UNRELEASED",
   "release_scope": "compact Authorization source candidate; static and local behavioral gates pass; Bradbury Authorization estimate and deployment remain separately gated",
-  "candidate_state": "CURRENT_SOURCE_AUTHORIZATION_FORMAT_FIX_BRADBURY_ESTIMATE_PENDING",
+  "candidate_state": "CURRENT_SOURCE_AUTHORIZATION_BRADBURY_ACCEPTED_FINALIZATION_PENDING",
   "production_deployment": {
     "status": "UNRELEASED",
     "reason": "Current-source Mandates is finalized on Bradbury, but Authorization deployment, complete Gate I live behavior, Bradbury runtime provenance, and Gate J evidence freeze are not complete.",
@@ -115,6 +115,24 @@
       "replacement_or_resend": false,
       "conclusion": "The outer transaction was mined, but GenVM rejected the source during contract parsing. The required blank line after the Depends header has been restored locally; the resulting source hash is a new local-only candidate awaiting exact authorization."
     },
+    "authorization_format_fix_deployment_attempt": {
+      "evidence": "docs/CURRENT_SOURCE_BRADBURY_AUTHORIZATION_ACCEPTED_2026-09-28.json",
+      "source_sha256": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+      "status": "ACCEPTED_NOT_FINALIZED",
+      "outer_evm_transaction": "0xd0796dab9c78d6d33464ed113580532da5f89fd122f4dffefec6dde49277bafe",
+      "internal_transaction": "0x813a2771ba4a8f2ec8dcf968b478c17cd2b646577b8d5c79d9f8558783b7d32f",
+      "gas_estimate": 16639967,
+      "observed_submission_ceiling": 16777216,
+      "internal_status": "ACCEPTED_NOT_FINALIZED",
+      "tx_execution_result": "FINISHED_WITH_RETURN",
+      "genvm_trace_result_code": 0,
+      "deployment_address": null,
+      "source_parity": false,
+      "deployment_submissions": 1,
+      "finalization_submissions": 0,
+      "finalization_required": true,
+      "conclusion": "The corrected source parsed and executed successfully with unanimous validator agreement. Finalization is still pending and requires a separate on-chain transaction."
+    },
     "access_probe": {
       "network": "https://rpc-bradbury.genlayer.com",
       "status": "PASS_WITH_CURL_USER_AGENT_COMPATIBILITY",
@@ -124,7 +142,7 @@
       "submission_performed": false,
       "conclusion": "Bradbury RPC accepts the read-only requests with a curl-compatible User-Agent; sim_countValidators is not exposed by the public endpoint. Bearer authentication was not required."
     },
-    "release_effect": "Pre-compact local closure and finalized Mandates deployment are proven; the authorized compact Authorization attempt failed during GenVM parsing, the corrected Authorization source is local-only, complete Gate I behavior for it, Bradbury runtime provenance, and Gate J remain open, so production status remains UNRELEASED."
+    "release_effect": "Pre-compact local closure and finalized Mandates deployment are proven; the corrected Authorization deployment is accepted with successful GenVM execution but not finalized, so current-source parity, complete Gate I behavior, Bradbury runtime provenance, and Gate J remain open, and production status remains UNRELEASED."
   },
   "current_candidate": {
     "source_hashes": {
@@ -183,7 +201,7 @@
     "The redesigned Mandates source was estimated read-only on Bradbury at 16,516,613 gas, below the observed 16,777,216 ceiling, then deployed once and finalized with source parity at 0xd4C0945533C959b094967781815e31ecd0C345F7.",
     "The current Authorization source was preflighted through the supported deployment path at 31,890,852 gas and rejected before acceptance as gas limit too high; no nonce was consumed. It requires a reviewed size/gas redesign before any further Bradbury write.",
     "The authorized compact Authorization source 8df817d76ff0ff5abd5adcfdefb97765261a7cce7bc704ffb44c2e1f28c27238 was submitted once at 16,639,954 gas; its outer transaction was mined, but GenVM rejected it as invalid_contract because the compacted source omitted the required blank line after the Depends header. No Authorization address or code was produced.",
-    "The current worktree Authorization source restores the required Depends-header blank line, is 19,967 bytes, and has source SHA-256 306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1. It passes the pinned local GLSim/adversarial suite and has not been transmitted to Bradbury; exact authorization is required before a new estimate or deployment.",
+    "The corrected Authorization source restores the required Depends-header blank line, is 19,967 bytes, and has source SHA-256 306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1. It passed the pinned local GLSim/adversarial suite and was submitted once after a passing Bradbury estimate; GenVM execution succeeded with unanimous validator agreement, but finalization is pending.",
     "Bradbury/public release remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {
