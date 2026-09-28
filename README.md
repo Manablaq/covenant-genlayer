@@ -38,26 +38,31 @@ Changing a consequential field invalidates the authorization.
 
 **UNRELEASED CURRENT CANDIDATE — the Mandates source has been redesigned to fit
 Bradbury’s observed gas ceiling without removing protocol features and is now
-deployed/finalized there with exact source parity. The current Authorization
-source still exceeds Bradbury’s observed gas ceiling, so its reviewed size/gas
-redesign, Gate I live verification, and final release certification remain
-pending.**
+deployed/finalized there with exact source parity. The authorized compact
+Authorization attempt fit the observed gas ceiling but failed during GenVM
+parsing because its required dependency-header blank line had been removed.
+That format defect is fixed locally in source hash
+`306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1`; the
+corrected bytes have not been transmitted, so a fresh exact authorization,
+Bradbury estimate/deployment, Gate I live verification, and final release
+certification remain pending.**
 
 The candidate retains mandate-bound evidence-body limits, bounded user-controlled
 inputs, one-time verified mandate-policy loading, all public Mandates methods,
 validation branches, commitment preimages, storage values, and state transitions.
-The compact diagnostic-code redesign passes Direct, GLSim, adversarial,
-runtime-calldata, reference-vector, and Gate D coverage. The redesigned source
-has been redeployed to the supported local runtime and matches both deployments
-byte-for-byte.
+The compact diagnostic-code redesign and the corrected local candidate pass
+Direct, GLSim, adversarial, runtime-calldata, reference-vector, and Gate D
+coverage. The supported-local live deployment evidence in the checkpoint is
+explicitly pre-compact evidence and is not current-candidate source parity.
 
 The first current-source approval `create_request` candidate did **not** reach
 the chain: mandatory pre-sign freshness revalidation found evidence observation
 age `1352` seconds against the mandate maximum of `900`, so the runner stopped
 before signing with submission count `0`. That fingerprint is not reusable.
 
-Current-source approval, rejection, repair/replacement, timeout, receipt
-consumption, replay, wrong-consumer, and redirect provenance are recorded in
+Approval, rejection, repair/replacement, timeout, receipt consumption,
+replay, wrong-consumer, and redirect provenance are recorded only for the
+pre-compact supported-local deployment in
 `docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
 
 `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` remains historical predecessor-source

@@ -1,8 +1,8 @@
 {
-  "manifest_version": 8,
+  "manifest_version": 10,
   "status": "UNRELEASED",
-  "release_scope": "redesigned backend source candidate; current-source local full-runtime closure and finalized Bradbury Mandates deployment proven; Authorization deployment and Gate I/J remain separately gated",
-  "candidate_state": "CURRENT_SOURCE_BRADBURY_MANDATES_FINALIZED_AUTHORIZATION_DEPLOYMENT_PENDING",
+  "release_scope": "compact Authorization source candidate; static and local behavioral gates pass; Bradbury Authorization estimate and deployment remain separately gated",
+  "candidate_state": "CURRENT_SOURCE_AUTHORIZATION_FORMAT_FIX_BRADBURY_ESTIMATE_PENDING",
   "production_deployment": {
     "status": "UNRELEASED",
     "reason": "Current-source Mandates is finalized on Bradbury, but Authorization deployment, complete Gate I live behavior, Bradbury runtime provenance, and Gate J evidence freeze are not complete.",
@@ -89,6 +89,32 @@
       "nonce_consumed": false,
       "redesign_required": true
     },
+    "authorization_compact_candidate_preflight": {
+      "source_sha256": "1fbeb9cd2223632fabd73dabaca63379c019939c779bbc730e825f4f03fe7e94",
+      "source_bytes": 23436,
+      "eth_estimateGas": 19325999,
+      "observed_submission_ceiling": 16777216,
+      "status": "READ_ONLY_ESTIMATE_FAIL",
+      "signing_performed": false,
+      "submission_performed": false,
+      "conclusion": "The exact authorized candidate exceeded the Bradbury gas ceiling; no deployment was attempted."
+    },
+    "authorization_compact_candidate_deployment_attempt": {
+      "evidence": "docs/CURRENT_SOURCE_BRADBURY_AUTHORIZATION_DEPLOYMENT_ATTEMPT_2026-09-28.json",
+      "source_sha256": "8df817d76ff0ff5abd5adcfdefb97765261a7cce7bc704ffb44c2e1f28c27238",
+      "status": "GENLAYER_EXECUTION_FAILED",
+      "outer_evm_transaction": "0x45d6f88754c3b307076f12c1dcb629b2e5506711ee33ff47ccca9f5c399a2c9e",
+      "internal_transaction": "0x951b381c1c6f3223524fba71017cd428190f09df859c80a89fda0a8340e1f438",
+      "internal_status": "ACCEPTED_NOT_FINALIZED",
+      "genvm_result_code": 2,
+      "error": "invalid_contract",
+      "cause": "trailing characters at line 1 column 84",
+      "deployment_address": null,
+      "source_parity": false,
+      "deployment_submissions": 1,
+      "replacement_or_resend": false,
+      "conclusion": "The outer transaction was mined, but GenVM rejected the source during contract parsing. The required blank line after the Depends header has been restored locally; the resulting source hash is a new local-only candidate awaiting exact authorization."
+    },
     "access_probe": {
       "network": "https://rpc-bradbury.genlayer.com",
       "status": "PASS_WITH_CURL_USER_AGENT_COMPATIBILITY",
@@ -98,20 +124,20 @@
       "submission_performed": false,
       "conclusion": "Bradbury RPC accepts the read-only requests with a curl-compatible User-Agent; sim_countValidators is not exposed by the public endpoint. Bearer authentication was not required."
     },
-    "release_effect": "Current-source local closure and finalized Mandates deployment are proven; Authorization deployment, complete Gate I behavior, Bradbury runtime provenance, and Gate J remain open, so production status remains UNRELEASED."
+    "release_effect": "Pre-compact local closure and finalized Mandates deployment are proven; the authorized compact Authorization attempt failed during GenVM parsing, the corrected Authorization source is local-only, complete Gate I behavior for it, Bradbury runtime provenance, and Gate J remain open, so production status remains UNRELEASED."
   },
   "current_candidate": {
     "source_hashes": {
-      "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
+      "covenant_authorization.py": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
       "covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
     },
-    "live_source_parity": true,
+    "live_source_parity": false,
     "source_commit": "40417500c938ae59de4fded587e3bfefd562e07c",
     "deployed_addresses": {
       "mandates": "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19",
       "authorization": "0xCe751D8399639157268a55F12e6f2aB081d49c72"
     },
-    "parity_scope": "redesigned repository source bytes match both current local deployments; all current-source local behavioral gates are finalized"
+    "parity_scope": "current worktree source is not installed at the historical local deployment addresses; the recorded live proofs belong to the pre-compact source"
   },
   "historical_local_live_proof": {
     "status": "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY",
@@ -149,17 +175,19 @@
   "notes": [
     "Historical local-runtime transactions prove the predecessor source only.",
     "The pre-redesign source had exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity; those deployments are historical after the deployment-size redesign.",
-    "The redesigned source retains the public surface, validation branches, commitment preimages, storage values, and state transitions. Deterministic, GLSim, runtime-calldata, adversarial, Gate D, and current-source full-runtime tests pass.",
-    "Current-source approval, rejection, repair/replacement, timeout, receipt consumption, replay, wrong-consumer, and redirect provenance gates are finalized locally with exact request-state parity.",
-    "The supported current runtime returned status 302 and Location without following the redirect; this is local runtime provenance only and is separately recorded as current-source evidence.",
+    "The compact candidate retains the public surface, validation branches, commitment preimages, storage values, and state transitions. Deterministic, GLSim, runtime-calldata, adversarial, Gate D, and candidate local tests pass.",
+    "Approval, rejection, repair/replacement, timeout, receipt consumption, replay, wrong-consumer, and redirect behavior are proven only for the pre-compact deployed source; the compact candidate still requires live closure.",
+    "The supported current runtime returned status 302 and Location without following the redirect; this is local runtime provenance only and is not current-candidate deployment evidence.",
     "Two exact/current-source Bradbury Mandates deployment paths were rejected before acceptance with gas limit too high; returned identities 0x6b5c91dbc8ea969d10508790847ecf49bafb895c331d34f4df95e3c5e5a82403 and 0xdfa2ed87220298fccc574bbe747ed52ec006d46e6e62045f51cf4202b4fb608d were not visible via eth_getTransactionByHash, so no Bradbury deployment is claimed.",
     "The exact current-source deployment fingerprint 1e2ae661318e46a762b204f05a94260a1f2d3198dc2846582bdfa1115319d399 was authorized, signed once, and submitted once; the network rejected it before acceptance. The sender nonce remained 1369, proving no accepted deployment transaction.",
     "The redesigned Mandates source was estimated read-only on Bradbury at 16,516,613 gas, below the observed 16,777,216 ceiling, then deployed once and finalized with source parity at 0xd4C0945533C959b094967781815e31ecd0C345F7.",
     "The current Authorization source was preflighted through the supported deployment path at 31,890,852 gas and rejected before acceptance as gas limit too high; no nonce was consumed. It requires a reviewed size/gas redesign before any further Bradbury write.",
+    "The authorized compact Authorization source 8df817d76ff0ff5abd5adcfdefb97765261a7cce7bc704ffb44c2e1f28c27238 was submitted once at 16,639,954 gas; its outer transaction was mined, but GenVM rejected it as invalid_contract because the compacted source omitted the required blank line after the Depends header. No Authorization address or code was produced.",
+    "The current worktree Authorization source restores the required Depends-header blank line, is 19,967 bytes, and has source SHA-256 306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1. It passes the pinned local GLSim/adversarial suite and has not been transmitted to Bradbury; exact authorization is required before a new estimate or deployment.",
     "Bradbury/public release remains separately gated and UNRELEASED; this manifest does not claim production release."
   ],
   "current_local_runtime_checkpoint": {
-    "status": "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE",
+    "status": "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE",
     "source_commit": "40417500c938ae59de4fded587e3bfefd562e07c",
     "chain_id": 61999,
     "validator_count": 5,
@@ -224,15 +252,15 @@
       }
     },
     "proof_boundary": {
-      "current_source_deployment_parity": true,
-      "current_mandate_created": true,
-      "current_approval_request_created": true,
-      "current_approval_evaluated": true,
-      "current_rejection_proven": true,
-      "current_repair_replacement_proven": true,
-      "current_timeout_recovery_proven": true,
-      "current_receipt_consumption_proven": true,
-      "current_redirect_provenance_proven": true,
+      "current_source_deployment_parity": false,
+      "current_mandate_created": false,
+      "current_approval_request_created": false,
+      "current_approval_evaluated": false,
+      "current_rejection_proven": false,
+      "current_repair_replacement_proven": false,
+      "current_timeout_recovery_proven": false,
+      "current_receipt_consumption_proven": false,
+      "current_redirect_provenance_proven": false,
       "production_or_bradbury_release": false
     },
     "evidence_summary": "docs/CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"

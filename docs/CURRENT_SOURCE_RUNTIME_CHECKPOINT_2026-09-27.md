@@ -1,9 +1,10 @@
-# Current-source supported-runtime checkpoint — 2026-09-27
+# Pre-compact source supported-runtime checkpoint — 2026-09-27
 
-This checkpoint records the redesigned backend after current-source deployment,
-full supported-local runtime closure, and the finalized current-source Bradbury
-Mandates deployment. It does not claim complete Gate I or final release
-certification.
+This checkpoint records the pre-compact source deployment and supported-local
+runtime closure. The repository now contains a newer compact Authorization
+candidate that has not been deployed or Bradbury-estimated; the live evidence
+below must not be attributed to that candidate. It does not claim complete Gate
+I or final release certification.
 
 ## Frozen source and deployments
 

@@ -14,7 +14,7 @@ MANDATES = REPO / "contracts" / "covenant_mandates.py"
 AUTHORIZATION = REPO / "contracts" / "covenant_authorization.py"
 
 EXPECTED_MANDATES_SHA = "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
-EXPECTED_AUTH_SHA = "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed"
+EXPECTED_AUTH_SHA = "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1"
 SDK = "v0.2.16"
 EXPECTED_SDK_FRAGMENT = "/extracted/v0.2.16/py-lib-genlayer-std/11rhn002yfajawsz7fai6mykznbxkxs6l91iskj5cm82c92qhy3v/genlayer/"
 
@@ -164,7 +164,7 @@ def sha(path: Path) -> str:
 _authorization_source = AUTHORIZATION.read_text(encoding="utf-8")
 assert "def _registry(" not in _authorization_source
 assert _authorization_source.count("_require_registry_binding") >= 2
-assert "CovenantMandatesIface(self.mandates_address)" in _authorization_source
+assert "gl.get_contract_at(self.mandates_address)" in _authorization_source
 print("GLSIM_PRODUCTION_R2_REGISTRY_HELPER_SHAPE=PASS")
 
 

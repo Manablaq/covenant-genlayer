@@ -1,5 +1,5 @@
 {
-  "status": "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE",
+  "status": "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE",
   "source_commit": "40417500c938ae59de4fded587e3bfefd562e07c",
   "chain_id": 61999,
   "validator_count": 5,
@@ -31,5 +31,5 @@
     "timeout_recovery": {"create_request": "0xda4481914f2df2c986374d6452446b37dc411b90e81e2d0fd7866ec4b9333d8d", "request_id": "0xb0659624dec1feaf4cc5770a22d420a80d08a7f9b049aa2fcf50e684229d4dd7", "evaluate_request": "0x84c2afae5cfe928c2e55b40cfafb7ed5b23ed8c0fa07be0225d2d76b3e29348e", "terminal_state": "EXPIRED", "result": "FINALIZED / MAJORITY_AGREE", "resubmission_policy": "no automatic resend or replacement"},
     "receipt_consumption": {"request_id": "0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f", "receipt_id": "0x985975c8f7b78d9a8f08a9550b118c3f97b534ec9cf8e3a8290e4cceb4a6afaa", "action_intent": "0x6f006350a0c90b47235dbb374fb15b5126b9800f6ed4c051fbdb54981070b032", "consume_receipt": "0x9d62334de4af6adf408f3e9a30a524279f413b7b1e1ebd1dc3ce1a08a136b74c", "replay_rejection": "0xb7b62b795779a480c9c3acc1b78d1ce877b5708dba209939126299d1f04065b6", "wrong_consumer_rejection": "0x1aa0bb79318752c2ff749431ab7e2dbf981f647725b759df98774b5a0b425c90", "terminal_state": "CONSUMED", "evidence_revision": 2, "result": "consumption finalized; replay and wrong-consumer finalized authorization rejections"}
   },
-  "proof_boundary": {"current_source_deployment_parity": true, "current_mandate_created": true, "current_approval_request_created": true, "current_approval_evaluated": true, "current_rejection_proven": true, "current_repair_replacement_proven": true, "current_timeout_recovery_proven": true, "current_receipt_consumption_proven": true, "current_redirect_provenance_proven": true, "production_or_bradbury_release": false}
+  "proof_boundary": {"current_source_deployment_parity": false, "current_mandate_created": false, "current_approval_request_created": false, "current_approval_evaluated": false, "current_rejection_proven": false, "current_repair_replacement_proven": false, "current_timeout_recovery_proven": false, "current_receipt_consumption_proven": false, "current_redirect_provenance_proven": false, "production_or_bradbury_release": false}
 }

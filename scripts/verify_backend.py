@@ -77,23 +77,23 @@ def main() -> int:
     assert "max_evidence_body_bytes" in mandates_source
     assert "get_max_evidence_body_bytes" in authorization_source
     assert "REPAIR_EVIDENCE_BODY_TOO_LARGE" in authorization_source
-    assert "hashlib.sha256(bb).digest()" in authorization_source
+    assert "_hs(bb).digest()" in authorization_source
     assert "gl.vm.run_nondet_unsafe" in authorization_source
     assert "receipt_consumed" in authorization_source
     assert "nonce_used" in authorization_source
 
     for name in (
-        "_authority_reason",
-        "_freshness_reason",
-        "_evidence_policy_reason",
-        "_run_semantic_consensus",
+        "_au",
+        "_fr",
+        "_ep",
+        "_sc",
     ):
         assert call_count(function_node(authorization_tree, name), "view") == 0
 
-    assert "policy.n" in authorization_source
+    assert "p0.n" in authorization_source
     assert "def _vp(" in authorization_source
-    assert "self._vp(policy)" in authorization_source
-    assert "len(bb)>int(policy.m)" in authorization_source
+    assert "self._vp(p0)" in authorization_source
+    assert "len(bb)>int(p0.m)" in authorization_source
     assert "387e1a66e920cb2dfadcdce40ab2d28da02efd1e" in runtime_readme
     assert "reqwest::redirect::Policy::none()" in runtime_patch
 
@@ -102,11 +102,11 @@ def main() -> int:
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
     current = manifest["current_candidate"]
-    assert current["live_source_parity"] is True
+    assert current["live_source_parity"] is False
     assert current["source_commit"] == "40417500c938ae59de4fded587e3bfefd562e07c"
     assert current["deployed_addresses"]["mandates"] == "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19"
     assert current["deployed_addresses"]["authorization"] == "0xCe751D8399639157268a55F12e6f2aB081d49c72"
-    assert current["parity_scope"] == "redesigned repository source bytes match both current local deployments; all current-source local behavioral gates are finalized"
+    assert current["parity_scope"] == "current worktree source is not installed at the historical local deployment addresses; the recorded live proofs belong to the pre-compact source"
     assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
     redesign = manifest["bradbury_deployment_attempts"]["redesign_candidate_estimate"]
@@ -127,9 +127,23 @@ def main() -> int:
     assert auth_attempt["gas_estimate"] >= auth_attempt["observed_submission_ceiling"]
     assert auth_attempt["accepted_transaction"] is None
     assert auth_attempt["nonce_consumed"] is False
+    compact_preflight = manifest["bradbury_deployment_attempts"]["authorization_compact_candidate_preflight"]
+    assert compact_preflight["source_sha256"] == "1fbeb9cd2223632fabd73dabaca63379c019939c779bbc730e825f4f03fe7e94"
+    assert compact_preflight["eth_estimateGas"] >= compact_preflight["observed_submission_ceiling"]
+    assert compact_preflight["signing_performed"] is False
+    assert compact_preflight["submission_performed"] is False
+    failed_attempt = manifest["bradbury_deployment_attempts"]["authorization_compact_candidate_deployment_attempt"]
+    assert failed_attempt["source_sha256"] == "8df817d76ff0ff5abd5adcfdefb97765261a7cce7bc704ffb44c2e1f28c27238"
+    assert failed_attempt["status"] == "GENLAYER_EXECUTION_FAILED"
+    assert failed_attempt["genvm_result_code"] == 2
+    assert failed_attempt["error"] == "invalid_contract"
+    assert failed_attempt["deployment_address"] is None
+    assert failed_attempt["source_parity"] is False
+    assert failed_attempt["deployment_submissions"] == 1
+    assert failed_attempt["replacement_or_resend"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
-    assert checkpoint["status"] == "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE"
+    assert checkpoint["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
     assert checkpoint["source_commit"] == "40417500c938ae59de4fded587e3bfefd562e07c"
     assert checkpoint["chain_id"] == 61999
     assert checkpoint["validator_count"] == 5
@@ -143,20 +157,21 @@ def main() -> int:
     assert proofs["receipt_consumption"]["terminal_state"] == "CONSUMED"
     assert proofs["redirect_provenance"]["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
     boundary = checkpoint["proof_boundary"]
-    assert boundary["current_source_deployment_parity"] is True
-    assert boundary["current_mandate_created"] is True
-    assert boundary["current_approval_request_created"] is True
-    assert boundary["current_approval_evaluated"] is True
-    assert boundary["current_rejection_proven"] is True
-    assert boundary["current_repair_replacement_proven"] is True
-    assert boundary["current_timeout_recovery_proven"] is True
-    assert boundary["current_receipt_consumption_proven"] is True
-    assert boundary["current_redirect_provenance_proven"] is True
+    assert boundary["current_source_deployment_parity"] is False
+    assert boundary["current_mandate_created"] is False
+    assert boundary["current_approval_request_created"] is False
+    assert boundary["current_approval_evaluated"] is False
+    assert boundary["current_rejection_proven"] is False
+    assert boundary["current_repair_replacement_proven"] is False
+    assert boundary["current_timeout_recovery_proven"] is False
+    assert boundary["current_receipt_consumption_proven"] is False
+    assert boundary["current_redirect_provenance_proven"] is False
     assert boundary["production_or_bradbury_release"] is False
 
     current_proof = json.loads(CURRENT_PROOF.read_text(encoding="utf-8"))
     current_redirect = json.loads(CURRENT_REDIRECT_PROOF.read_text(encoding="utf-8"))
-    assert current_proof["status"] == "CURRENT_SOURCE_LOCAL_RUNTIME_CLOSURE"
+    assert current_proof["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
+    assert current_proof["proof_boundary"]["current_source_deployment_parity"] is False
     assert current_proof["proof_boundary"]["production_or_bradbury_release"] is False
     assert current_redirect["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
     assert current_redirect["decoded_result"] == "status=302;location=b'/final'"
