@@ -26,6 +26,7 @@ CURRENT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
 CURRENT_BRADBURY_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json"
 CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
 CURRENT_CONSENSUS_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
+FRESH_EVALUATION_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json"
 
 
 def sha256(path: Path) -> str:
@@ -184,6 +185,7 @@ def main() -> int:
     current_bradbury = json.loads(CURRENT_BRADBURY_PROOF.read_text(encoding="utf-8"))
     current_redirect = json.loads(CURRENT_REDIRECT_PROOF.read_text(encoding="utf-8"))
     current_consensus = json.loads(CURRENT_CONSENSUS_PROOF.read_text(encoding="utf-8"))
+    fresh_evaluation = json.loads(FRESH_EVALUATION_PROOF.read_text(encoding="utf-8"))
     assert current_proof["status"] == "HISTORICAL_PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
     assert current_proof["proof_boundary"]["current_source_deployment_parity"] is False
     assert current_proof["proof_boundary"]["production_or_bradbury_release"] is False
@@ -211,8 +213,28 @@ def main() -> int:
     assert current_consensus["validator_votes_decoded"] == repaired["validator_votes_decoded"]
     assert current_consensus["validator_result_hashes_equal"] is False
     assert current_consensus["release_interpretation"]["release_blocker"] is True
+    assert fresh_evaluation["evaluation_transaction_id"] == "0x1c7bac1e7b42545425c17bfe76b36cfddf01d6ae4c68abac7978865af7b0031c"
+    assert fresh_evaluation["evaluation"]["status"] == "FINALIZED"
+    assert fresh_evaluation["evaluation"]["consensus_result"] == "AGREE"
+    assert fresh_evaluation["evaluation"]["execution_result"] == "FINISHED_WITH_RETURN"
+    assert fresh_evaluation["evaluation"]["terminal_state"] == "AUTHORIZED"
+    assert fresh_evaluation["evaluation"]["receipt_id"] == "0x3fd417b1bac107e2204d9256e9c9889bc7cd61fe4eb7d4d20ccb0e8b7260635e"
+    assert fresh_evaluation["evaluation"]["validator_votes_decoded"] == [1, 3, 4, 1, 1]
+    assert fresh_evaluation["evaluation"]["validator_vote_names"] == ["AGREE", "TIMEOUT", "DETERMINISTIC_VIOLATION", "AGREE", "AGREE"]
+    assert fresh_evaluation["evaluation"]["validator_result_hashes_equal"] is False
+    assert fresh_evaluation["evaluation"]["strict_unanimity_required"] is True
+    assert fresh_evaluation["evaluation"]["strict_unanimity_proven"] is False
+    assert fresh_evaluation["evaluation"]["release_blocker"] is True
+    fresh_proof = current_bradbury["behavioral_proofs"]["fresh_current_source_evaluation"]
+    assert fresh_proof["evaluate_internal_transaction"] == fresh_evaluation["evaluation_transaction_id"]
+    assert fresh_proof["terminal_state"] == "AUTHORIZED"
+    assert fresh_proof["validator_votes_decoded"] == fresh_evaluation["evaluation"]["validator_votes_decoded"]
+    assert fresh_proof["validator_result_hashes_equal"] is False
+    assert fresh_proof["strict_unanimity_proven"] is False
     assert manifest["current_bradbury_live_proof"]["behavioral_gate_i_complete"] is False
     assert manifest["current_bradbury_live_proof"]["strict_consensus_gate_proven"] is False
+    assert manifest["current_bradbury_live_proof"]["fresh_current_source_evaluation"]["terminal_state"] == "AUTHORIZED"
+    assert manifest["current_bradbury_live_proof"]["fresh_current_source_evaluation"]["validator_result_hashes_equal"] is False
     if manifest["status"] == "RELEASED" or production["status"] == "RELEASED":
         raise AssertionError("release status cannot be enabled while strict consensus is unproven")
     boundary = current_bradbury["proof_boundary"]

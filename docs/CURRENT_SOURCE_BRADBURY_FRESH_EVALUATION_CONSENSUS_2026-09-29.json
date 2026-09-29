@@ -1,0 +1,69 @@
+{
+  "source": "gen_getTransactionReceipt",
+  "rpc": "https://rpc-bradbury.genlayer.com",
+  "queried_at": "2026-09-29",
+  "create_transaction_id": "0x7d21bbedbf767ead04be52e6639d2893ad54adad51cf51f9ca920c3a1444ef7d",
+  "create_outer_transaction": "0x38010b09208d4f78399aa6e0b6f88458a68e245d93cd3474ab3415e399fdecff",
+  "evaluation_transaction_id": "0x1c7bac1e7b42545425c17bfe76b36cfddf01d6ae4c68abac7978865af7b0031c",
+  "evaluation_outer_transaction": "0xbb0f3d7927df57b46db8409b7711663ae318c7e8e8d6e89b9570669944092340",
+  "request_id": "0xd25a322fb4a93aac8dd32c52e80f3d82ea5dd4cf7bf3c7c0cb78ca7c93d82a89",
+  "request_nonce": 10013,
+  "create": {
+    "status_code": 7,
+    "status": "FINALIZED",
+    "consensus_result_code": 1,
+    "consensus_result": "AGREE",
+    "execution_result_code": 1,
+    "execution_result": "FINISHED_WITH_RETURN",
+    "validator_votes_base64": "AQEBAQE=",
+    "validator_votes_decoded": [1, 1, 1, 1, 1],
+    "validator_result_hashes_equal": true
+  },
+  "evaluation": {
+    "status_code": 7,
+    "status": "FINALIZED",
+    "previous_status_code": 13,
+    "consensus_result_code": 1,
+    "consensus_result": "AGREE",
+    "execution_result_code": 1,
+    "execution_result": "FINISHED_WITH_RETURN",
+    "tx_execution_hash": "0xe83b7c2564d17db0ce010ab90e4c4ee3b550011d2dcc53d7bc1e224d4947d567",
+    "decision_round_array_index": 2,
+    "votes_committed": 5,
+    "votes_revealed": 5,
+    "round_validators": [
+      "0x4fc292d5d255ec8ad4cdcd36c5e188dfee9d160e",
+      "0x3f5caed686336ed9cf3dede61154b0cd67fb9bd7",
+      "0xf01877b6ac60861ca3b134e0e483c482679b4682",
+      "0xa856ae1b278f030082c66fa50a5f51f485d1f940",
+      "0xa58d6fccd69eaafb5869da58913f116045d75444"
+    ],
+    "validator_votes_base64": "AQMEAQE=",
+    "validator_votes_decoded": [1, 3, 4, 1, 1],
+    "validator_vote_names": [
+      "AGREE",
+      "TIMEOUT",
+      "DETERMINISTIC_VIOLATION",
+      "AGREE",
+      "AGREE"
+    ],
+    "validator_result_hashes": [
+      "0x5fe796c5bfc9d2393c620c07a5974f28664328fd5446d38213234490a0329960",
+      "0x9fc8d2d92c2ea25ae2ac3d9b20370cb9cb1e53d073b5c1a20b03621ca750f8df",
+      "0x2038d64123798387c033feb46876201b7a2f59ebb22c67a2a9342edb3991ad5f",
+      "0x5fe796c5bfc9d2393c620c07a5974f28664328fd5446d38213234490a0329960",
+      "0x5fe796c5bfc9d2393c620c07a5974f28664328fd5446d38213234490a0329960"
+    ],
+    "validator_result_hashes_equal": false,
+    "terminal_state": "AUTHORIZED",
+    "receipt_id": "0x3fd417b1bac107e2204d9256e9c9889bc7cd61fe4eb7d4d20ccb0e8b7260635e",
+    "action_subject": "0x8225e32345e39c4d0b2d4e0b90081470d362162fe209c3848b849cab333a213c",
+    "action_intent": "0x598cfdbc685630fb8a095431911dcfeed0fa7a3bfa205c2d373befebd6e957af",
+    "evidence_set_commitment": "0x55a7c6ff492357f9b62e269a101104aa46b9b2dfb07bc79fca21436d6eb85210",
+    "receipt_consumed": false,
+    "strict_unanimity_required": true,
+    "strict_unanimity_proven": false,
+    "release_blocker": true,
+    "reason": "Bradbury finalized the evaluation and the contract became AUTHORIZED, but one validator timed out, one reported DETERMINISTIC_VIOLATION, and the validator result hashes are non-uniform. This is final application state, not strict-unanimous consensus."
+  }
+}

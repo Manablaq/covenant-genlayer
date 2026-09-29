@@ -5,7 +5,7 @@
   "candidate_state": "CURRENT_SOURCE_BRADBURY_LIVE_BEHAVIOR_PROVENANCE_AND_CONSENSUS_GATES_OPEN",
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "Current-source Mandates and Authorization are finalized on Bradbury and current-source behavior is evidenced. Production remains unreleased because one semantic evaluation has a deterministic-violation vote/non-uniform result hashes, Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J still requires the final evidence freeze.",
+    "reason": "Current-source Mandates and Authorization are finalized on Bradbury and current-source behavior is evidenced. Production remains unreleased because the finalized current-source semantic evaluations have non-uniform validator results (including TIMEOUT and DETERMINISTIC_VIOLATION), Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J still requires the final evidence freeze.",
     "required_before_release": [
       "Strict consensus closure: every decision-bearing evaluation must have no DETERMINISTIC_VIOLATION vote and uniform validator result hashes",
       "Bradbury runtime provenance and redirect compatibility",
@@ -165,7 +165,17 @@
     "behavioral_gate_i_complete": false,
     "strict_consensus_gate_proven": false,
     "effective_origin_proven": false,
-    "production_release": false
+    "production_release": false,
+    "fresh_current_source_evaluation": {
+      "evidence": "docs/CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json",
+      "evaluation_internal_transaction": "0x1c7bac1e7b42545425c17bfe76b36cfddf01d6ae4c68abac7978865af7b0031c",
+      "request_id": "0xd25a322fb4a93aac8dd32c52e80f3d82ea5dd4cf7bf3c7c0cb78ca7c93d82a89",
+      "terminal_state": "AUTHORIZED",
+      "finality": "FINALIZED / result=AGREE",
+      "validator_votes": "AQMEAQE=",
+      "validator_result_hashes_equal": false,
+      "strict_unanimity_proven": false
+    }
   },
   "historical_local_live_proof": {
     "status": "HISTORICAL_ONLY_NOT_CURRENT_SOURCE_PARITY",
@@ -212,7 +222,7 @@
     "The pre-redesign current Authorization source was preflighted at 31,890,852 gas and rejected before acceptance as gas limit too high; that historical attempt is retained for audit and is not the deployed compact source.",
     "The authorized compact Authorization source 8df817d76ff0ff5abd5adcfdefb97765261a7cce7bc704ffb44c2e1f28c27238 was submitted once at 16,639,954 gas; its outer transaction was mined, but GenVM rejected it as invalid_contract because the compacted source omitted the required blank line after the Depends header. No Authorization address or code was produced.",
     "The corrected Authorization source restores the required Depends-header blank line, is 19,967 bytes, and has source SHA-256 306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1. It passed the pinned local GLSim/adversarial suite, was submitted once after a passing Bradbury estimate, reached FINALIZED with unanimous validator agreement, and matches deployed bytecode.",
-    "Current-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers deployment/source parity, approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths once their finality records are complete.",
+    "Current-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers deployment/source parity, approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths. A fresh current-source evaluation reached AUTHORIZED and FINALIZED, but its validator votes included TIMEOUT and DETERMINISTIC_VIOLATION with non-uniform result hashes; it is recorded as a strict-consensus failure, not as clean release evidence.",
     "The local no-redirect runtime probe exposes the redirect response and local effective-origin policy, but Bradbury does not expose an enforceable effective URL/history to this client. That external provenance gate remains false; Bradbury/public production release remains UNRELEASED."
   ],
   "current_local_runtime_checkpoint": {
