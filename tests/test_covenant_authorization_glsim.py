@@ -44,41 +44,52 @@ assert _file_sha(sdk_loader.__file__) == EXPECTED_SDK_LOADER_SHA
 assert _file_sha(direct_loader.__file__) == EXPECTED_DIRECT_LOADER_SHA
 assert _file_sha(glsim_engine.__file__) == EXPECTED_GLSIM_ENGINE_SHA
 
-_ORIGINAL_SETUP_SDK_PATHS = sdk_loader.setup_sdk_paths
-_PIN_SHIM_EVENTS = []
+if hasattr(sdk_loader, "_covenant_pinned_setup_sdk_paths"):
+    # The runtime-faithful calldata test imports this module under an
+    # isolated name during collection. Reuse the process-wide shim instead of
+    # wrapping it a second time; otherwise the shared SDK loader changes
+    # identity and teardown assertions become order-dependent.
+    _ORIGINAL_SETUP_SDK_PATHS = sdk_loader._covenant_original_setup_sdk_paths
+    _PIN_SHIM_EVENTS = sdk_loader._covenant_pin_shim_events
+    _pinned_setup_sdk_paths = sdk_loader._covenant_pinned_setup_sdk_paths
+else:
+    _ORIGINAL_SETUP_SDK_PATHS = sdk_loader.setup_sdk_paths
+    _PIN_SHIM_EVENTS = []
 
-def _pinned_setup_sdk_paths(contract_path=None, version=None):
-    effective_version = SDK if version is None else version
-    if effective_version != SDK:
-        raise RuntimeError(
-            f"Covenant Gate D refuses GenVM version {effective_version!r}; expected {SDK!r}"
+    def _pinned_setup_sdk_paths(contract_path=None, version=None):
+        effective_version = SDK if version is None else version
+        if effective_version != SDK:
+            raise RuntimeError(
+                f"Covenant Gate D refuses GenVM version {effective_version!r}; expected {SDK!r}"
+            )
+
+        result = _ORIGINAL_SETUP_SDK_PATHS(contract_path, effective_version)
+        _PIN_SHIM_EVENTS.append(
+            (
+                str(contract_path) if contract_path is not None else None,
+                version,
+                effective_version,
+                tuple(str(p) for p in result),
+            )
         )
-
-    result = _ORIGINAL_SETUP_SDK_PATHS(contract_path, effective_version)
-    _PIN_SHIM_EVENTS.append(
-        (
-            str(contract_path) if contract_path is not None else None,
-            version,
-            effective_version,
-            tuple(str(p) for p in result),
+        print(
+            "GLSIM_PIN_SHIM_SETUP"
+            + "|REQUESTED_VERSION=" + repr(version)
+            + "|EFFECTIVE_VERSION=" + repr(effective_version)
+            + "|CONTRACT=" + repr(str(contract_path) if contract_path is not None else None)
         )
-    )
-    print(
-        "GLSIM_PIN_SHIM_SETUP"
-        + "|REQUESTED_VERSION=" + repr(version)
-        + "|EFFECTIVE_VERSION=" + repr(effective_version)
-        + "|CONTRACT=" + repr(str(contract_path) if contract_path is not None else None)
-    )
-    return result
+        return result
 
-sdk_loader.setup_sdk_paths = _pinned_setup_sdk_paths
+    sdk_loader._covenant_original_setup_sdk_paths = _ORIGINAL_SETUP_SDK_PATHS
+    sdk_loader._covenant_pinned_setup_sdk_paths = _pinned_setup_sdk_paths
+    sdk_loader._covenant_pin_shim_events = _PIN_SHIM_EVENTS
+    sdk_loader.setup_sdk_paths = _pinned_setup_sdk_paths
 
 # Direct Mode's generic public-method proxy calldata roundtrip decodes nested
 # dataclasses to ordinary dicts. Real GenLayer supports dataclasses as public
 # method parameters, so this test-local adapter restores only the exact
 # EvidenceInput shape after the generic roundtrip. It does not alter Covenant
 # or the installed genlayer-test package.
-_ORIGINAL_CALLDATA_ROUNDTRIP_ARGS = direct_loader._calldata_roundtrip_args
 _ACTIVE_EVIDENCE_INPUT = None
 _ACTIVE_EVIDENCE_FIELDS = None
 _TYPED_ADAPTER_REHYDRATION_COUNT = 0
@@ -105,17 +116,25 @@ def _rehydrate_evidence_input(value):
 
     return value
 
-def _typed_calldata_roundtrip_args(args, kwargs):
-    decoded_args, decoded_kwargs = _ORIGINAL_CALLDATA_ROUNDTRIP_ARGS(args, kwargs)
-    return (
-        tuple(_rehydrate_evidence_input(value) for value in decoded_args),
-        {
-            key: _rehydrate_evidence_input(value)
-            for key, value in decoded_kwargs.items()
-        },
-    )
+if hasattr(direct_loader, "_covenant_typed_calldata_roundtrip_args"):
+    _ORIGINAL_CALLDATA_ROUNDTRIP_ARGS = direct_loader._covenant_original_calldata_roundtrip_args
+    _typed_calldata_roundtrip_args = direct_loader._covenant_typed_calldata_roundtrip_args
+else:
+    _ORIGINAL_CALLDATA_ROUNDTRIP_ARGS = direct_loader._calldata_roundtrip_args
 
-direct_loader._calldata_roundtrip_args = _typed_calldata_roundtrip_args
+    def _typed_calldata_roundtrip_args(args, kwargs):
+        decoded_args, decoded_kwargs = _ORIGINAL_CALLDATA_ROUNDTRIP_ARGS(args, kwargs)
+        return (
+            tuple(_rehydrate_evidence_input(value) for value in decoded_args),
+            {
+                key: _rehydrate_evidence_input(value)
+                for key, value in decoded_kwargs.items()
+            },
+        )
+
+    direct_loader._covenant_original_calldata_roundtrip_args = _ORIGINAL_CALLDATA_ROUNDTRIP_ARGS
+    direct_loader._covenant_typed_calldata_roundtrip_args = _typed_calldata_roundtrip_args
+    direct_loader._calldata_roundtrip_args = _typed_calldata_roundtrip_args
 
 print("GLSIM_TYPED_CALLDATA_ADAPTER=ENABLED")
 print("GLSIM_TYPED_CALLDATA_ADAPTER_SCOPE=EXACT_EVIDENCEINPUT_FIELD_SHAPE")

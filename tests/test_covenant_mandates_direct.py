@@ -4,8 +4,6 @@ from pathlib import Path
 
 import pytest
 
-pytest_plugins = ("gltest.direct.pytest_plugin",)
-
 REPO = Path(os.environ.get("COVENANT_REPO", Path(__file__).resolve().parents[1])).resolve()
 MANDATES = REPO / "contracts" / "covenant_mandates.py"
 SDK = "v0.2.16"
