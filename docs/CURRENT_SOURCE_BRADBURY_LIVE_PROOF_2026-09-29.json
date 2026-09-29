@@ -90,7 +90,7 @@
       "evaluate_internal_transaction": "0x82736a0274accd35a555b02e9c3f20b1f23d4b907cb0df965ed7df6d24dc4561",
       "evaluate_outer_transaction": "0x9518291723ed0d50183be50ea7f965afa335b397f0287b9c82c85e56eb177629",
       "evaluation_status": "FINALIZED",
-      "evaluation_finality": "FINALIZED / MAJORITY_AGREE",
+      "evaluation_finality": "FINALIZED / result=AGREE; 4/5 validators agreed",
       "terminal_state": "AUTHORIZED",
       "evidence_revision": 1,
       "action_subject": "0x4525896438be1279b48536c23ea6b644090b1212e6e1ad608c6b2bb9fc360d9b",
@@ -102,8 +102,21 @@
       "votes_committed": 5,
       "votes_revealed": 5,
       "validator_votes": "AQQBAQE=",
+      "validator_votes_decoded": [1, 4, 1, 1, 1],
+      "validator_dissenting_index": 1,
+      "validator_dissenting_address": "0x9d998ad7c7f9cc448a4dbdf49edd7cadbe3d57b6",
+      "validator_result_hashes": [
+        "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+        "0x38d5abc39eeb6c10195347da0a7427854a6f400232c7c51973180b98a94a831c",
+        "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+        "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+        "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150"
+      ],
       "validator_result_hashes_equal": false,
-      "validator_parity_note": "Bradbury finalized MAJORITY_AGREE with five revealed votes; one validator vote is DETERMINISTIC_VIOLATION and the result hashes are not uniform. This non-unanimous consensus is recorded explicitly and is not represented as unanimity."
+      "validator_parity_note": "Bradbury finalized the transaction with five revealed votes; four validators agreed and validator index 1 reported DETERMINISTIC_VIOLATION with a different result hash. This non-unanimous consensus is recorded explicitly and is not represented as unanimity.",
+      "strict_unanimity_required": true,
+      "strict_unanimity_proven": false,
+      "raw_consensus_evidence": "docs/CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
     },
     "timeout_recovery": {
       "create_internal_transaction": "0x0e37d94b3ac3459ac0efc6102716117aa046216e1780852b68ba0dc7ad206468",

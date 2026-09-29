@@ -1,0 +1,63 @@
+{
+  "source": "gen_getTransactionReceipt",
+  "rpc": "https://rpc-bradbury.genlayer.com",
+  "queried_at": "2026-09-29",
+  "transaction_id": "0x82736a0274accd35a555b02e9c3f20b1f23d4b907cb0df965ed7df6d24dc4561",
+  "outer_transaction": "0x9518291723ed0d50183be50ea7f965afa335b397f0287b9c82c85e56eb177629",
+  "request_id": "0xff8e3e685f75715b0629c101b667b197ba75b39acd614950a30fae9e9a287ca5",
+  "status_code": 7,
+  "status": "FINALIZED",
+  "consensus_result_code": 1,
+  "consensus_result": "AGREE",
+  "execution_result_code": 1,
+  "execution_result": "FINISHED_WITH_RETURN",
+  "result_hash": "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+  "read_state_block_ranges": [
+    {
+      "activation_block": 23148865,
+      "processing_block": 23148866,
+      "proposal_block": 23148867
+    }
+  ],
+  "round": 0,
+  "leader_index": 2,
+  "round_validators": [
+    "0xb7551bef37a05995218f9a1bb7a93e5b6705f535",
+    "0x9d998ad7c7f9cc448a4dbdf49edd7cadbe3d57b6",
+    "0x470aaa7de37ff3e1c2b38ed9096263ca0d541f21",
+    "0xa58d6fccd69eaafb5869da58913f116045d75444",
+    "0x422357d87b035e478777c84748bac834ce2a9597"
+  ],
+  "votes_committed": 5,
+  "votes_revealed": 5,
+  "validator_votes_base64": "AQQBAQE=",
+  "validator_votes_decoded": [1, 4, 1, 1, 1],
+  "validator_vote_names": [
+    "AGREE",
+    "DETERMINISTIC_VIOLATION",
+    "AGREE",
+    "AGREE",
+    "AGREE"
+  ],
+  "validator_result_hashes": [
+    "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+    "0x38d5abc39eeb6c10195347da0a7427854a6f400232c7c51973180b98a94a831c",
+    "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+    "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150",
+    "0x4dd29186fa0f4471eade984374db009d0400e3020afcab97380cc67b0d7b5150"
+  ],
+  "validator_result_hashes_equal": false,
+  "dissent": {
+    "validator_index": 1,
+    "validator": "0x9d998ad7c7f9cc448a4dbdf49edd7cadbe3d57b6",
+    "vote_code": 4,
+    "vote": "DETERMINISTIC_VIOLATION",
+    "result_hash": "0x38d5abc39eeb6c10195347da0a7427854a6f400232c7c51973180b98a94a831c"
+  },
+  "release_interpretation": {
+    "strict_unanimity_required": true,
+    "strict_unanimity_proven": false,
+    "release_blocker": true,
+    "reason": "The finalized application state is valid network finality, but one validator rejected the deterministic consequence comparison. The transaction must not be presented as unanimous or strict-release clean."
+  }
+}

@@ -25,6 +25,7 @@ RUNTIME_README = ROOT / "runtime" / "README.md"
 CURRENT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
 CURRENT_BRADBURY_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json"
 CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
+CURRENT_CONSENSUS_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
 
 
 def sha256(path: Path) -> str:
@@ -182,6 +183,7 @@ def main() -> int:
     current_proof = json.loads(CURRENT_PROOF.read_text(encoding="utf-8"))
     current_bradbury = json.loads(CURRENT_BRADBURY_PROOF.read_text(encoding="utf-8"))
     current_redirect = json.loads(CURRENT_REDIRECT_PROOF.read_text(encoding="utf-8"))
+    current_consensus = json.loads(CURRENT_CONSENSUS_PROOF.read_text(encoding="utf-8"))
     assert current_proof["status"] == "HISTORICAL_PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
     assert current_proof["proof_boundary"]["current_source_deployment_parity"] is False
     assert current_proof["proof_boundary"]["production_or_bradbury_release"] is False
@@ -199,7 +201,20 @@ def main() -> int:
     assert repaired["evidence_revision"] == 1
     assert repaired["repair_deadline_unchanged"] is True
     assert repaired["validator_votes"] == "AQQBAQE="
+    assert repaired["validator_votes_decoded"] == [1, 4, 1, 1, 1]
+    assert repaired["validator_dissenting_index"] == 1
+    assert repaired["validator_dissenting_address"] == "0x9d998ad7c7f9cc448a4dbdf49edd7cadbe3d57b6"
     assert repaired["validator_result_hashes_equal"] is False
+    assert repaired["strict_unanimity_required"] is True
+    assert repaired["strict_unanimity_proven"] is False
+    assert current_consensus["transaction_id"] == repaired["evaluate_internal_transaction"]
+    assert current_consensus["validator_votes_decoded"] == repaired["validator_votes_decoded"]
+    assert current_consensus["validator_result_hashes_equal"] is False
+    assert current_consensus["release_interpretation"]["release_blocker"] is True
+    assert manifest["current_bradbury_live_proof"]["behavioral_gate_i_complete"] is False
+    assert manifest["current_bradbury_live_proof"]["strict_consensus_gate_proven"] is False
+    if manifest["status"] == "RELEASED" or production["status"] == "RELEASED":
+        raise AssertionError("release status cannot be enabled while strict consensus is unproven")
     boundary = current_bradbury["proof_boundary"]
     assert boundary["current_repair_replacement_proven"] is True
     assert boundary["current_timeout_recovery_proven"] is True

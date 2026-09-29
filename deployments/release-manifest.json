@@ -2,11 +2,12 @@
   "manifest_version": 11,
   "status": "UNRELEASED",
   "release_scope": "current-source Bradbury deployment and live behavior evidence; external effective-origin provenance and Gate J remain open",
-  "candidate_state": "CURRENT_SOURCE_BRADBURY_LIVE_BEHAVIOR_CERTIFIED_PROVENANCE_GATE_OPEN",
+  "candidate_state": "CURRENT_SOURCE_BRADBURY_LIVE_BEHAVIOR_PROVENANCE_AND_CONSENSUS_GATES_OPEN",
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "Current-source Mandates and Authorization are finalized on Bradbury and current-source Gate I behavior is evidenced. Production remains unreleased because Bradbury effective-origin/runtime provenance is not externally enforceable and Gate J still requires the final evidence freeze.",
+    "reason": "Current-source Mandates and Authorization are finalized on Bradbury and current-source behavior is evidenced. Production remains unreleased because one semantic evaluation has a deterministic-violation vote/non-uniform result hashes, Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J still requires the final evidence freeze.",
     "required_before_release": [
+      "Strict consensus closure: every decision-bearing evaluation must have no DETERMINISTIC_VIOLATION vote and uniform validator result hashes",
       "Bradbury runtime provenance and redirect compatibility",
       "Gate J reviewer evidence freeze"
     ]
@@ -161,7 +162,8 @@
     "evidence": "docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json",
     "status": "CURRENT_SOURCE_BRADBURY_GATE_I_PROOF_COMPLETE_EFFECTIVE_ORIGIN_GATE_OPEN",
     "deployment_and_source_parity": true,
-    "behavioral_gate_i_complete": true,
+    "behavioral_gate_i_complete": false,
+    "strict_consensus_gate_proven": false,
     "effective_origin_proven": false,
     "production_release": false
   },
