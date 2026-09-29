@@ -8,6 +8,9 @@
   "evaluation_outer_transaction": "0xbb0f3d7927df57b46db8409b7711663ae318c7e8e8d6e89b9570669944092340",
   "request_id": "0xd25a322fb4a93aac8dd32c52e80f3d82ea5dd4cf7bf3c7c0cb78ca7c93d82a89",
   "request_nonce": 10013,
+  "source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+  "deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
+  "proven_against_current_deployment": false,
   "create": {
     "status_code": 7,
     "status": "FINALIZED",

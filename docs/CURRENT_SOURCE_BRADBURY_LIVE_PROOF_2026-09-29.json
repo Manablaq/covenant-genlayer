@@ -1,15 +1,18 @@
 {
-  "status": "CURRENT_SOURCE_BRADBURY_GATE_I_PROOF_COMPLETE_EFFECTIVE_ORIGIN_GATE_OPEN",
+  "status": "CURRENT_SOURCE_BRADBURY_DEPLOYMENT_PARITY_COMPLETE_BEHAVIORAL_RECERTIFICATION_OPEN",
   "network": "https://rpc-bradbury.genlayer.com",
   "chain_id": 4221,
   "validator_count": 5,
   "consensus_validator_contract": "0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D",
   "finality_address_manager": "0x85D7bf947A512Fc640C75327A780c90847267697",
-  "deployed_source_commit": "3243a739395d4d457a736ac6099dcb7fb79fcac4",
+  "deployed_source_commit": "6da89ec6e75cd9e8f1aee2be93a539020129c7f2",
   "source_hashes": {
-    "contracts/covenant_authorization.py": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+    "contracts/covenant_authorization.py": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
     "contracts/covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
   },
+  "behavioral_evidence_source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+  "behavioral_evidence_deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
+  "behavioral_evidence_matches_current_deployment": false,
   "deployments": {
     "mandates": {
       "address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
@@ -22,9 +25,10 @@
       "source_parity": true
     },
     "authorization": {
-      "address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
-      "deployment_transaction": "0xd0796dab9c78d6d33464ed113580532da5f89fd122f4dffefec6dde49277bafe",
-      "internal_transaction": "0x813a2771ba4a8f2ec8dcf968b478c17cd2b646577b8d5c79d9f8558783b7d32f",
+      "address": "0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
+      "deployment_transaction": "0x6b8d8e57001215cd3f37ee441851038c8b7bbd2540fc96482845b3954a8cea56",
+      "internal_transaction": "0x2ac192e955b379efa7588993edb2d7553fbc3aaf996a1f4337e2e9ed74ed781b",
+      "finalization_transaction": "0xde9f816d449cfc36ff0ca23bf55d41c7f5cafb7f5309a89f203e0d6da8af5086",
       "status": "FINALIZED",
       "status_code": 7,
       "consensus_result": "AGREE",
@@ -58,6 +62,9 @@
       "finality": "FINALIZED / MAJORITY_AGREE"
     },
     "fresh_current_source_evaluation": {
+      "source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+      "deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
+      "proven_against_current_deployment": false,
       "create_internal_transaction": "0x7d21bbedbf767ead04be52e6639d2893ad54adad51cf51f9ca920c3a1444ef7d",
       "create_outer_transaction": "0x38010b09208d4f78399aa6e0b6f88458a68e245d93cd3474ab3415e399fdecff",
       "evaluate_internal_transaction": "0x1c7bac1e7b42545425c17bfe76b36cfddf01d6ae4c68abac7978865af7b0031c",
@@ -191,14 +198,14 @@
   },
   "proof_boundary": {
     "current_source_deployment_parity": true,
-    "current_mandate_created": true,
-    "current_approval_evaluated": true,
-    "current_rejection_proven": true,
-    "current_repair_replacement_proven": true,
-    "current_timeout_recovery_proven": true,
-    "current_receipt_consumption_proven": true,
-    "current_replay_rejection_proven": true,
-    "current_wrong_consumer_rejection_proven": true,
+    "current_mandate_created": false,
+    "current_approval_evaluated": false,
+    "current_rejection_proven": false,
+    "current_repair_replacement_proven": false,
+    "current_timeout_recovery_proven": false,
+    "current_receipt_consumption_proven": false,
+    "current_replay_rejection_proven": false,
+    "current_wrong_consumer_rejection_proven": false,
     "current_redirect_provenance_proven": false,
     "production_or_bradbury_release": false
   }

@@ -106,9 +106,9 @@ def main() -> int:
     assert production["status"] == "UNRELEASED"
     current = manifest["current_candidate"]
     assert current["live_source_parity"] is True
-    assert current["source_commit"] == "3243a739395d4d457a736ac6099dcb7fb79fcac4"
+    assert current["source_commit"] == "6da89ec6e75cd9e8f1aee2be93a539020129c7f2"
     assert current["deployed_addresses"]["mandates"] == "0xd4C0945533C959b094967781815e31ecd0C345F7"
-    assert current["deployed_addresses"]["authorization"] == "0x8c1c7169756287a30bceeb28caee4991b5566076"
+    assert current["deployed_addresses"]["authorization"] == "0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2"
     assert current["parity_scope"] == "current contract source hashes match the exact Bradbury bytecode at the current deployment addresses"
     assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
@@ -145,7 +145,7 @@ def main() -> int:
     assert failed_attempt["deployment_submissions"] == 1
     assert failed_attempt["replacement_or_resend"] is False
     accepted_attempt = manifest["bradbury_deployment_attempts"]["authorization_format_fix_deployment_attempt"]
-    assert accepted_attempt["source_sha256"] == sha256(AUTHORIZATION)
+    assert accepted_attempt["source_sha256"] == "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1"
     assert accepted_attempt["status"] == "FINALIZED"
     assert accepted_attempt["gas_estimate"] < accepted_attempt["observed_submission_ceiling"]
     assert accepted_attempt["tx_execution_result"] == "FINISHED_WITH_RETURN"
@@ -154,6 +154,18 @@ def main() -> int:
     assert accepted_attempt["source_parity"] is True
     assert accepted_attempt["finalization_submissions"] == 1
     assert accepted_attempt["finalization_required"] is False
+    typed_attempt = manifest["bradbury_deployment_attempts"]["authorization_strict_typing_deployment"]
+    assert typed_attempt["source_sha256"] == sha256(AUTHORIZATION)
+    assert typed_attempt["source_commit"] == current["source_commit"]
+    assert typed_attempt["status"] == "FINALIZED"
+    assert typed_attempt["internal_status_code"] == 7
+    assert typed_attempt["consensus_result"] == "AGREE"
+    assert typed_attempt["tx_execution_result"] == "FINISHED_WITH_RETURN"
+    assert typed_attempt["deployment_address"] == current["deployed_addresses"]["authorization"]
+    assert typed_attempt["source_parity"] is True
+    assert typed_attempt["deployment_submissions"] == 1
+    assert typed_attempt["finalization_submissions"] == 1
+    assert typed_attempt["replacement_or_resend"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
     assert checkpoint["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
@@ -193,6 +205,10 @@ def main() -> int:
     assert current_bradbury["source_hashes"]["contracts/covenant_authorization.py"] == sha256(AUTHORIZATION)
     assert current_bradbury["deployments"]["mandates"]["source_parity"] is True
     assert current_bradbury["deployments"]["authorization"]["source_parity"] is True
+    assert current_bradbury["deployments"]["authorization"]["address"] == current["deployed_addresses"]["authorization"]
+    assert current_bradbury["behavioral_evidence_source_hash"] == "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1"
+    assert current_bradbury["behavioral_evidence_deployment_address"] == "0x8c1c7169756287a30bceeb28caee4991b5566076"
+    assert current_bradbury["behavioral_evidence_matches_current_deployment"] is False
     assert current_bradbury["configuration"]["authorization_mandates_binding"] is True
     assert current_bradbury["behavioral_proofs"]["approval_and_consumption"]["terminal_state"] == "CONSUMED"
     assert current_bradbury["behavioral_proofs"]["independent_rejection"]["terminal_state"] == "DENIED"
@@ -225,12 +241,18 @@ def main() -> int:
     assert fresh_evaluation["evaluation"]["strict_unanimity_required"] is True
     assert fresh_evaluation["evaluation"]["strict_unanimity_proven"] is False
     assert fresh_evaluation["evaluation"]["release_blocker"] is True
+    assert fresh_evaluation["source_hash"] == "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1"
+    assert fresh_evaluation["deployment_address"] == "0x8c1c7169756287a30bceeb28caee4991b5566076"
+    assert fresh_evaluation["proven_against_current_deployment"] is False
     fresh_proof = current_bradbury["behavioral_proofs"]["fresh_current_source_evaluation"]
     assert fresh_proof["evaluate_internal_transaction"] == fresh_evaluation["evaluation_transaction_id"]
     assert fresh_proof["terminal_state"] == "AUTHORIZED"
     assert fresh_proof["validator_votes_decoded"] == fresh_evaluation["evaluation"]["validator_votes_decoded"]
     assert fresh_proof["validator_result_hashes_equal"] is False
     assert fresh_proof["strict_unanimity_proven"] is False
+    assert fresh_proof["source_hash"] == fresh_evaluation["source_hash"]
+    assert fresh_proof["deployment_address"] == fresh_evaluation["deployment_address"]
+    assert fresh_proof["proven_against_current_deployment"] is False
     assert manifest["current_bradbury_live_proof"]["behavioral_gate_i_complete"] is False
     assert manifest["current_bradbury_live_proof"]["strict_consensus_gate_proven"] is False
     assert manifest["current_bradbury_live_proof"]["fresh_current_source_evaluation"]["terminal_state"] == "AUTHORIZED"
@@ -238,10 +260,10 @@ def main() -> int:
     if manifest["status"] == "RELEASED" or production["status"] == "RELEASED":
         raise AssertionError("release status cannot be enabled while strict consensus is unproven")
     boundary = current_bradbury["proof_boundary"]
-    assert boundary["current_repair_replacement_proven"] is True
-    assert boundary["current_timeout_recovery_proven"] is True
-    assert boundary["current_replay_rejection_proven"] is True
-    assert boundary["current_wrong_consumer_rejection_proven"] is True
+    assert boundary["current_repair_replacement_proven"] is False
+    assert boundary["current_timeout_recovery_proven"] is False
+    assert boundary["current_replay_rejection_proven"] is False
+    assert boundary["current_wrong_consumer_rejection_proven"] is False
     assert current_bradbury["redirect_effective_origin"]["status"] == "UNPROVEN_BRADBURY_EFFECTIVE_ORIGIN"
     assert current_bradbury["proof_boundary"]["production_or_bradbury_release"] is False
     assert current_redirect["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
