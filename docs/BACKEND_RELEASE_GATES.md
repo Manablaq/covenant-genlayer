@@ -107,3 +107,20 @@ Freeze:
 - reviewer handoff.
 
 Only after Gate J may frontend development begin.
+
+## Immutable backend-verification action record
+
+This release-gates record is the authoritative evidence record for the exact
+backend verification action below. It proves the action fields themselves; it
+does not claim that production release has already been certified.
+
+- `action_type`: `backend_release_verification`
+- `target`: `docs/BACKEND_RELEASE_GATES.md`
+- `recipient`: empty bytes
+- `value`: `0`
+- `payload`: `verify`
+
+The requested action is to verify this backend release-gates record against the
+immutable mandate and evidence policy. The target, empty recipient, zero value,
+and `verify` payload above are the exact action subject that the authorization
+request binds and the evidence substantively proves.
