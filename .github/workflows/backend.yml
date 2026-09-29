@@ -25,7 +25,6 @@ jobs:
         env:
           COVENANT_REPO: ${{ github.workspace }}
           GENVM_VERSION: v0.2.16
-          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
         run: pytest -q tests/test_covenant_mandates_direct.py
       - name: Gate C exact-source verification
         env:

@@ -99,10 +99,10 @@ class CovenantAuthorization(gl.Contract):
 		if not self.x0.get(a,_B):_x()
 		return self.x1[a]
 	def _require_registry_binding(self)->None:
-		bg=gl.get_contract_at(self.mandates_address);bh=bg.view()
+		bg:Y=typing.cast(Y,gl.get_contract_at(self.mandates_address));bh:Y=bg.view()
 		if Address(bh.get_contract_address())!=self.mandates_address:_x()
 		if bh.get_chain_id()!=gl.message.chain_id:_x()
-	def _lm(self,bg:Y,c:B,d:V)->MandatePolicy:bh=bg.view();p0=MandatePolicy(a=bh.get_max_value(c,d),b=bh.get_max_request_lifetime_seconds(c,d),c=bh.get_repair_window_seconds(c,d),d=bh.get_allowed_action_hashes(c,d),e=bh.get_allowed_target_commitments(c,d),f=bh.get_allowed_recipient_commitments(c,d),g=bh.get_required_primary_count(c,d),h=bh.get_required_corroboration_count(c,d),i=bh.get_max_publication_age_seconds(c,d),j=bh.get_max_observation_age_seconds(c,d),k=bh.get_max_publish_observe_gap_seconds(c,d),l=bh.get_max_evidence_records(c,d),m=bh.get_max_evidence_body_bytes(c,d),n=bh.get_semantic_criteria(c,d),o=bh.get_authority_role_masks(c,d),p=bh.get_authority_ids(c,d),q=bh.get_authority_publisher_names(c,d),r=bh.get_authority_source_prefixes(c,d),s=bh.get_authority_rule_hashes(c,d),t=bh.get_human_mode(c,d),u=R(bh.get_human_approver(c,d)));self._vp(p0);return p0
+	def _lm(self,bg:Y,c:B,d:V)->MandatePolicy:bh:Y=bg.view();p0=MandatePolicy(a=bh.get_max_value(c,d),b=bh.get_max_request_lifetime_seconds(c,d),c=bh.get_repair_window_seconds(c,d),d=bh.get_allowed_action_hashes(c,d),e=bh.get_allowed_target_commitments(c,d),f=bh.get_allowed_recipient_commitments(c,d),g=bh.get_required_primary_count(c,d),h=bh.get_required_corroboration_count(c,d),i=bh.get_max_publication_age_seconds(c,d),j=bh.get_max_observation_age_seconds(c,d),k=bh.get_max_publish_observe_gap_seconds(c,d),l=bh.get_max_evidence_records(c,d),m=bh.get_max_evidence_body_bytes(c,d),n=bh.get_semantic_criteria(c,d),o=bh.get_authority_role_masks(c,d),p=bh.get_authority_ids(c,d),q=bh.get_authority_publisher_names(c,d),r=bh.get_authority_source_prefixes(c,d),s=bh.get_authority_rule_hashes(c,d),t=bh.get_human_mode(c,d),u=R(bh.get_human_approver(c,d)));self._vp(p0);return p0
 	def _vp(self,p0:MandatePolicy)->None:
 		r=p0.p
 		if p0.m<=u256(0)or p0.m>u256(Q35):_x()
@@ -247,7 +247,7 @@ class CovenantAuthorization(gl.Contract):
 			vr0=eo0();return typing.cast(S,lr0.calldata)==vr0
 		return typing.cast(Y,gl.vm.run_nondet_unsafe(eo0,vf0))
 	def _rf(self,q:RequestRecord,p0:O[MandatePolicy]=None)->MandatePolicy:
-		bg=gl.get_contract_at(self.mandates_address);self._require_registry_binding()
+		bg:Y=typing.cast(Y,gl.get_contract_at(self.mandates_address));self._require_registry_binding()
 		if not bg.view().version_exists(q.c,q.d):_x()
 		if bg.view().get_mandate_commitment(q.c,q.d)!=q.e:_x()
 		if p0 is None:p0=self._lm(bg,q.c,q.d)
@@ -277,7 +277,7 @@ class CovenantAuthorization(gl.Contract):
 		if gl.message.sender_address!=agent:_x()
 		_l32(mi,'mandate_id');_l32(mc,'mandate_commitment')
 		if at=='':_x()
-		_lt(at,'action_type',Q27);_lb(tg,'target',Q28);_lb(rp,'recipient',Q29);_lb(pl,'payload',Q30);rg0=gl.get_contract_at(self.mandates_address);self._require_registry_binding()
+		_lt(at,'action_type',Q27);_lb(tg,'target',Q28);_lb(rp,'recipient',Q29);_lb(pl,'payload',Q30);rg0:Y=typing.cast(Y,gl.get_contract_at(self.mandates_address));self._require_registry_binding()
 		if not rg0.view().mandate_exists(mi):_x()
 		if not rg0.view().version_exists(mi,mv):_x()
 		if not rg0.view().is_version_eligible(mi,mv):_x()
