@@ -36,16 +36,14 @@ Changing a consequential field invalidates the authorization.
 
 ## Current release status
 
-**UNRELEASED CURRENT CANDIDATE — the Mandates source has been redesigned to fit
-Bradbury’s observed gas ceiling without removing protocol features and is now
-deployed/finalized there with exact source parity. The authorized compact
-Authorization attempt fit the observed gas ceiling but failed during GenVM
-parsing because its required dependency-header blank line had been removed.
-That format defect is fixed in source hash
-`306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1`; the
-corrected deployment is accepted with successful GenVM execution but awaits
-separate finalization. Current-source parity, Gate I live verification, and
-final release certification remain pending.**
+**UNRELEASED CURRENT CANDIDATE — the Mandates and corrected Authorization
+sources are deployed/finalized on Bradbury with exact source parity. The
+current-source approval, denial, repair/replacement, expiry recovery, receipt
+consumption, and negative receipt paths are recorded in
+`docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json`. Production remains
+unreleased because Bradbury does not expose an enforceable effective URL/history
+for approved-host provenance, and Gate J still requires the final evidence
+freeze.**
 
 The candidate retains mandate-bound evidence-body limits, bounded user-controlled
 inputs, one-time verified mandate-policy loading, all public Mandates methods,
@@ -60,19 +58,16 @@ the chain: mandatory pre-sign freshness revalidation found evidence observation
 age `1352` seconds against the mandate maximum of `900`, so the runner stopped
 before signing with submission count `0`. That fingerprint is not reusable.
 
-Approval, rejection, repair/replacement, timeout, receipt consumption,
-replay, wrong-consumer, and redirect provenance are recorded only for the
-pre-compact supported-local deployment in
-`docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md`.
+The older supported-local live checkpoint is historical predecessor-source
+evidence. It is not used for current-source parity or Bradbury claims.
 
 `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` remains historical predecessor-source
 evidence and is not used to establish the current-source claims.
 
-`deployments/release-manifest.json` records the current supported-local
-source-parity checkpoint, finalized Bradbury Mandates deployment, rejected
-Authorization deployment attempt, and historical predecessor proof. The
-backend and nested `production_deployment.status` remain `UNRELEASED` until
-the remaining Bradbury/public gates are closed.
+`deployments/release-manifest.json` records the finalized current-source
+Bradbury deployments and the remaining external release boundary. The backend
+and nested `production_deployment.status` remain `UNRELEASED` until effective-
+origin provenance and Gate J are closed.
 
 ## Verification
 

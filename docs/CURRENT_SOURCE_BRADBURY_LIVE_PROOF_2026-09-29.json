@@ -1,0 +1,165 @@
+{
+  "status": "CURRENT_SOURCE_BRADBURY_GATE_I_PROOF_COMPLETE_EFFECTIVE_ORIGIN_GATE_OPEN",
+  "network": "https://rpc-bradbury.genlayer.com",
+  "chain_id": 4221,
+  "validator_count": 5,
+  "consensus_validator_contract": "0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D",
+  "finality_address_manager": "0x85D7bf947A512Fc640C75327A780c90847267697",
+  "deployed_source_commit": "3243a739395d4d457a736ac6099dcb7fb79fcac4",
+  "source_hashes": {
+    "contracts/covenant_authorization.py": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+    "contracts/covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
+  },
+  "deployments": {
+    "mandates": {
+      "address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+      "deployment_transaction": "0xac76bf661d59ee0dafaff0c08045dcdfa8ff402f8b9c127270d5b978f7937557",
+      "finalization_transaction": "0xc4ae3ec1c1e2b06f377c32d07196d4243f0179e880b9c4087962584b483536dd",
+      "status": "FINALIZED",
+      "status_code": 7,
+      "consensus_result": "AGREE",
+      "execution_result": "FINISHED_WITH_RETURN",
+      "source_parity": true
+    },
+    "authorization": {
+      "address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
+      "deployment_transaction": "0xd0796dab9c78d6d33464ed113580532da5f89fd122f4dffefec6dde49277bafe",
+      "internal_transaction": "0x813a2771ba4a8f2ec8dcf968b478c17cd2b646577b8d5c79d9f8558783b7d32f",
+      "status": "FINALIZED",
+      "status_code": 7,
+      "consensus_result": "AGREE",
+      "execution_result": "FINISHED_WITH_RETURN",
+      "source_parity": true
+    }
+  },
+  "configuration": {
+    "mandates_version": 3,
+    "mandates_commitment": "0x1f16e8de8f41827bdfd93145f4cb10a48f61f52ec39aa233a147bcf08b414b2e",
+    "mandates_v2_commitment": "0x685723ab8b4de139624d5ace052dd41e0d598e3482ebb0f75e83eb82f82c77bf",
+    "mandates_v1_commitment": "0x7e7e10d4803f3108a9a92ea1afd159da44d6646833fff9669598e8877af1f3e4",
+    "authorization_mandates_address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+    "authorization_mandates_binding": true
+  },
+  "behavioral_proofs": {
+    "approval_and_consumption": {
+      "create_internal_transaction": "0xe1f90fb830af6b97bef6613415057cff488a41ddb4d9202449aecfaf107635bd",
+      "create_outer_transaction": "0xfed94e8dd1fe0885ce5af706d73241faf1c7b4d30e5d5f1af53daaaea0b124a9",
+      "evaluate_internal_transaction": "0x43c64a23d1f60dbc112ce9dd3e0560e925df9a2739b4f4727507b88a32ad65ac",
+      "evaluate_outer_transaction": "0x48e6bdf7f7428103e3c689adbc3e9c44457bb6e81cea9f064ef568cad741cfb1",
+      "request_id": "0xcb6df7b8fc04a338410954ed4699ffeab18ace898eb87fbb1732b97ceafe57f9",
+      "authorized_state_before_consumption": true,
+      "action_subject": "0xc6333faf650939bd268c8455e61002d33c30313e82aee48aac95888eaf20d9a3",
+      "action_intent": "0x13c58522e3cdb6b0a072076ae001dfdebeedf629d9a69d5df0b18b2c84457c0f",
+      "receipt_id": "0x20eabbd6b07aeeac9cc7593c1ba459c46724d0fa22d75b72bdfe2e9a04729102",
+      "consume_internal_transaction": "0xcd3d70daa433467015b2c5f7ccc830333bf33379a44e587a734751b5687a2659",
+      "consume_outer_transaction": "0x6752bb4bd75d096634b68093f0658510969d44c0a6c3edfe22ebf56f4c1fa4c9",
+      "terminal_state": "CONSUMED",
+      "receipt_consumed": true,
+      "finality": "FINALIZED / MAJORITY_AGREE"
+    },
+    "independent_rejection": {
+      "create_internal_transaction": "0x8b2bbe31b8473723347fbbbddb7cd90a550442536599bf6cba1404121405ad72",
+      "create_outer_transaction": "0xc9d141ddda542233c56795c873158d537cb39cb4a21ac277737891e6b789a097",
+      "evaluate_internal_transaction": "0xeee0ec881be3f70e59ddc44194303dfa7b520930852521f64a8dcafdc9090405",
+      "evaluate_outer_transaction": "0x023ee83b9d8f5ff732e2c1d6ee06a3ac2a67421b2d45b4e71baac7a1487bff1d",
+      "request_id": "0xd798f9ac45038356c3b51762e1b4524bf19dac1881195e48f9ab6c612d8599de",
+      "terminal_state": "DENIED",
+      "receipt_id": "0x",
+      "finality": "FINALIZED / MAJORITY_AGREE"
+    },
+    "repair_replacement": {
+      "create_internal_transaction": "0xd3561de8104f58dd812daa7ecfa6cae0cc3f003676aafa4a559cf99634ec4684",
+      "create_outer_transaction": "0x4d6069bdc37a50632163fe1538b89865007fdeba87808b0e5c21588cb837ddad",
+      "request_id": "0xff8e3e685f75715b0629c101b667b197ba75b39acd614950a30fae9e9a287ca5",
+      "initial_state": "REPAIR_REQUIRED",
+      "initial_repair_reason": "INVALID_AUTHORITY",
+      "initial_evidence_revision": 0,
+      "replacement_internal_transaction": "0x273893188a8abbe773cf9a3e85310cae41bb1cea4b86e80ae335be963e25a5f6",
+      "replacement_outer_transaction": "0xb2a8d3871cac827f466bed15e2d6fbf7e6ee68f3358bf524cadf7182f9e6b650",
+      "replacement_status": "FINALIZED",
+      "replacement_finality": "FINALIZED / MAJORITY_AGREE",
+      "preacceptance_evaluation_failure": {
+        "outer_transaction": "0x85bdc8afc9a39fa4d39a9950192636e18e24795a1d62364bd64eabab6a2d6e2c",
+        "outer_receipt_status": 0,
+        "internal_transaction": null,
+        "logs": 0,
+        "worker_nonce": "0x5da",
+        "request_state_after_failure": "PENDING",
+        "retry_policy": "fresh_read_only_preflight_then_one_new_envelope"
+      },
+      "evaluate_internal_transaction": "0x82736a0274accd35a555b02e9c3f20b1f23d4b907cb0df965ed7df6d24dc4561",
+      "evaluate_outer_transaction": "0x9518291723ed0d50183be50ea7f965afa335b397f0287b9c82c85e56eb177629",
+      "evaluation_status": "FINALIZED",
+      "evaluation_finality": "FINALIZED / MAJORITY_AGREE",
+      "terminal_state": "AUTHORIZED",
+      "evidence_revision": 1,
+      "action_subject": "0x4525896438be1279b48536c23ea6b644090b1212e6e1ad608c6b2bb9fc360d9b",
+      "action_intent": "0xd430df9dd4ee7f4928353a131919bab4fbbc9ec514deb2300ed462b7b94bad68",
+      "evidence_set_commitment": "0x2c4919942d84790dbcb0337b4164ade55ada9fd76d4fe86e032e856d67b8b3e9",
+      "receipt_id": "0xccad1ca01f897daa90b5eb14e15d6c2bd826c99f82fd4f1b10ab6f1c87b299fc",
+      "repair_deadline_unchanged": true,
+      "expires_at": 1790702496,
+      "votes_committed": 5,
+      "votes_revealed": 5,
+      "validator_votes": "AQQBAQE=",
+      "validator_result_hashes_equal": false,
+      "validator_parity_note": "Bradbury finalized MAJORITY_AGREE with five revealed votes; one validator vote is DETERMINISTIC_VIOLATION and the result hashes are not uniform. This non-unanimous consensus is recorded explicitly and is not represented as unanimity."
+    },
+    "timeout_recovery": {
+      "create_internal_transaction": "0x0e37d94b3ac3459ac0efc6102716117aa046216e1780852b68ba0dc7ad206468",
+      "create_outer_transaction": "0x801e827daaf001d8e157361294111d3a699236081db053ce17ee58ae4d651976",
+      "replacement_internal_transaction": "0x31d55dd8bf7b59a2448b33a964245953fceaefadeec5d8eb6d0c045ae42fcf82",
+      "replacement_outer_transaction": "0xd79f54c6cfb1e221c1b0b218623f9aa94120150b0e8995099ef45aab111135c1",
+      "evaluate_internal_transaction": "0x8e51b180dbaec3da5465a44c1f235b2c9de57f33b758b255fe32cb84b491a12e",
+      "evaluate_outer_transaction": "0x3524256ed8906394ffb4f16cf9e42eb9d4bc8959e52f60de39ea19930807c953",
+      "request_id": "0xaac22c8a737be948fccf76a7610982d0ca9ce7e2400258bb9bec2699d88de781",
+      "terminal_state": "EXPIRED",
+      "resubmission_policy": "NO_AUTOMATIC_RESEND_OR_REPLACEMENT",
+      "finality": "FINALIZED / MAJORITY_AGREE",
+      "status_code": 7,
+      "execution_result": "FINISHED_WITH_RETURN"
+    }
+  },
+  "receipt_negative_proofs": {
+    "request_id": "0xcb6df7b8fc04a338410954ed4699ffeab18ace898eb87fbb1732b97ceafe57f9",
+    "receipt_id": "0x20eabbd6b07aeeac9cc7593c1ba459c46724d0fa22d75b72bdfe2e9a04729102",
+    "action_intent": "0x13c58522e3cdb6b0a072076ae001dfdebeedf629d9a69d5df0b18b2c84457c0f",
+    "replay": {
+      "internal_transaction": "0xf006b6a82a97d26de62e89ee8243c7cbb32e52e99c5595d0d995aa50bab20f66",
+      "outer_transaction": "0xbe5907be14dc706a38c7661b4f1330f33e4c2ef757e78a6940bb3d30b8c096c4",
+      "read_only_simulation": "REVERTED",
+      "finality": "FINALIZED / MAJORITY_AGREE",
+      "status_code": 7,
+      "execution_result": "FINISHED_WITH_REVERT"
+    },
+    "wrong_consumer": {
+      "internal_transaction": "0x881cea65439750a1dda4b8e15c0db2b724d795bcecf7c66d869782af5a37a048",
+      "outer_transaction": "0x1936c5d70e6e22928315d3ca8c94564c053488aad0240ae9549f79869a0099a9",
+      "read_only_simulation": "REVERTED",
+      "finality": "FINALIZED / MAJORITY_AGREE",
+      "status_code": 7,
+      "execution_result": "FINISHED_WITH_REVERT"
+    }
+  },
+  "redirect_effective_origin": {
+    "status": "UNPROVEN_BRADBURY_EFFECTIVE_ORIGIN",
+    "local_probe_status": "PASS_LOCAL_CURRENT_RUNTIME",
+    "local_probe_result": "status=302;location=b'/final'",
+    "required_property": "approved-host provenance must be based on an enforceable effective URL with redirect history",
+    "reason_unproven": "Bradbury follows redirects but does not expose the effective URL or redirect history through the available runtime result",
+    "production_release_blocked": true
+  },
+  "proof_boundary": {
+    "current_source_deployment_parity": true,
+    "current_mandate_created": true,
+    "current_approval_evaluated": true,
+    "current_rejection_proven": true,
+    "current_repair_replacement_proven": true,
+    "current_timeout_recovery_proven": true,
+    "current_receipt_consumption_proven": true,
+    "current_replay_rejection_proven": true,
+    "current_wrong_consumer_rejection_proven": true,
+    "current_redirect_provenance_proven": false,
+    "production_or_bradbury_release": false
+  }
+}

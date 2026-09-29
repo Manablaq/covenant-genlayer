@@ -1,5 +1,5 @@
 {
-  "status": "ACCEPTED_NOT_FINALIZED",
+  "status": "FINALIZED",
   "network": "https://rpc-bradbury.genlayer.com",
   "chain_id": 4221,
   "consensus": "0x0112Bf6e83497965A5fdD6Dad1E447a6E004271D",
@@ -19,8 +19,8 @@
   "outer_evm_receipt_status": 1,
   "outer_evm_block": "0x15fe986",
   "internal_transaction": "0x813a2771ba4a8f2ec8dcf968b478c17cd2b646577b8d5c79d9f8558783b7d32f",
-  "internal_status": "ACCEPTED_NOT_FINALIZED",
-  "internal_status_code": 5,
+  "internal_status": "FINALIZED",
+  "internal_status_code": 7,
   "consensus_result": "AGREE",
   "votes_committed": 5,
   "votes_revealed": 5,
@@ -29,9 +29,13 @@
   "tx_execution_result_code": 1,
   "genvm_trace_result_code": 0,
   "tx_execution_hash": "0xe16c261899f5156323c2ff469a49836e26fc72d67cd4d24f5147181b2617f0b0",
-  "deployment_address": null,
-  "source_parity": false,
-  "finalization_submissions": 0,
-  "finalization_required": true,
-  "conclusion": "The corrected source parsed and executed successfully, and the outer transaction was mined with unanimous validator execution agreement. The transaction is accepted but not finalized, so no deployed Authorization address or current-source parity claim is made. Finalization requires a separate on-chain transaction."
+  "deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
+  "source_parity": {
+    "gen_getContractCode_sha256": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+    "gen_getContractCode_bytes": 19967,
+    "match": true
+  },
+  "finalization_submissions": 1,
+  "finalization_required": false,
+  "conclusion": "The corrected source parsed and executed successfully, reached FINALIZED with unanimous validator agreement, and the deployed Authorization code matches the exact current source hash and byte count."
 }

@@ -1,10 +1,11 @@
-# Pre-compact source supported-runtime checkpoint — 2026-09-27
+# Historical pre-compact source supported-runtime checkpoint — 2026-09-27
 
-This checkpoint records the pre-compact source deployment and supported-local
-runtime closure. The repository now contains a newer compact Authorization
-candidate that has not been deployed or Bradbury-estimated; the live evidence
-below must not be attributed to that candidate. It does not claim complete Gate
-I or final release certification.
+This checkpoint records only the pre-compact source deployment and
+supported-local runtime closure. It is retained for audit history and is
+superseded for current-source claims by
+`docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json`. Nothing below may be
+used as current Bradbury source-parity evidence or as final release
+certification.
 
 ## Frozen source and deployments
 
@@ -25,7 +26,7 @@ committed and revealed validator votes. Each write was prepared from a
 persisted unsigned transaction, bound to an exact fingerprint, signed once,
 submitted once, and recovered by transaction ID.
 
-## Current-source live closure
+## Historical pre-compact live closure
 
 ### Approval
 
@@ -80,16 +81,12 @@ origin cannot silently inherit approved-host provenance. The tracked summary is
 
 ## Release boundary
 
-The current-source local backend gates are complete, and the Mandates contract
-has now been deployed and finalized on Bradbury with exact source parity. The
-repository remains `UNRELEASED` because the remaining external gates are not
-complete:
+This historical local closure is not the current Bradbury release boundary.
+The current-source Bradbury boundary is recorded in the new machine-readable
+proof artifact; the repository remains `UNRELEASED` because the remaining
+external gates are not complete:
 
-- current-source Authorization deployment and immutable Mandates binding;
 - Bradbury runtime provenance and redirect compatibility;
-- Gate I live verification for binding, request behavior, receipt generation,
-  consumption, mutation rejection, replay/wrong-consumer rejection, and
-  recovery/expiry;
 - Gate J reviewer evidence freeze and final certification.
 
 The Mandates source was estimated read-only at `16,516,613` gas against the
@@ -101,8 +98,7 @@ consumed. A reviewed Authorization size/gas redesign is therefore required
 before its Bradbury deployment.
 
 The machine-readable Bradbury deployment evidence is
-`docs/CURRENT_SOURCE_BRADBURY_MANDATES_DEPLOYMENT_2026-09-27.json`.
-
-The machine-readable current proof is
-`docs/CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json`; release status is recorded in
-`deployments/release-manifest.json`.
+`docs/CURRENT_SOURCE_BRADBURY_MANDATES_DEPLOYMENT_2026-09-27.json`; the
+current-source live proof is
+`docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json`. Release status is
+recorded in `deployments/release-manifest.json`.

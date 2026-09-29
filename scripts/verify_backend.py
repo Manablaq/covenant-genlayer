@@ -23,6 +23,7 @@ MANIFEST = ROOT / "deployments" / "release-manifest.json"
 RUNTIME_PATCH = ROOT / "runtime" / "patches" / "genvm-v0.2.16-no-redirect.patch"
 RUNTIME_README = ROOT / "runtime" / "README.md"
 CURRENT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
+CURRENT_BRADBURY_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json"
 CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
 
 
@@ -102,11 +103,11 @@ def main() -> int:
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
     current = manifest["current_candidate"]
-    assert current["live_source_parity"] is False
-    assert current["source_commit"] == "40417500c938ae59de4fded587e3bfefd562e07c"
-    assert current["deployed_addresses"]["mandates"] == "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19"
-    assert current["deployed_addresses"]["authorization"] == "0xCe751D8399639157268a55F12e6f2aB081d49c72"
-    assert current["parity_scope"] == "current worktree source is not installed at the historical local deployment addresses; the recorded live proofs belong to the pre-compact source"
+    assert current["live_source_parity"] is True
+    assert current["source_commit"] == "3243a739395d4d457a736ac6099dcb7fb79fcac4"
+    assert current["deployed_addresses"]["mandates"] == "0xd4C0945533C959b094967781815e31ecd0C345F7"
+    assert current["deployed_addresses"]["authorization"] == "0x8c1c7169756287a30bceeb28caee4991b5566076"
+    assert current["parity_scope"] == "current contract source hashes match the exact Bradbury bytecode at the current deployment addresses"
     assert current["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
     assert current["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
     redesign = manifest["bradbury_deployment_attempts"]["redesign_candidate_estimate"]
@@ -143,14 +144,14 @@ def main() -> int:
     assert failed_attempt["replacement_or_resend"] is False
     accepted_attempt = manifest["bradbury_deployment_attempts"]["authorization_format_fix_deployment_attempt"]
     assert accepted_attempt["source_sha256"] == sha256(AUTHORIZATION)
-    assert accepted_attempt["status"] == "ACCEPTED_NOT_FINALIZED"
+    assert accepted_attempt["status"] == "FINALIZED"
     assert accepted_attempt["gas_estimate"] < accepted_attempt["observed_submission_ceiling"]
     assert accepted_attempt["tx_execution_result"] == "FINISHED_WITH_RETURN"
     assert accepted_attempt["genvm_trace_result_code"] == 0
-    assert accepted_attempt["deployment_address"] is None
-    assert accepted_attempt["source_parity"] is False
-    assert accepted_attempt["finalization_submissions"] == 0
-    assert accepted_attempt["finalization_required"] is True
+    assert accepted_attempt["deployment_address"] == "0x8c1c7169756287a30bceeb28caee4991b5566076"
+    assert accepted_attempt["source_parity"] is True
+    assert accepted_attempt["finalization_submissions"] == 1
+    assert accepted_attempt["finalization_required"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
     assert checkpoint["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
@@ -179,10 +180,33 @@ def main() -> int:
     assert boundary["production_or_bradbury_release"] is False
 
     current_proof = json.loads(CURRENT_PROOF.read_text(encoding="utf-8"))
+    current_bradbury = json.loads(CURRENT_BRADBURY_PROOF.read_text(encoding="utf-8"))
     current_redirect = json.loads(CURRENT_REDIRECT_PROOF.read_text(encoding="utf-8"))
-    assert current_proof["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
+    assert current_proof["status"] == "HISTORICAL_PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
     assert current_proof["proof_boundary"]["current_source_deployment_parity"] is False
     assert current_proof["proof_boundary"]["production_or_bradbury_release"] is False
+    assert current_bradbury["source_hashes"]["contracts/covenant_mandates.py"] == sha256(MANDATES)
+    assert current_bradbury["source_hashes"]["contracts/covenant_authorization.py"] == sha256(AUTHORIZATION)
+    assert current_bradbury["deployments"]["mandates"]["source_parity"] is True
+    assert current_bradbury["deployments"]["authorization"]["source_parity"] is True
+    assert current_bradbury["configuration"]["authorization_mandates_binding"] is True
+    assert current_bradbury["behavioral_proofs"]["approval_and_consumption"]["terminal_state"] == "CONSUMED"
+    assert current_bradbury["behavioral_proofs"]["independent_rejection"]["terminal_state"] == "DENIED"
+    repaired = current_bradbury["behavioral_proofs"]["repair_replacement"]
+    assert repaired["replacement_status"] == "FINALIZED"
+    assert repaired["evaluation_status"] == "FINALIZED"
+    assert repaired["terminal_state"] == "AUTHORIZED"
+    assert repaired["evidence_revision"] == 1
+    assert repaired["repair_deadline_unchanged"] is True
+    assert repaired["validator_votes"] == "AQQBAQE="
+    assert repaired["validator_result_hashes_equal"] is False
+    boundary = current_bradbury["proof_boundary"]
+    assert boundary["current_repair_replacement_proven"] is True
+    assert boundary["current_timeout_recovery_proven"] is True
+    assert boundary["current_replay_rejection_proven"] is True
+    assert boundary["current_wrong_consumer_rejection_proven"] is True
+    assert current_bradbury["redirect_effective_origin"]["status"] == "UNPROVEN_BRADBURY_EFFECTIVE_ORIGIN"
+    assert current_bradbury["proof_boundary"]["production_or_bradbury_release"] is False
     assert current_redirect["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
     assert current_redirect["decoded_result"] == "status=302;location=b'/final'"
     historical = manifest["historical_pre_redesign_local_runtime_checkpoint"]
