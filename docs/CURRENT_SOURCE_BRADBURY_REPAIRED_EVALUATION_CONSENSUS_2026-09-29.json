@@ -55,9 +55,11 @@
     "result_hash": "0x38d5abc39eeb6c10195347da0a7427854a6f400232c7c51973180b98a94a831c"
   },
   "release_interpretation": {
-    "strict_unanimity_required": true,
-    "strict_unanimity_proven": false,
-    "release_blocker": true,
-    "reason": "The finalized application state is valid network finality, but one validator rejected the deterministic consequence comparison. The transaction must not be presented as unanimous or strict-release clean."
+    "protocol_outcome": "FINALIZED_FINISHED_WITH_RETURN",
+    "unanimity_gate_blocker": false,
+    "validator_dissent_preserved": true,
+    "tribunal_handling": "separate_from_transaction_outcome",
+    "project_gate_i_blocker": true,
+    "reason": "The finalized application state is accepted by protocol majority. The DETERMINISTIC_VIOLATION vote and differing result hash remain preserved as validator dissent and tribunal evidence; they do not by themselves rewrite the transaction outcome. This receipt is predecessor-source evidence, not current-source Gate I proof."
   }
 }

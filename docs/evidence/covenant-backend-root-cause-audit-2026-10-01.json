@@ -1,0 +1,106 @@
+{
+  "schema": "covenant-backend-root-cause-audit-v1",
+  "audit_date": "2026-10-01",
+  "repository": {
+    "initial_branch": "main",
+    "initial_head": "ac37ddf46ce38636035817861150a31dc89e54d9",
+    "initial_origin_main": "ac37ddf46ce38636035817861150a31dc89e54d9",
+    "initial_worktree_clean": true,
+    "current_source_hashes": {
+      "contracts/covenant_authorization.py": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
+      "contracts/covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
+    },
+    "deployed_addresses": {
+      "mandates": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+      "authorization": "0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2"
+    }
+  },
+  "required_findings": {
+    "ROOT_CAUSE_NONCE_RACE": "R3 froze unsigned nonce 1516; R4 observed latest=pending=1517 and stopped before signing. The sender is shared with other activity outside the frozen Covenant workflow.",
+    "ROOT_CAUSE_FALSE_UNANIMITY_GATE": "YES",
+    "EFFECTIVE_ORIGIN_GATE": "PLATFORM_BLOCKER",
+    "CONTRACT_SOURCE_DEFECT": "NO",
+    "CONTRACT_REDEPLOY_REQUIRED": "NO"
+  },
+  "protocol_audit": {
+    "acceptance_rule": "MAJORITY",
+    "success_rule": "status=FINALIZED AND consensus_result=AGREE AND execution_result=FINISHED_WITH_RETURN",
+    "unanimity_required": false,
+    "dissent_alone_blocks_release": false,
+    "validator_dissent_preserved": true,
+    "deterministic_violation_handling": "separate tribunal/judicial/economic handling; does not automatically rewrite transaction outcome",
+    "project_semantic_state_is_separate": true
+  },
+  "runtime_api_audit": {
+    "response_status": "Correct for pinned/deployed runtime path and GLSim mocks; public docs also show status_code on a documented surface.",
+    "response_headers": "Exposed by local GLSim full-response adapter and pinned runtime adapter; exercised by tests and local probe.",
+    "redirect_behavior": "Local GLSim live I/O and unpatched pinned reqwest follow redirects; tracked patched v0.2.16 local runtime does not.",
+    "bradbury_effective_origin": "Available Bradbury provenance reports redirect following without effective URL/history exposure.",
+    "supported_effective_url_or_history_api": false,
+    "contract_source_changed": false,
+    "evidence": [
+      "runtime/README.md",
+      "runtime/patches/genvm-v0.2.16-no-redirect.patch",
+      "docs/CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json",
+      "tests/test_covenant_authorization_glsim.py"
+    ]
+  },
+  "source_diff": {
+    "predecessor_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
+    "current_hash": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
+    "predecessor_commit": "3243a739395d4d457a736ac6099dcb7fb79fcac4",
+    "current_deployment_commit": "6da89ec6e75cd9e8f1aee2be93a539020129c7f2",
+    "semantic_change": "typing-only; no contract behavior change",
+    "changes": [
+      "_require_registry_binding: cast get_contract_at result to Y",
+      "_lm: annotate bg.view result as Y",
+      "_rf: cast get_contract_at result to Y",
+      "create_request: cast get_contract_at result to Y"
+    ]
+  },
+  "EXACT_CURRENT_GATE_I_REMAINING_OPERATIONS": [
+    "Create a current-source mandate/request and finalized successful authorization against current deployed addresses.",
+    "Obtain a current-source denial result with validator-independent decision-substance evidence.",
+    "Exercise malformed/failing evidence and repair/retry behavior on current source, including finality and recovery/expiry.",
+    "Prove exact current-source receipt generation and post-finality consumption.",
+    "Prove current-source mutation rejection, replay rejection, and wrong-consumer rejection.",
+    "Preserve raw validator/transaction evidence and bind every result to current source hash/address; no blind resend, replacement, or post-authorization rebuild."
+  ],
+  "GATE_F_REMAINING": [
+    "Current-source authorization consequential result",
+    "Current-source denial consequential result",
+    "Current-source validator-independent decision-substance verification",
+    "Current-source malformed/failing evidence repair/retry",
+    "Current-source irreversible consequence only after finality"
+  ],
+  "GATE_G_REMAINING": [
+    "Deploy the exact current-source graph in the pinned full runtime before treating Gate G as closed; record source sizes/hashes, ABI/schema hashes, ordering, constructor/wiring, and resulting identities. The persisted local checkpoint is predecessor Authorization source and cannot be reused."
+  ],
+  "GATE_H_REMAINING": [],
+  "EXACT_GATE_J_REMAINING": [
+    "Freeze reviewed git commit/tree.",
+    "Freeze current source and ABI/schema hashes.",
+    "Freeze deployment and transaction identities.",
+    "Freeze toolchain/runtime versions and machine-readable evidence.",
+    "Complete reviewer handoff after Gate F/I and runtime provenance are resolved."
+  ],
+  "BACKEND_COMPLETE": "NO",
+  "NEXT_ACTION": "Do not reuse the stale R3 fingerprint. Close the exact current-source Gate G full-runtime proof, resolve Bradbury effective-origin/runtime provenance with the runtime owner, then schedule one fresh current-source Gate F/I run using a dedicated Covenant signer and the read-only pre-sign guard, followed by Gate J freeze.",
+  "safety": {
+    "private_key_or_secret_contents_in_artifacts": false,
+    "signing_performed": false,
+    "submission_performed": false,
+    "blockchain_writes": 0,
+    "git_push": false,
+    "contract_source_mutated": false
+  },
+  "official_documentation": [
+    "https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions/transaction-statuses",
+    "https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/finality",
+    "https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions/transaction-execution",
+    "https://docs.genlayer.com/developers/intelligent-contracts/equivalence-principle",
+    "https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/deterministic-violations-and-tribunals",
+    "https://docs.genlayer.com/developers/intelligent-contracts/features/web-access",
+    "https://docs.genlayer.com/developers/decentralized-applications/querying-a-transaction"
+  ]
+}

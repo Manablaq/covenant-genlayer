@@ -38,12 +38,12 @@ Changing a consequential field invalidates the authorization.
 
 **UNRELEASED CURRENT CANDIDATE — the Mandates and corrected Authorization
 sources are deployed/finalized on Bradbury with exact source parity. The
-current-source approval, denial, repair/replacement, expiry recovery, receipt
-consumption, and negative receipt paths are recorded in
-`docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json`. Production remains
-unreleased because Bradbury does not expose an enforceable effective URL/history
-for approved-host provenance, and Gate J still requires the final evidence
-freeze.**
+available approval, denial, repair/replacement, expiry recovery, receipt
+consumption, and negative receipt paths are explicitly bound to the predecessor
+Authorization deployment and are not current-source Gate I proof. Production
+remains unreleased because current-source behavioral recertification is open,
+Bradbury does not expose an enforceable effective URL/history for approved-host
+provenance, and Gate J still requires the final evidence freeze.**
 
 The candidate retains mandate-bound evidence-body limits, bounded user-controlled
 inputs, one-time verified mandate-policy loading, all public Mandates methods,
@@ -53,10 +53,11 @@ Direct, GLSim, adversarial, runtime-calldata, reference-vector, and Gate D
 coverage. The supported-local live deployment evidence in the checkpoint is
 explicitly pre-compact evidence and is not current-candidate source parity.
 
-The first current-source approval `create_request` candidate did **not** reach
-the chain: mandatory pre-sign freshness revalidation found evidence observation
-age `1352` seconds against the mandate maximum of `900`, so the runner stopped
-before signing with submission count `0`. That fingerprint is not reusable.
+The R3 unsigned `create_request` candidate was frozen at EVM nonce `1516`. R4
+found latest/pending nonce `1517` and stopped before signing; the stale
+fingerprint is retired and must not be reused. The sender is treated as shared
+with other activity, so the read-only `scripts/covenant_write_guard.py` performs
+a final latest/pending and fingerprint check but is not a cross-process lock.
 
 The older supported-local live checkpoint is historical predecessor-source
 evidence. It is not used for current-source parity or Bradbury claims.
@@ -65,9 +66,9 @@ evidence. It is not used for current-source parity or Bradbury claims.
 evidence and is not used to establish the current-source claims.
 
 `deployments/release-manifest.json` records the finalized current-source
-Bradbury deployments and the remaining external release boundary. The backend
-and nested `production_deployment.status` remain `UNRELEASED` until effective-
-origin provenance and Gate J are closed.
+Bradbury deployments and the remaining release boundaries. The backend and
+nested `production_deployment.status` remain `UNRELEASED` until current-source
+Gate F/G/I, effective-origin provenance, and Gate J are closed.
 
 ## Verification
 
@@ -96,3 +97,8 @@ python scripts/live_preflight.py \
 
 The preflight refuses to overwrite evidence and has no transaction-signing or
 submission path.
+
+Before any separately authorized write workflow, run the read-only Covenant
+guard against the already authorized unsigned candidate. It refuses nonce drift,
+retired fingerprints, mismatched fingerprints, and any candidate that records
+signing or submission; it never rebuilds a candidate after authorization.

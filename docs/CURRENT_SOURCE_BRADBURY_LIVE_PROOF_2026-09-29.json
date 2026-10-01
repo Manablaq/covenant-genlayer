@@ -13,6 +13,15 @@
   "behavioral_evidence_source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
   "behavioral_evidence_deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
   "behavioral_evidence_matches_current_deployment": false,
+  "protocol_consensus": {
+    "acceptance_rule": "MAJORITY",
+    "finality_status": "FINALIZED",
+    "successful_execution": "FINISHED_WITH_RETURN",
+    "unanimity_required": false,
+    "unanimity_gate_blocker": false,
+    "validator_dissent_preserved": true,
+    "tribunal_handling": "separate_from_transaction_outcome"
+  },
   "deployments": {
     "mandates": {
       "address": "0xd4C0945533C959b094967781815e31ecd0C345F7",
@@ -61,7 +70,7 @@
       "receipt_consumed": true,
       "finality": "FINALIZED / MAJORITY_AGREE"
     },
-    "fresh_current_source_evaluation": {
+    "fresh_predecessor_source_evaluation": {
       "source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
       "deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
       "proven_against_current_deployment": false,
@@ -86,9 +95,11 @@
       "validator_votes_decoded": [1, 3, 4, 1, 1],
       "validator_vote_names": ["AGREE", "TIMEOUT", "DETERMINISTIC_VIOLATION", "AGREE", "AGREE"],
       "validator_result_hashes_equal": false,
-      "strict_unanimity_required": true,
-      "strict_unanimity_proven": false,
-      "release_blocker": true,
+      "unanimity_gate_blocker": false,
+      "validator_dissent_preserved": true,
+      "tribunal_handling": "separate_from_transaction_outcome",
+      "project_gate_i_blocker": true,
+      "project_gate_i_reason": "This receipt is bound to the predecessor Authorization deployment, so it cannot prove current-source Gate I behavior.",
       "raw_consensus_evidence": "docs/CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json"
     },
     "independent_rejection": {
@@ -148,8 +159,9 @@
       ],
       "validator_result_hashes_equal": false,
       "validator_parity_note": "Bradbury finalized the transaction with five revealed votes; four validators agreed and validator index 1 reported DETERMINISTIC_VIOLATION with a different result hash. This non-unanimous consensus is recorded explicitly and is not represented as unanimity.",
-      "strict_unanimity_required": true,
-      "strict_unanimity_proven": false,
+      "unanimity_gate_blocker": false,
+      "validator_dissent_preserved": true,
+      "tribunal_handling": "separate_from_transaction_outcome",
       "raw_consensus_evidence": "docs/CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
     },
     "timeout_recovery": {

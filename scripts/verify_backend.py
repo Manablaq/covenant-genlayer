@@ -56,6 +56,16 @@ def git(*args: str) -> str:
     ).strip()
 
 
+def assert_protocol_success(record: dict, label: str) -> None:
+    """Apply GenLayer's protocol success rule without inventing unanimity."""
+
+    assert record["status"] == "FINALIZED", f"{label} is not FINALIZED"
+    assert record["consensus_result"] == "AGREE", f"{label} is not accepted"
+    assert (
+        record["execution_result"] == "FINISHED_WITH_RETURN"
+    ), f"{label} did not finish successfully"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path)
@@ -223,12 +233,15 @@ def main() -> int:
     assert repaired["validator_dissenting_index"] == 1
     assert repaired["validator_dissenting_address"] == "0x9d998ad7c7f9cc448a4dbdf49edd7cadbe3d57b6"
     assert repaired["validator_result_hashes_equal"] is False
-    assert repaired["strict_unanimity_required"] is True
-    assert repaired["strict_unanimity_proven"] is False
+    assert repaired["unanimity_gate_blocker"] is False
+    assert repaired["validator_dissent_preserved"] is True
+    assert repaired["tribunal_handling"] == "separate_from_transaction_outcome"
     assert current_consensus["transaction_id"] == repaired["evaluate_internal_transaction"]
     assert current_consensus["validator_votes_decoded"] == repaired["validator_votes_decoded"]
     assert current_consensus["validator_result_hashes_equal"] is False
-    assert current_consensus["release_interpretation"]["release_blocker"] is True
+    assert_protocol_success(current_consensus, "repaired evaluation")
+    assert current_consensus["release_interpretation"]["unanimity_gate_blocker"] is False
+    assert current_consensus["release_interpretation"]["project_gate_i_blocker"] is True
     assert fresh_evaluation["evaluation_transaction_id"] == "0x1c7bac1e7b42545425c17bfe76b36cfddf01d6ae4c68abac7978865af7b0031c"
     assert fresh_evaluation["evaluation"]["status"] == "FINALIZED"
     assert fresh_evaluation["evaluation"]["consensus_result"] == "AGREE"
@@ -238,27 +251,31 @@ def main() -> int:
     assert fresh_evaluation["evaluation"]["validator_votes_decoded"] == [1, 3, 4, 1, 1]
     assert fresh_evaluation["evaluation"]["validator_vote_names"] == ["AGREE", "TIMEOUT", "DETERMINISTIC_VIOLATION", "AGREE", "AGREE"]
     assert fresh_evaluation["evaluation"]["validator_result_hashes_equal"] is False
-    assert fresh_evaluation["evaluation"]["strict_unanimity_required"] is True
-    assert fresh_evaluation["evaluation"]["strict_unanimity_proven"] is False
-    assert fresh_evaluation["evaluation"]["release_blocker"] is True
+    assert_protocol_success(fresh_evaluation["evaluation"], "fresh predecessor evaluation")
+    assert fresh_evaluation["evaluation"]["unanimity_gate_blocker"] is False
+    assert fresh_evaluation["evaluation"]["validator_dissent_preserved"] is True
+    assert fresh_evaluation["evaluation"]["tribunal_handling"] == "separate_from_transaction_outcome"
+    assert fresh_evaluation["evaluation"]["project_gate_i_blocker"] is True
     assert fresh_evaluation["source_hash"] == "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1"
     assert fresh_evaluation["deployment_address"] == "0x8c1c7169756287a30bceeb28caee4991b5566076"
     assert fresh_evaluation["proven_against_current_deployment"] is False
-    fresh_proof = current_bradbury["behavioral_proofs"]["fresh_current_source_evaluation"]
+    fresh_proof = current_bradbury["behavioral_proofs"]["fresh_predecessor_source_evaluation"]
     assert fresh_proof["evaluate_internal_transaction"] == fresh_evaluation["evaluation_transaction_id"]
     assert fresh_proof["terminal_state"] == "AUTHORIZED"
     assert fresh_proof["validator_votes_decoded"] == fresh_evaluation["evaluation"]["validator_votes_decoded"]
     assert fresh_proof["validator_result_hashes_equal"] is False
-    assert fresh_proof["strict_unanimity_proven"] is False
+    assert fresh_proof["unanimity_gate_blocker"] is False
+    assert fresh_proof["validator_dissent_preserved"] is True
     assert fresh_proof["source_hash"] == fresh_evaluation["source_hash"]
     assert fresh_proof["deployment_address"] == fresh_evaluation["deployment_address"]
     assert fresh_proof["proven_against_current_deployment"] is False
     assert manifest["current_bradbury_live_proof"]["behavioral_gate_i_complete"] is False
-    assert manifest["current_bradbury_live_proof"]["strict_consensus_gate_proven"] is False
-    assert manifest["current_bradbury_live_proof"]["fresh_current_source_evaluation"]["terminal_state"] == "AUTHORIZED"
-    assert manifest["current_bradbury_live_proof"]["fresh_current_source_evaluation"]["validator_result_hashes_equal"] is False
+    assert manifest["current_bradbury_live_proof"]["protocol_consensus"]["acceptance_rule"] == "MAJORITY"
+    assert manifest["current_bradbury_live_proof"]["protocol_consensus"]["unanimity_gate_blocker"] is False
+    assert manifest["current_bradbury_live_proof"]["fresh_predecessor_source_evaluation"]["terminal_state"] == "AUTHORIZED"
+    assert manifest["current_bradbury_live_proof"]["fresh_predecessor_source_evaluation"]["validator_result_hashes_equal"] is False
     if manifest["status"] == "RELEASED" or production["status"] == "RELEASED":
-        raise AssertionError("release status cannot be enabled while strict consensus is unproven")
+        raise AssertionError("release status cannot be enabled while Gate I/J remain open")
     boundary = current_bradbury["proof_boundary"]
     assert boundary["current_repair_replacement_proven"] is False
     assert boundary["current_timeout_recovery_proven"] is False

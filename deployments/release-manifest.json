@@ -1,13 +1,22 @@
 {
-  "manifest_version": 12,
+  "manifest_version": 13,
   "status": "UNRELEASED",
   "release_scope": "current-source Bradbury deployment and live behavior evidence; external effective-origin provenance and Gate J remain open",
-  "candidate_state": "CURRENT_SOURCE_BRADBURY_BEHAVIORAL_RECERTIFICATION_PROVENANCE_AND_CONSENSUS_GATES_OPEN",
+  "candidate_state": "CURRENT_SOURCE_BRADBURY_BEHAVIORAL_RECERTIFICATION_AND_PROVENANCE_GATES_OPEN",
+  "protocol_acceptance": {
+    "acceptance_rule": "MAJORITY",
+    "successful_finalized_execution": "status=FINALIZED and execution_result=FINISHED_WITH_RETURN",
+    "unanimity_required": false,
+    "unanimity_gate_blocker": false,
+    "validator_dissent_and_deterministic_violation_preserved": true,
+    "dissent_alone_blocks_release": false,
+    "tribunal_effect": "separate_from_transaction_outcome"
+  },
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity. The available behavioral receipts were produced against the predecessor Authorization deployment and are retained as historical evidence; current-source behavioral recertification is open. Production also remains unreleased because the predecessor semantic evaluations have non-uniform validator results (including TIMEOUT and DETERMINISTIC_VIOLATION), Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J still requires the final evidence freeze.",
+    "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity. The available behavioral receipts were produced against the predecessor Authorization deployment and are retained as historical evidence; current-source behavioral recertification is open. Production remains unreleased because Bradbury effective-origin/runtime provenance is not externally enforceable and Gate J still requires the final evidence freeze.",
     "required_before_release": [
-      "Strict consensus closure: every decision-bearing evaluation must have no DETERMINISTIC_VIOLATION vote and uniform validator result hashes",
+      "Current-source Gate F/G/I behavioral recertification against source hash 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e at Authorization 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
       "Bradbury runtime provenance and redirect compatibility",
       "Gate J reviewer evidence freeze"
     ]
@@ -191,13 +200,19 @@
     "status": "CURRENT_SOURCE_BRADBURY_DEPLOYMENT_PARITY_COMPLETE_BEHAVIORAL_RECERTIFICATION_OPEN",
     "deployment_and_source_parity": true,
     "behavioral_gate_i_complete": false,
-    "strict_consensus_gate_proven": false,
     "effective_origin_proven": false,
     "production_release": false,
     "behavioral_evidence_source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
     "behavioral_evidence_deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
     "behavioral_evidence_matches_current_deployment": false,
-    "fresh_current_source_evaluation": {
+    "protocol_consensus": {
+      "acceptance_rule": "MAJORITY",
+      "unanimity_required": false,
+      "unanimity_gate_blocker": false,
+      "validator_dissent_preserved": true,
+      "tribunal_handling": "separate_from_transaction_outcome"
+    },
+    "fresh_predecessor_source_evaluation": {
       "evidence": "docs/CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json",
       "source_hash": "306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1",
       "deployment_address": "0x8c1c7169756287a30bceeb28caee4991b5566076",
@@ -208,7 +223,9 @@
       "finality": "FINALIZED / result=AGREE",
       "validator_votes": "AQMEAQE=",
       "validator_result_hashes_equal": false,
-      "strict_unanimity_proven": false
+      "unanimity_gate_blocker": false,
+      "validator_dissent_preserved": true,
+      "project_gate_i_blocker": true
     }
   },
   "historical_local_live_proof": {
@@ -257,7 +274,7 @@
     "The authorized compact Authorization source 8df817d76ff0ff5abd5adcfdefb97765261a7cce7bc704ffb44c2e1f28c27238 was submitted once at 16,639,954 gas; its outer transaction was mined, but GenVM rejected it as invalid_contract because the compacted source omitted the required blank line after the Depends header. No Authorization address or code was produced.",
     "The corrected predecessor Authorization source restores the required Depends-header blank line, is 19,967 bytes, and has source SHA-256 306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1. It passed the pinned local GLSim/adversarial suite, was submitted once after a passing Bradbury estimate, reached FINALIZED with unanimous validator agreement, and matches its historical deployed bytecode.",
     "The current strictly typed Authorization source is 20,022 bytes with source SHA-256 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e. It passed GenVM lint and strict Pyright, was submitted once below the Bradbury ceiling, reached FINALIZED with unanimous validator agreement, and matches deployed bytecode at 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2. Existing behavioral receipts remain explicitly bound to the predecessor deployment until current-source behavioral recertification is completed.",
-    "The predecessor-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths. Its fresh evaluation reached AUTHORIZED and FINALIZED, but its validator votes included TIMEOUT and DETERMINISTIC_VIOLATION with non-uniform result hashes; it is recorded as a strict-consensus failure and not as current-source release evidence.",
+    "The predecessor-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths. Its fresh evaluation reached AUTHORIZED and FINALIZED by protocol majority; TIMEOUT, DETERMINISTIC_VIOLATION, and non-uniform result hashes are preserved as dissent/tribunal evidence and are not current-source release evidence.",
     "The local no-redirect runtime probe exposes the redirect response and local effective-origin policy, but Bradbury does not expose an enforceable effective URL/history to this client. That external provenance gate remains false; Bradbury/public production release remains UNRELEASED."
   ],
   "current_local_runtime_checkpoint": {

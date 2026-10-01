@@ -64,9 +64,10 @@
     "action_intent": "0x598cfdbc685630fb8a095431911dcfeed0fa7a3bfa205c2d373befebd6e957af",
     "evidence_set_commitment": "0x55a7c6ff492357f9b62e269a101104aa46b9b2dfb07bc79fca21436d6eb85210",
     "receipt_consumed": false,
-    "strict_unanimity_required": true,
-    "strict_unanimity_proven": false,
-    "release_blocker": true,
-    "reason": "Bradbury finalized the evaluation and the contract became AUTHORIZED, but one validator timed out, one reported DETERMINISTIC_VIOLATION, and the validator result hashes are non-uniform. This is final application state, not strict-unanimous consensus."
+    "unanimity_gate_blocker": false,
+    "validator_dissent_preserved": true,
+    "tribunal_handling": "separate_from_transaction_outcome",
+    "project_gate_i_blocker": true,
+    "reason": "Bradbury finalized the evaluation by protocol majority and the contract became AUTHORIZED. TIMEOUT, DETERMINISTIC_VIOLATION, and non-uniform validator result hashes remain preserved as dissent and tribunal evidence; they do not by themselves rewrite the finalized transaction outcome. This receipt is bound to the predecessor Authorization deployment and therefore is not current-source Gate I proof."
   }
 }

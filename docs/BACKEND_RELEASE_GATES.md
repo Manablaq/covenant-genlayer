@@ -53,6 +53,25 @@ Must prove at minimum:
 
 Raw validator/transaction evidence is preserved before decoding or summarization.
 
+### Protocol acceptance interpretation
+
+Gate F uses GenLayer's documented protocol acceptance rule: a leader result is
+accepted when the validator committee reaches majority agreement, and a
+successful terminal result is `FINALIZED` with execution result
+`FINISHED_WITH_RETURN`. Gate F does not require unanimous validator result
+hashes or zero `DETERMINISTIC_VIOLATION` votes.
+
+Validator votes, result hashes, timeouts, and deterministic-violation evidence
+must remain in the evidence record. A validator dissent is distinct from the
+protocol transaction outcome; tribunal handling is separate judicial/economic
+evidence and does not automatically rewrite a finalized transaction. The
+protocol result is also distinct from the Covenant semantic state such as
+`AUTHORIZED`, `DENIED`, or `EXPIRED`.
+
+This interpretation removes an invented unanimity release blocker. It does not
+waive current-source parity, the Gate F/I behavioral checks, source-bound
+semantic outcomes, or any separately frozen runtime provenance requirement.
+
 ## Gate G — Pre-Bradbury deployment proof
 
 The exact reviewed graph must deploy in the full runtime before Bradbury.
@@ -164,5 +183,6 @@ The exact action evidenced by this immutable release-gates record remains:
 
 The evidence substantively verifies that this is the requested backend
 verification action. Current typed-deployment behavioral recertification,
-strict-consensus closure, Bradbury redirect/effective-origin provenance, and
-Gate J remain release gates and are not claimed complete by this publication.
+Bradbury redirect/effective-origin provenance, and Gate J remain release gates
+and are not claimed complete by this publication. Validator dissent is retained
+as evidence but is not a standalone release blocker.
