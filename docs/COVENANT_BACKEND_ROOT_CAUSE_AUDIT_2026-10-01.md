@@ -149,9 +149,12 @@ transitions, web access calls, or release semantics.
 Already evidenced and reusable for the current deployment: current Mandates and
 Authorization addresses, exact source parity, deployment finality, source
 hashes, configured Mandates binding, and typed deployment submission history.
-Predecessor behavioral receipts are not reused as current-source proof. The
-persisted full-runtime local checkpoint has predecessor Authorization source,
-so it does not close Gate G for the current graph.
+Predecessor behavioral receipts are not reused as current-source proof. Gate G
+is now closed by the exact current-source five-validator local full-runtime
+deployments recorded in `docs/CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json`:
+Mandates `0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656` at `0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07`, followed by Authorization `0x562FA7DD960338B41C456b60564F964F571A1764`
+at `0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d`. Both finalized with `AGREE / FINISHED_WITH_RETURN`, exact source
+parity, one submission each, and live Authorization→Mandates binding.
 
 The minimum remaining live operations are:
 
@@ -171,13 +174,12 @@ The minimum remaining live operations are:
    allowed after an authorized candidate becomes stale.
 
 No additional live operation is required solely to obtain unanimous hashes or
-zero deterministic-violation votes. Gate G still needs one exact current-source
-graph deployment proof in the pinned full runtime, with source/schema hashes,
-ordering, wiring, and resulting identities recorded before treating that gate
-as closed. Gate H's current typed deployment has a frozen one-plan submission
-history and needs no new write in this pass. The remaining behavioral work is
-Gate F/I proof, not a redeployment of the already-parity-matched Bradbury
-contracts.
+zero deterministic-violation votes. Gate G is closed by the exact current-source
+local full-runtime proof, including source/schema hashes, deployment ordering,
+constructor wiring, finality, source parity, and resulting identities. Gate H's
+current typed Bradbury deployment remains finalized with source parity. The
+remaining behavioral work is Gate F/I proof, not a redeployment of either
+already-parity-matched contract graph.
 
 ### Exact Gate J remaining
 
@@ -209,11 +211,27 @@ for future mandates/releases.
 - Production remains `UNRELEASED`; this audit does not fabricate Gate I or Gate
   J proof.
 
-`NEXT_ACTION`: do not regenerate or sign the stale R3 candidate. Close the
-exact current-source Gate G full-runtime proof, resolve the Bradbury runtime
-provenance blocker with the runtime owner, then schedule one fresh current-source
-Gate F/I evidence run using a dedicated Covenant signer and the read-only
-pre-sign guard, followed by the Gate J evidence freeze.
+`NEXT_ACTION`: do not regenerate or sign the stale R3 candidate. Gate G is now
+closed. Resolve the Bradbury effective-origin/runtime provenance blocker and
+refresh immutable evidence first; then run a fresh current-source Gate F/I
+behavioral workflow only under separate transaction-level authorization, using
+a dedicated Covenant signer and the read-only pre-sign guard, followed by the
+Gate J evidence freeze.
+
+
+## Post-audit Gate G checkpoint — 2026-10-01
+
+The later fail-closed Gate G execution supersedes the audit's earlier Gate
+G-open finding without changing the contract sources or production release
+status. On local chain `61999` with five validators, current-source Mandates
+`0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656` finalized from `0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07`, then current-source Authorization
+`0x562FA7DD960338B41C456b60564F964F571A1764` finalized from `0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d` and proved live binding to that Mandates
+address. Both deployments have exact source parity and exactly one submission.
+
+This closes Gate G only. Gate F/I current-source behavioral recertification,
+fresh immutable evidence, Bradbury effective-origin/runtime provenance, and
+Gate J remain open. Production remains `UNRELEASED`, and no Bradbury
+redeployment is required by this checkpoint.
 
 ## Official documentation checked
 

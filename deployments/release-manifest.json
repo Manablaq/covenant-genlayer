@@ -1,8 +1,8 @@
 {
-  "manifest_version": 13,
+  "manifest_version": 14,
   "status": "UNRELEASED",
-  "release_scope": "current-source Bradbury deployment and live behavior evidence; external effective-origin provenance and Gate J remain open",
-  "candidate_state": "CURRENT_SOURCE_BRADBURY_BEHAVIORAL_RECERTIFICATION_AND_PROVENANCE_GATES_OPEN",
+  "release_scope": "current-source Bradbury deployment plus current-source local Gate G closure; current-source behavioral recertification, external effective-origin provenance, and Gate J remain open",
+  "candidate_state": "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED_BRADBURY_BEHAVIORAL_RECERTIFICATION_AND_PROVENANCE_GATES_OPEN",
   "protocol_acceptance": {
     "acceptance_rule": "MAJORITY",
     "successful_finalized_execution": "status=FINALIZED and execution_result=FINISHED_WITH_RETURN",
@@ -14,9 +14,9 @@
   },
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity. The available behavioral receipts were produced against the predecessor Authorization deployment and are retained as historical evidence; current-source behavioral recertification is open. Production remains unreleased because Bradbury effective-origin/runtime provenance is not externally enforceable and Gate J still requires the final evidence freeze.",
+    "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity, and the exact current-source graph is finalized in the supported local full runtime with source parity and Authorization\u2192Mandates binding. The available behavioral receipts remain predecessor-source historical evidence; current-source Gate F/I behavioral recertification is open. Production remains unreleased because fresh immutable evidence is required, Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J remains open.",
     "required_before_release": [
-      "Current-source Gate F/G/I behavioral recertification against source hash 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e at Authorization 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
+      "Current-source Gate F/I behavioral recertification against source hash 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e at Authorization 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
       "Bradbury runtime provenance and redirect compatibility",
       "Gate J reviewer evidence freeze"
     ]
@@ -55,7 +55,12 @@
       "pending_nonce_after_attempt": 1369,
       "latest_block_gas_limit": 100000000,
       "eth_estimateGas_without_cap": 17076600,
-      "caps_reverting_with_execution_reverted": [15000000, 15900000, 16000000, 16777216],
+      "caps_reverting_with_execution_reverted": [
+        15000000,
+        15900000,
+        16000000,
+        16777216
+      ],
       "cap_17060259_estimate_result": 17060259,
       "conclusion": "The exact current-source deployment requires more gas than the accepted Bradbury deployment envelope. No lower-gas submission is safe or release-valid."
     },
@@ -175,7 +180,11 @@
       "network": "https://rpc-bradbury.genlayer.com",
       "status": "PASS_WITH_CURL_USER_AGENT_COMPATIBILITY",
       "http_status": 200,
-      "methods_attempted": ["eth_chainId", "sim_countValidators", "eth_getTransactionCount"],
+      "methods_attempted": [
+        "eth_chainId",
+        "sim_countValidators",
+        "eth_getTransactionCount"
+      ],
       "signing_performed": false,
       "submission_performed": false,
       "conclusion": "Bradbury RPC accepts the read-only requests with a curl-compatible User-Agent; sim_countValidators is not exposed by the public endpoint. Bearer authentication was not required."
@@ -275,75 +284,82 @@
     "The corrected predecessor Authorization source restores the required Depends-header blank line, is 19,967 bytes, and has source SHA-256 306e0ab52bb3c4697bbf4e3c42b62b6eda3a878acee9eecd07ce5a0054ca01c1. It passed the pinned local GLSim/adversarial suite, was submitted once after a passing Bradbury estimate, reached FINALIZED with unanimous validator agreement, and matches its historical deployed bytecode.",
     "The current strictly typed Authorization source is 20,022 bytes with source SHA-256 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e. It passed GenVM lint and strict Pyright, was submitted once below the Bradbury ceiling, reached FINALIZED with unanimous validator agreement, and matches deployed bytecode at 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2. Existing behavioral receipts remain explicitly bound to the predecessor deployment until current-source behavioral recertification is completed.",
     "The predecessor-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths. Its fresh evaluation reached AUTHORIZED and FINALIZED by protocol majority; TIMEOUT, DETERMINISTIC_VIOLATION, and non-uniform result hashes are preserved as dissent/tribunal evidence and are not current-source release evidence.",
-    "The local no-redirect runtime probe exposes the redirect response and local effective-origin policy, but Bradbury does not expose an enforceable effective URL/history to this client. That external provenance gate remains false; Bradbury/public production release remains UNRELEASED."
+    "The local no-redirect runtime probe exposes the redirect response and local effective-origin policy, but Bradbury does not expose an enforceable effective URL/history to this client. That external provenance gate remains false; Bradbury/public production release remains UNRELEASED.",
+    "The exact current-source local Gate G graph finalized on chain 61999 with five validators: Mandates 0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656 (0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07) and Authorization 0x562FA7DD960338B41C456b60564F964F571A1764 (0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d); both have exact source parity, Authorization binds the new Mandates address, each deployment was submitted exactly once, and Gate G is closed without changing the open Gate F/I, effective-origin, fresh-evidence, Gate J, or production boundaries."
   ],
   "current_local_runtime_checkpoint": {
-    "status": "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE",
-    "source_commit": "40417500c938ae59de4fded587e3bfefd562e07c",
+    "status": "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED",
+    "evidence": "docs/CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json",
+    "source_commit": "6da89ec6e75cd9e8f1aee2be93a539020129c7f2",
+    "reviewed_repository_head": "285d0407b5493cdb8240bed7c19ffc2716160d54",
+    "reviewed_repository_tree": "333bc606754f08d5678fcec1528a71cce6d88d19",
     "chain_id": 61999,
     "validator_count": 5,
+    "genvm_version": "v0.2.16",
     "source_hashes": {
-      "covenant_authorization.py": "24ad76f931ccef6dca2ca6fbe94971b3eb22d7a98facb5c3de9c4491d6e507ed",
+      "covenant_authorization.py": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
       "covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
     },
+    "source_bytes": {
+      "covenant_authorization.py": 20022,
+      "covenant_mandates.py": 19852
+    },
+    "schema_hashes": {
+      "covenant_authorization.py": "c99383242a8c89c05b7f063d2cb2c95f4103b2af3b146683603ab8a9b1475158",
+      "covenant_mandates.py": "d754f3daf8e38bf4cc2dc6641315a49e9f74f54efe651e1d3905fff7d5431ae6"
+    },
+    "deployment_order": [
+      "mandates",
+      "authorization"
+    ],
     "deployed_addresses": {
-      "mandates": "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19",
-      "authorization": "0xCe751D8399639157268a55F12e6f2aB081d49c72"
+      "mandates": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+      "authorization": "0x562FA7DD960338B41C456b60564F964F571A1764"
     },
     "transactions": {
-      "mandates_deployment": "0x093cb27ac4de83a210249b68076e3f262ef6874130d1778161e623b09492811f",
-      "authorization_deployment": "0xfa3a4bfc19056a3776490fcc0943ce58054a31dfd1aa426cb80c993a9ccbee66",
-      "mandate_create": "0xf27766dc65cb24ddcaf7c83e043e0e830a5b954959f27ff15026e0837db595fc"
+      "mandates_deployment": "0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07",
+      "authorization_deployment": "0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d"
     },
-    "live_proofs": {
-      "approval": {
-        "create_request": "0x7ca94d4d04ab94d3860f5b62a6c6c2473da4b728e483f9e41487378d7098b6ee",
-        "request_id": "0x594f617cb3aca07f932b4ccbec34ac99b8d38f3404cd1b12072c921a58b3dec2",
-        "evaluate_request": "0x08c6660afe722216fd0672449b604f1bcfa139990b3b42daed85c73fe8565247",
-        "terminal_state": "AUTHORIZED",
-        "result": "FINALIZED / MAJORITY_AGREE"
+    "authorized_candidates": {
+      "mandates": {
+        "fingerprint_sha256": "baa8d717a334b8d37613bad68ca4bc96f0b9e7534beb4f900d905d619d51de25",
+        "nonce": 75
       },
-      "rejection": {
-        "create_request": "0x96a781b4c7722c4931f72976afc50626f344d3887809b544421af0462754b2df",
-        "request_id": "0x24bdd5c1342e415d65309af4de376e48c352664543afbb2190927bf2e1fdb7d9",
-        "evaluate_request": "0xb6634e9542f5d982696ada388dceb135e89a2c47a8044ef41c745b480e299f99",
-        "terminal_state": "DENIED",
-        "result": "FINALIZED / MAJORITY_AGREE"
-      },
-      "repair_replacement": {
-        "create_request": "0xe8aa4b57e0bc9a7321d85119732f87bd461475d3e88198d306daf52913622616",
-        "request_id": "0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f",
-        "valid_replacement": "0x54bbcbf3c5c141697b75f2683897f06122e71854f6272b971de3c71252777873",
-        "repaired_evaluate_request": "0x4cdd2f35e951ca055b236548f06efe4faf0097c5db04d3f7b3bd9217ada04eec",
-        "terminal_state": "AUTHORIZED",
-        "evidence_revision": 2,
-        "result": "FINALIZED / MAJORITY_AGREE"
-      },
-      "timeout_recovery": {
-        "create_request": "0xda4481914f2df2c986374d6452446b37dc411b90e81e2d0fd7866ec4b9333d8d",
-        "request_id": "0xb0659624dec1feaf4cc5770a22d420a80d08a7f9b049aa2fcf50e684229d4dd7",
-        "evaluate_request": "0x84c2afae5cfe928c2e55b40cfafb7ed5b23ed8c0fa07be0225d2d76b3e29348e",
-        "terminal_state": "EXPIRED",
-        "result": "FINALIZED / MAJORITY_AGREE",
-        "resubmission_policy": "no automatic resend or replacement"
-      },
-      "receipt_consumption": {
-        "request_id": "0xbbca9874d6b7101ef51bf5367081b806bd01b16c0bdd97e6343581e7bf98728f",
-        "consume_receipt": "0x9d62334de4af6adf408f3e9a30a524279f413b7b1e1ebd1dc3ce1a08a136b74c",
-        "replay_rejection": "0xb7b62b795779a480c9c3acc1b78d1ce877b5708dba209939126299d1f04065b6",
-        "wrong_consumer_rejection": "0x1aa0bb79318752c2ff749431ab7e2dbf981f647725b759df98774b5a0b425c90",
-        "terminal_state": "CONSUMED",
-        "result": "FINALIZED / MAJORITY_AGREE; negative paths finalized authorization rejections"
-      },
-      "redirect_provenance": {
-        "status": "PASS_LOCAL_CURRENT_RUNTIME",
-        "decoded_result": "status=302;location=b'/final'",
-        "effective_origin_policy": "redirect response exposed; final URL not fetched",
-        "evidence": "docs/CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
+      "authorization": {
+        "fingerprint_sha256": "5979387cac3dad60906d79b3c2d87fc3cc7635387ce83e1259e273e3d57aded0",
+        "nonce": 76,
+        "constructor_mandates_address": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656"
       }
     },
+    "finality": {
+      "mandates": {
+        "status": "FINALIZED",
+        "consensus_result": "AGREE",
+        "execution_result": "FINISHED_WITH_RETURN",
+        "source_parity": true,
+        "submission_count": 1
+      },
+      "authorization": {
+        "status": "FINALIZED",
+        "consensus_result": "AGREE",
+        "execution_result": "FINISHED_WITH_RETURN",
+        "source_parity": true,
+        "submission_count": 1
+      }
+    },
+    "authorization_mandates_binding": true,
+    "exactly_one_order1_write": true,
+    "exactly_one_order2_write": true,
+    "additional_order2_chain_writes": 0,
+    "bradbury_writes_in_gate_g_order2": 0,
+    "post_finality_sender_nonce": {
+      "latest": 77,
+      "pending": 77
+    },
+    "gate_g_complete": true,
     "proof_boundary": {
-      "current_source_deployment_parity": false,
+      "current_source_deployment_parity": true,
+      "current_source_authorization_mandates_binding": true,
       "current_mandate_created": false,
       "current_approval_request_created": false,
       "current_approval_evaluated": false,
@@ -353,8 +369,7 @@
       "current_receipt_consumption_proven": false,
       "current_redirect_provenance_proven": false,
       "production_or_bradbury_release": false
-    },
-    "evidence_summary": "docs/CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
+    }
   },
   "historical_pre_redesign_local_runtime_checkpoint": {
     "status": "PRE_REDESIGN_HISTORICAL_LOCAL_RUNTIME_CLOSURE",

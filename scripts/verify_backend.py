@@ -27,6 +27,7 @@ CURRENT_BRADBURY_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_LIVE_PROOF_202
 CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-27.json"
 CURRENT_CONSENSUS_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
 FRESH_EVALUATION_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json"
+LOCAL_GATE_G_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json"
 
 
 def sha256(path: Path) -> str:
@@ -178,21 +179,46 @@ def main() -> int:
     assert typed_attempt["replacement_or_resend"] is False
 
     checkpoint = manifest["current_local_runtime_checkpoint"]
-    assert checkpoint["status"] == "PRE_COMPACT_SOURCE_LOCAL_RUNTIME_CLOSURE"
-    assert checkpoint["source_commit"] == "40417500c938ae59de4fded587e3bfefd562e07c"
+    local_gate_g = json.loads(LOCAL_GATE_G_PROOF.read_text(encoding="utf-8"))
+    assert checkpoint["status"] == "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED"
+    assert checkpoint["evidence"] == "docs/CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json"
+    assert checkpoint["source_commit"] == current["source_commit"]
+    assert checkpoint["reviewed_repository_head"] == "285d0407b5493cdb8240bed7c19ffc2716160d54"
+    assert checkpoint["reviewed_repository_tree"] == "333bc606754f08d5678fcec1528a71cce6d88d19"
     assert checkpoint["chain_id"] == 61999
     assert checkpoint["validator_count"] == 5
-    assert checkpoint["deployed_addresses"]["mandates"] == "0x4817FA4E770B1bE4633BD938991bcdB97EAA8E19"
-    assert checkpoint["deployed_addresses"]["authorization"] == "0xCe751D8399639157268a55F12e6f2aB081d49c72"
-    proofs = checkpoint["live_proofs"]
-    assert proofs["approval"]["terminal_state"] == "AUTHORIZED"
-    assert proofs["rejection"]["terminal_state"] == "DENIED"
-    assert proofs["repair_replacement"]["terminal_state"] == "AUTHORIZED"
-    assert proofs["timeout_recovery"]["terminal_state"] == "EXPIRED"
-    assert proofs["receipt_consumption"]["terminal_state"] == "CONSUMED"
-    assert proofs["redirect_provenance"]["status"] == "PASS_LOCAL_CURRENT_RUNTIME"
+    assert checkpoint["genvm_version"] == "v0.2.16"
+    assert checkpoint["source_hashes"]["covenant_mandates.py"] == sha256(MANDATES)
+    assert checkpoint["source_hashes"]["covenant_authorization.py"] == sha256(AUTHORIZATION)
+    assert checkpoint["source_bytes"]["covenant_mandates.py"] == len(MANDATES.read_bytes())
+    assert checkpoint["source_bytes"]["covenant_authorization.py"] == len(AUTHORIZATION.read_bytes())
+    assert checkpoint["deployed_addresses"]["mandates"] == "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656"
+    assert checkpoint["deployed_addresses"]["authorization"] == "0x562FA7DD960338B41C456b60564F964F571A1764"
+    assert checkpoint["transactions"]["mandates_deployment"] == "0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07"
+    assert checkpoint["transactions"]["authorization_deployment"] == "0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d"
+    assert checkpoint["authorized_candidates"]["mandates"]["nonce"] == 75
+    assert checkpoint["authorized_candidates"]["authorization"]["nonce"] == 76
+    assert checkpoint["authorized_candidates"]["authorization"]["constructor_mandates_address"] == checkpoint["deployed_addresses"]["mandates"]
+    assert checkpoint["finality"]["mandates"]["status"] == "FINALIZED"
+    assert checkpoint["finality"]["mandates"]["consensus_result"] == "AGREE"
+    assert checkpoint["finality"]["mandates"]["execution_result"] == "FINISHED_WITH_RETURN"
+    assert checkpoint["finality"]["mandates"]["source_parity"] is True
+    assert checkpoint["finality"]["mandates"]["submission_count"] == 1
+    assert checkpoint["finality"]["authorization"]["status"] == "FINALIZED"
+    assert checkpoint["finality"]["authorization"]["consensus_result"] == "AGREE"
+    assert checkpoint["finality"]["authorization"]["execution_result"] == "FINISHED_WITH_RETURN"
+    assert checkpoint["finality"]["authorization"]["source_parity"] is True
+    assert checkpoint["finality"]["authorization"]["submission_count"] == 1
+    assert checkpoint["authorization_mandates_binding"] is True
+    assert checkpoint["exactly_one_order1_write"] is True
+    assert checkpoint["exactly_one_order2_write"] is True
+    assert checkpoint["additional_order2_chain_writes"] == 0
+    assert checkpoint["bradbury_writes_in_gate_g_order2"] == 0
+    assert checkpoint["post_finality_sender_nonce"] == {"latest": 77, "pending": 77}
+    assert checkpoint["gate_g_complete"] is True
     boundary = checkpoint["proof_boundary"]
-    assert boundary["current_source_deployment_parity"] is False
+    assert boundary["current_source_deployment_parity"] is True
+    assert boundary["current_source_authorization_mandates_binding"] is True
     assert boundary["current_mandate_created"] is False
     assert boundary["current_approval_request_created"] is False
     assert boundary["current_approval_evaluated"] is False
@@ -202,6 +228,19 @@ def main() -> int:
     assert boundary["current_receipt_consumption_proven"] is False
     assert boundary["current_redirect_provenance_proven"] is False
     assert boundary["production_or_bradbury_release"] is False
+    assert local_gate_g["status"] == "GATE_G_CLOSED"
+    assert local_gate_g["repository"]["reviewed_parent_head"] == checkpoint["reviewed_repository_head"]
+    assert local_gate_g["repository"]["reviewed_parent_tree"] == checkpoint["reviewed_repository_tree"]
+    assert local_gate_g["source"]["mandates"]["sha256"] == sha256(MANDATES)
+    assert local_gate_g["source"]["authorization"]["sha256"] == sha256(AUTHORIZATION)
+    assert local_gate_g["source"]["mandates"]["schema_sha256"] == checkpoint["schema_hashes"]["covenant_mandates.py"]
+    assert local_gate_g["source"]["authorization"]["schema_sha256"] == checkpoint["schema_hashes"]["covenant_authorization.py"]
+    assert local_gate_g["order1_mandates"]["transaction"] == checkpoint["transactions"]["mandates_deployment"]
+    assert local_gate_g["order1_mandates"]["address"] == checkpoint["deployed_addresses"]["mandates"]
+    assert local_gate_g["order2_authorization"]["transaction"] == checkpoint["transactions"]["authorization_deployment"]
+    assert local_gate_g["order2_authorization"]["address"] == checkpoint["deployed_addresses"]["authorization"]
+    assert local_gate_g["order2_authorization"]["constructor_mandates_address"] == checkpoint["deployed_addresses"]["mandates"]
+    assert local_gate_g["order2_authorization"]["mandates_binding"] is True
 
     current_proof = json.loads(CURRENT_PROOF.read_text(encoding="utf-8"))
     current_bradbury = json.loads(CURRENT_BRADBURY_PROOF.read_text(encoding="utf-8"))

@@ -73,9 +73,7 @@
     "Current-source malformed/failing evidence repair/retry",
     "Current-source irreversible consequence only after finality"
   ],
-  "GATE_G_REMAINING": [
-    "Deploy the exact current-source graph in the pinned full runtime before treating Gate G as closed; record source sizes/hashes, ABI/schema hashes, ordering, constructor/wiring, and resulting identities. The persisted local checkpoint is predecessor Authorization source and cannot be reused."
-  ],
+  "GATE_G_REMAINING": [],
   "GATE_H_REMAINING": [],
   "EXACT_GATE_J_REMAINING": [
     "Freeze reviewed git commit/tree.",
@@ -85,7 +83,7 @@
     "Complete reviewer handoff after Gate F/I and runtime provenance are resolved."
   ],
   "BACKEND_COMPLETE": "NO",
-  "NEXT_ACTION": "Do not reuse the stale R3 fingerprint. Close the exact current-source Gate G full-runtime proof, resolve Bradbury effective-origin/runtime provenance with the runtime owner, then schedule one fresh current-source Gate F/I run using a dedicated Covenant signer and the read-only pre-sign guard, followed by Gate J freeze.",
+  "NEXT_ACTION": "Gate G is closed. Resolve Bradbury effective-origin/runtime provenance and refresh immutable evidence before any separately authorized current-source Gate F/I behavioral writes; then complete Gate J freeze.",
   "safety": {
     "private_key_or_secret_contents_in_artifacts": false,
     "signing_performed": false,
@@ -102,5 +100,40 @@
     "https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/deterministic-violations-and-tribunals",
     "https://docs.genlayer.com/developers/intelligent-contracts/features/web-access",
     "https://docs.genlayer.com/developers/decentralized-applications/querying-a-transaction"
-  ]
+  ],
+  "GATE_G_CLOSURE": {
+    "status": "CLOSED",
+    "evidence": "docs/CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json",
+    "mandates": {
+      "address": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+      "transaction": "0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07",
+      "source_sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+      "submission_count": 1,
+      "finality": "FINALIZED / AGREE / FINISHED_WITH_RETURN"
+    },
+    "authorization": {
+      "address": "0x562FA7DD960338B41C456b60564F964F571A1764",
+      "transaction": "0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d",
+      "source_sha256": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
+      "submission_count": 1,
+      "finality": "FINALIZED / AGREE / FINISHED_WITH_RETURN",
+      "constructor_mandates_address": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+      "mandates_binding": true
+    },
+    "chain_id": 61999,
+    "validator_count": 5,
+    "production_release_effect": "NONE"
+  },
+  "checkpoint_sync": {
+    "sync_parent_head": "285d0407b5493cdb8240bed7c19ffc2716160d54",
+    "sync_parent_tree": "333bc606754f08d5678fcec1528a71cce6d88d19",
+    "local_gate_g_status": "CLOSED",
+    "current_source_gate_f_status": "OPEN",
+    "current_source_gate_i_status": "OPEN",
+    "effective_origin_status": "PLATFORM_BLOCKER",
+    "fresh_immutable_evidence_required": true,
+    "production_status": "UNRELEASED",
+    "contract_source_changed": false,
+    "contract_redeploy_required": false
+  }
 }

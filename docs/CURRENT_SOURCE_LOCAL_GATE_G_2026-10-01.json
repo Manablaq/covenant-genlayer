@@ -1,0 +1,80 @@
+{
+  "schema": "covenant-current-source-local-gate-g-v1",
+  "checkpoint_date": "2026-10-01",
+  "status": "GATE_G_CLOSED",
+  "release_effect": "Local current-source Gate G is closed only. Gate F/I behavioral recertification, Bradbury effective-origin provenance, fresh immutable evidence, Gate J, and production release remain open.",
+  "repository": {
+    "reviewed_parent_head": "285d0407b5493cdb8240bed7c19ffc2716160d54",
+    "reviewed_parent_tree": "333bc606754f08d5678fcec1528a71cce6d88d19",
+    "source_commit": "6da89ec6e75cd9e8f1aee2be93a539020129c7f2",
+    "branch": "main"
+  },
+  "runtime": {
+    "kind": "LOCAL_FULL_GENVM_MULTI_VALIDATOR",
+    "rpc": "http://127.0.0.1:4000/api",
+    "chain_id": 61999,
+    "validator_count": 5,
+    "genvm_version": "v0.2.16"
+  },
+  "source": {
+    "mandates": {
+      "sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+      "bytes": 19852,
+      "schema_sha256": "d754f3daf8e38bf4cc2dc6641315a49e9f74f54efe651e1d3905fff7d5431ae6"
+    },
+    "authorization": {
+      "sha256": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
+      "bytes": 20022,
+      "schema_sha256": "c99383242a8c89c05b7f063d2cb2c95f4103b2af3b146683603ab8a9b1475158"
+    }
+  },
+  "deployment_order": [
+    "mandates",
+    "authorization"
+  ],
+  "order1_mandates": {
+    "unsigned_fingerprint_sha256": "baa8d717a334b8d37613bad68ca4bc96f0b9e7534beb4f900d905d619d51de25",
+    "nonce": 75,
+    "transaction": "0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07",
+    "address": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+    "finality": {
+      "status": "FINALIZED",
+      "consensus_result": "AGREE",
+      "execution_result": "FINISHED_WITH_RETURN"
+    },
+    "source_parity": true,
+    "submission_count": 1,
+    "replacement_or_resend": false
+  },
+  "order2_authorization": {
+    "unsigned_fingerprint_sha256": "5979387cac3dad60906d79b3c2d87fc3cc7635387ce83e1259e273e3d57aded0",
+    "nonce": 76,
+    "transaction": "0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d",
+    "address": "0x562FA7DD960338B41C456b60564F964F571A1764",
+    "constructor_mandates_address": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+    "mandates_binding": true,
+    "finality": {
+      "status": "FINALIZED",
+      "consensus_result": "AGREE",
+      "execution_result": "FINISHED_WITH_RETURN"
+    },
+    "source_parity": true,
+    "submission_count": 1,
+    "replacement_or_resend": false,
+    "additional_chain_writes": 0,
+    "bradbury_writes": 0
+  },
+  "post_finality": {
+    "sender_latest_nonce": 77,
+    "sender_pending_nonce": 77
+  },
+  "proof_boundary": {
+    "current_source_deployment_parity": true,
+    "current_source_authorization_mandates_binding": true,
+    "current_source_local_behavioral_gate_f_complete": false,
+    "current_source_bradbury_behavioral_gate_i_complete": false,
+    "effective_origin_proven": false,
+    "production_or_bradbury_release": false
+  },
+  "next": "Resolve Bradbury effective-origin/runtime provenance and refresh immutable evidence before any separately authorized current-source Gate F/I write workflow."
+}

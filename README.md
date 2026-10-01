@@ -50,8 +50,11 @@ inputs, one-time verified mandate-policy loading, all public Mandates methods,
 validation branches, commitment preimages, storage values, and state transitions.
 The compact diagnostic-code redesign and the corrected local candidate pass
 Direct, GLSim, adversarial, runtime-calldata, reference-vector, and Gate D
-coverage. The supported-local live deployment evidence in the checkpoint is
-explicitly pre-compact evidence and is not current-candidate source parity.
+coverage. Current-source local Gate G is now closed in the five-validator full
+runtime. `docs/CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json` records the exact
+Mandates and Authorization deployments, source/schema hashes, finality, ordering,
+and Authorization→Mandates binding. Earlier supported-local checkpoints remain
+historical predecessor-source evidence and are not relabeled as current behavior.
 
 The R3 unsigned `create_request` candidate was frozen at EVM nonce `1516`. R4
 found latest/pending nonce `1517` and stopped before signing; the stale
@@ -59,8 +62,10 @@ fingerprint is retired and must not be reused. The sender is treated as shared
 with other activity, so the read-only `scripts/covenant_write_guard.py` performs
 a final latest/pending and fingerprint check but is not a cross-process lock.
 
-The older supported-local live checkpoint is historical predecessor-source
-evidence. It is not used for current-source parity or Bradbury claims.
+The older supported-local live checkpoint remains historical predecessor-source
+behavior evidence. It is not used to establish current-source Gate F/I behavior
+or Bradbury claims; the new Gate G record proves deployment/finality/parity and
+wiring only.
 
 `docs/GATE_F_LIVE_CLOSURE_2026-09-27.md` remains historical predecessor-source
 evidence and is not used to establish the current-source claims.
@@ -68,7 +73,7 @@ evidence and is not used to establish the current-source claims.
 `deployments/release-manifest.json` records the finalized current-source
 Bradbury deployments and the remaining release boundaries. The backend and
 nested `production_deployment.status` remain `UNRELEASED` until current-source
-Gate F/G/I, effective-origin provenance, and Gate J are closed.
+Gate F/I, effective-origin provenance, fresh immutable evidence, and Gate J are closed.
 
 ## Verification
 
