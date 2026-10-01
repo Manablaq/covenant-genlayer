@@ -1,0 +1,27 @@
+{
+  "commitment_recomputed_under_execution_domain": "0x1f16e8de8f41827bdfd93145f4cb10a48f61f52ec39aa233a147bcf08b414b2e",
+  "commitment_recomputed_under_transport_chain": "0x7b5e65b4c3b724b2d4c1a20d2b71ab610e98794a7f2230aa3c41848f5ffd9109",
+  "current_authorization": "0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
+  "current_mandates": "0xd4C0945533C959b094967781815e31ecd0C345F7",
+  "execution_domain_matches_finalized_state": true,
+  "genvm_execution_chain_id": 1,
+  "interpretation": "Bradbury exposes EVM/transport eth_chainId=4221 while the current GenVM intelligent-contract execution context exposes gl.message.chain_id=1. Covenant's finalized mandate identity and stored version-3 commitment cryptographically bind to execution-domain 1.",
+  "issuer": "0x1f87Ae197af539253978d435aD45cCf28Fb95024",
+  "issuer_nonce": 9002,
+  "mandate_commitment": "0x1f16e8de8f41827bdfd93145f4cb10a48f61f52ec39aa233a147bcf08b414b2e",
+  "mandate_id": "0x02efac38045c666e86c806678f31ca80413f21936b415a3f788f0081bacb0e3c",
+  "mandate_id_recomputed_under_execution_domain": "0x02efac38045c666e86c806678f31ca80413f21936b415a3f788f0081bacb0e3c",
+  "mandate_id_recomputed_under_transport_chain": "0xb10aeecd2743ae0f979f5cbbcab8fc799ab1656944a12aa9ccbcff6e5ae51a97",
+  "mandate_version": 3,
+  "network": "Bradbury",
+  "schema": "covenant-bradbury-domain-provenance-v1",
+  "security_note": "This certificate records observed Bradbury behavior; it does not claim that GenLayer documentation defines these two IDs as distinct. Covenant continues to bind Intelligent Contract identities to the actual execution domain exposed to finalized GenVM writes plus the contract address.",
+  "source_evidence": {
+    "binding": "current-authorization-mandates-binding.json",
+    "gate_i_r1_root": "/Users/mralbert/Downloads/covenant-gate-i-r1-typed-preflight-20261001-091518",
+    "policy": "current-mandate-policy.json"
+  },
+  "status": "PASS",
+  "transport_chain_id_matches_finalized_state_domain": false,
+  "transport_evm_chain_id": 4221
+}

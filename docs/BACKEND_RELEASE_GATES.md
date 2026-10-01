@@ -124,3 +124,45 @@ The requested action is to verify this backend release-gates record against the
 immutable mandate and evidence policy. The target, empty recipient, zero value,
 and `verify` payload above are the exact action subject that the authorization
 request binds and the evidence substantively proves.
+
+## Fresh Bradbury backend-verification evidence publication — 2026-10-01
+
+This section is a fresh immutable evidence record for the exact backend
+verification action defined above. It does **not** claim Gate I, Gate J, or
+production release completion.
+
+Current reviewed repository parent:
+
+- `01fc00fc17e64b0e5a6675816666051b92669bb4`
+
+Current Bradbury graph:
+
+- Mandates: `0xd4C0945533C959b094967781815e31ecd0C345F7`
+- Authorization: `0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2`
+- Mandate ID: `0x02efac38045c666e86c806678f31ca80413f21936b415a3f788f0081bacb0e3c`
+- Mandate version: `3`
+- Mandate commitment: `0x1f16e8de8f41827bdfd93145f4cb10a48f61f52ec39aa233a147bcf08b414b2e`
+
+Observed Bradbury domains are recorded without conflation:
+
+- EVM/transport `eth_chainId`: `4221`
+- finalized GenVM execution `gl.message.chain_id`: `1`
+
+`docs/CURRENT_SOURCE_BRADBURY_DOMAIN_PROVENANCE_2026-10-01.json` reproduces the
+already-finalized mandate ID and version-3 commitment from execution-domain `1`
+and proves the same preimages do not match when `4221` is substituted. This is
+an observation of current Bradbury behavior, not a claim that the public
+documentation defines the two values as separate namespaces.
+
+The exact action evidenced by this immutable release-gates record remains:
+
+- `action_type`: `backend_release_verification`
+- `target`: `docs/BACKEND_RELEASE_GATES.md`
+- `recipient`: empty bytes
+- `value`: `0`
+- `payload`: `verify`
+
+The evidence substantively verifies that this is the requested backend
+verification action. Current typed-deployment behavioral recertification,
+strict-consensus closure, Bradbury redirect/effective-origin provenance, and
+Gate J remain release gates and are not claimed complete by this publication.
