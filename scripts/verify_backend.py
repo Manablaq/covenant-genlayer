@@ -21,6 +21,12 @@ AUTHORIZATION = ROOT / "contracts" / "covenant_authorization.py"
 MANDATES = ROOT / "contracts" / "covenant_mandates.py"
 MANIFEST = ROOT / "deployments" / "release-manifest.json"
 RUNTIME_PATCH = ROOT / "runtime" / "patches" / "genvm-v0.2.16-no-redirect.patch"
+RUNTIME_REMEDIATION_PATCH = (
+    ROOT
+    / "runtime"
+    / "patches"
+    / "genvm-v0.6.0-rc8-configurable-web-redirects.patch"
+)
 RUNTIME_README = ROOT / "runtime" / "README.md"
 CURRENT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LIVE_PROOF_2026-09-27.json"
 CURRENT_BRADBURY_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json"
@@ -28,6 +34,7 @@ CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-
 CURRENT_CONSENSUS_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
 FRESH_EVALUATION_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json"
 LOCAL_GATE_G_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json"
+STUDIO_NEXT_PREFLIGHT = ROOT / "docs" / "STUDIO_NEXT_READ_ONLY_PREFLIGHT_2026-10-02.json"
 
 
 def sha256(path: Path) -> str:
@@ -75,6 +82,7 @@ def main() -> int:
     authorization_source = AUTHORIZATION.read_text(encoding="utf-8")
     mandates_source = MANDATES.read_text(encoding="utf-8")
     runtime_patch = RUNTIME_PATCH.read_text(encoding="utf-8")
+    runtime_remediation_patch = RUNTIME_REMEDIATION_PATCH.read_text(encoding="utf-8")
     runtime_readme = RUNTIME_README.read_text(encoding="utf-8")
     authorization_tree = ast.parse(authorization_source)
     mandates_tree = ast.parse(mandates_source)
@@ -110,8 +118,21 @@ def main() -> int:
     assert "len(bb)>int(p0.m)" in authorization_source
     assert "387e1a66e920cb2dfadcdce40ab2d28da02efd1e" in runtime_readme
     assert "reqwest::redirect::Policy::none()" in runtime_patch
+    assert "619dfad4bae51c191ef66c3e8cac6ed996961858" in runtime_readme
+    assert "follow_redirects" in runtime_remediation_patch
+    assert "reqwest::redirect::Policy::none()" in runtime_remediation_patch
+    assert "signer_client" in runtime_remediation_patch
+    assert (
+        "test_unfiltered_client_can_expose_redirect_without_fetching_target"
+        in runtime_remediation_patch
+    )
+    assert (
+        "test_unfiltered_client_preserves_default_redirect_following"
+        in runtime_remediation_patch
+    )
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    assert manifest["manifest_version"] == 15
     assert manifest["status"] == "UNRELEASED"
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
@@ -332,6 +353,49 @@ def main() -> int:
     assert runtime["runtime_patch_sha256"] == sha256(RUNTIME_PATCH)
     assert runtime["runtime_configuration_sha256"] == "b3499f5307c7eb1f181cc7944f8d9383ec9ad9dd3cad1aba1d94589ed263fa28"
     assert runtime["mounted_components"] == ["jsonrpc", "consensus-worker"]
+    remediation = manifest["runtime_remediation_candidate"]
+    assert remediation["status"] == "PATCH_VERIFIED_LOCAL_NOT_DEPLOYED"
+    assert remediation["upstream_commit"] == "619dfad4bae51c191ef66c3e8cac6ed996961858"
+    assert remediation["upstream_tag"] == "v0.6.0-rc8"
+    assert remediation["patch"] == (
+        "runtime/patches/genvm-v0.6.0-rc8-configurable-web-redirects.patch"
+    )
+    assert remediation["patch_sha256"] == sha256(RUNTIME_REMEDIATION_PATCH)
+    assert remediation["configuration"] == {
+        "key": "follow_redirects",
+        "default": True,
+        "covenant_required_value": False,
+    }
+    assert remediation["scope"]["filtered_web_requests_configurable"] is True
+    assert remediation["scope"]["allowlisted_web_requests_configurable"] is True
+    assert remediation["scope"]["signer_client_isolated"] is True
+    assert remediation["scope"]["llm_provider_behavior_preserved"] is True
+    assert remediation["scope"]["contract_features_removed"] is False
+    assert remediation["local_verification"]["clean_checkout_apply_check"] is True
+    assert remediation["local_verification"]["cargo_fmt_check"] is True
+    assert remediation["local_verification"]["redirect_tests_passed"] == 3
+    assert remediation["local_verification"]["redirect_tests_failed"] == 0
+    assert remediation["local_verification"]["providers_test_binary_compiled"] is True
+    assert remediation["local_verification"]["signing_server_test_binary_compiled"] is True
+    assert remediation["local_verification"]["full_test_suite_claimed"] is False
+    studio_next = json.loads(STUDIO_NEXT_PREFLIGHT.read_text(encoding="utf-8"))
+    assert studio_next["endpoint"] == "https://studio-dev.genlayer.com/api"
+    assert studio_next["signing_performed"] is False
+    assert studio_next["submission_performed"] is False
+    assert studio_next["rpc"]["eth_chainId"] == {"hex": "0xf22d", "decimal": 61997}
+    assert studio_next["rpc"]["sim_countValidators"] == 16
+    assert studio_next["tooling"]["inspected_rc_cli"] == "0.40.0-rc.3"
+    assert studio_next["tooling"]["inspected_rc_has_studio_dev_profile"] is True
+    assert studio_next["runtime_redirect_behavior_proven"] is False
+    assert remediation["studio_next"]["evidence"] == (
+        "docs/STUDIO_NEXT_READ_ONLY_PREFLIGHT_2026-10-02.json"
+    )
+    assert remediation["studio_next"]["chain_id"] == 61997
+    assert remediation["studio_next"]["validator_count"] == 16
+    assert remediation["studio_next"]["patched_runtime_deployed"] is False
+    assert remediation["studio_next"]["redirect_behavior_proven"] is False
+    assert remediation["bradbury"]["patched_runtime_deployed"] is False
+    assert remediation["bradbury"]["redirect_behavior_proven"] is False
 
     result = {
         "status": "PASS",
@@ -342,7 +406,10 @@ def main() -> int:
             "covenant_authorization.py": sha256(AUTHORIZATION),
         },
         "runtime_patch_sha256": sha256(RUNTIME_PATCH),
+        "runtime_remediation_patch_sha256": sha256(RUNTIME_REMEDIATION_PATCH),
         "runtime_binary_sha256": manifest["runtime_provenance"]["runtime_binary_sha256"],
+        "studio_next_chain_id": studio_next["rpc"]["eth_chainId"]["decimal"],
+        "studio_next_validator_count": studio_next["rpc"]["sim_countValidators"],
         "policy_reads_in_evidence_helpers": 0,
         "evidence_body_limit_bytes": 8192,
         "manifest_status": manifest["status"],

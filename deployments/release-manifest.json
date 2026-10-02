@@ -1,8 +1,8 @@
 {
-  "manifest_version": 14,
+  "manifest_version": 15,
   "status": "UNRELEASED",
-  "release_scope": "current-source Bradbury deployment plus current-source local Gate G closure; current-source behavioral recertification, external effective-origin provenance, and Gate J remain open",
-  "candidate_state": "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED_BRADBURY_BEHAVIORAL_RECERTIFICATION_AND_PROVENANCE_GATES_OPEN",
+  "release_scope": "current-source Bradbury deployment plus current-source local Gate G closure; a current GenVM redirect-remediation candidate and Studio Next read-only preflight are verified, but target-network runtime deployment, current-source behavioral recertification, effective-origin provenance, and Gate J remain open",
+  "candidate_state": "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED_RUNTIME_REMEDIATION_PREPARED_TARGET_NETWORK_PROVENANCE_AND_BEHAVIORAL_GATES_OPEN",
   "protocol_acceptance": {
     "acceptance_rule": "MAJORITY",
     "successful_finalized_execution": "status=FINALIZED and execution_result=FINISHED_WITH_RETURN",
@@ -17,7 +17,7 @@
     "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity, and the exact current-source graph is finalized in the supported local full runtime with source parity and Authorization\u2192Mandates binding. The available behavioral receipts remain predecessor-source historical evidence; current-source Gate F/I behavioral recertification is open. Production remains unreleased because fresh immutable evidence is required, Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J remains open.",
     "required_before_release": [
       "Current-source Gate F/I behavioral recertification against source hash 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e at Authorization 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
-      "Bradbury runtime provenance and redirect compatibility",
+      "Target-network deployment of the verified GenVM no-follow web configuration plus immutable runtime provenance and live redirect compatibility proof",
       "Gate J reviewer evidence freeze"
     ]
   },
@@ -270,6 +270,54 @@
       "consensus-worker"
     ]
   },
+  "runtime_remediation_candidate": {
+    "status": "PATCH_VERIFIED_LOCAL_NOT_DEPLOYED",
+    "upstream_repository": "https://github.com/genlayerlabs/genvm-manager",
+    "upstream_commit": "619dfad4bae51c191ef66c3e8cac6ed996961858",
+    "upstream_tag": "v0.6.0-rc8",
+    "executor_commit": "f7f95a31dddbef2aa9371e2228644f83dcce9fe3",
+    "patch": "runtime/patches/genvm-v0.6.0-rc8-configurable-web-redirects.patch",
+    "patch_sha256": "c835f3beb94065fd0fa4a56040aa6882f455617a3218338b02c954eaa2241b68",
+    "configuration": {
+      "key": "follow_redirects",
+      "default": true,
+      "covenant_required_value": false
+    },
+    "scope": {
+      "filtered_web_requests_configurable": true,
+      "allowlisted_web_requests_configurable": true,
+      "signer_client_isolated": true,
+      "llm_provider_behavior_preserved": true,
+      "contract_features_removed": false
+    },
+    "local_verification": {
+      "clean_checkout_apply_check": true,
+      "cargo_fmt_check": true,
+      "redirect_tests_passed": 3,
+      "redirect_tests_failed": 0,
+      "providers_test_binary_compiled": true,
+      "signing_server_test_binary_compiled": true,
+      "full_test_suite_claimed": false,
+      "full_no_run_attempt": "parallel unrelated test linking exceeded local Docker memory; affected binaries were compiled serially"
+    },
+    "studio_next": {
+      "evidence": "docs/STUDIO_NEXT_READ_ONLY_PREFLIGHT_2026-10-02.json",
+      "endpoint": "https://studio-dev.genlayer.com/api",
+      "chain_id": 61997,
+      "validator_count": 16,
+      "matching_cli": "0.40.0-rc.3",
+      "read_only_preflight": true,
+      "signing_performed": false,
+      "submission_performed": false,
+      "patched_runtime_deployed": false,
+      "redirect_behavior_proven": false
+    },
+    "bradbury": {
+      "patched_runtime_deployed": false,
+      "redirect_behavior_proven": false
+    },
+    "release_effect": "none until the patched or equivalent runtime is immutably identified, deployed across the target validator set with follow_redirects=false, and verified by a live no-target-fetch redirect probe"
+  },
   "notes": [
     "Historical local-runtime transactions prove the predecessor source only.",
     "The pre-redesign source had exact-source Mandates and Authorization deployments on the supported local runtime, plus a finalized mandate with state parity; those deployments are historical after the deployment-size redesign.",
@@ -285,6 +333,7 @@
     "The current strictly typed Authorization source is 20,022 bytes with source SHA-256 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e. It passed GenVM lint and strict Pyright, was submitted once below the Bradbury ceiling, reached FINALIZED with unanimous validator agreement, and matches deployed bytecode at 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2. Existing behavioral receipts remain explicitly bound to the predecessor deployment until current-source behavioral recertification is completed.",
     "The predecessor-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths. Its fresh evaluation reached AUTHORIZED and FINALIZED by protocol majority; TIMEOUT, DETERMINISTIC_VIOLATION, and non-uniform result hashes are preserved as dissent/tribunal evidence and are not current-source release evidence.",
     "The local no-redirect runtime probe exposes the redirect response and local effective-origin policy, but Bradbury does not expose an enforceable effective URL/history to this client. That external provenance gate remains false; Bradbury/public production release remains UNRELEASED.",
+    "A current GenVM v0.6.0-rc8 remediation candidate now makes web redirect following explicitly configurable without changing signer or LLM/provider behavior. It applies cleanly, is formatted, compiles, and passes its redirect regression tests. Studio Next chain 61997 is reachable with 16 validators through the matching RC tooling, but no target network is yet proven to run the patch with follow_redirects=false, so this work does not change the UNRELEASED boundary.",
     "The exact current-source local Gate G graph finalized on chain 61999 with five validators: Mandates 0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656 (0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07) and Authorization 0x562FA7DD960338B41C456b60564F964F571A1764 (0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d); both have exact source parity, Authorization binds the new Mandates address, each deployment was submitted exactly once, and Gate G is closed without changing the open Gate F/I, effective-origin, fresh-evidence, Gate J, or production boundaries."
   ],
   "current_local_runtime_checkpoint": {

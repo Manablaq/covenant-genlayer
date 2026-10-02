@@ -1,0 +1,24 @@
+{
+  "observed_at_utc": "2026-10-02T05:34:17Z",
+  "endpoint": "https://studio-dev.genlayer.com/api",
+  "signing_performed": false,
+  "submission_performed": false,
+  "rpc": {
+    "eth_chainId": {
+      "hex": "0xf22d",
+      "decimal": 61997
+    },
+    "sim_countValidators": 16,
+    "eth_blockNumber": "0x6abf4260"
+  },
+  "tooling": {
+    "installed_stable_cli": "0.39.2",
+    "installed_stable_has_studio_dev_profile": false,
+    "inspected_rc_cli": "0.40.0-rc.3",
+    "inspected_rc_has_studio_dev_profile": true,
+    "rc_profile_chain_id": 61997,
+    "rc_profile_endpoint": "https://studio-dev.genlayer.com/api"
+  },
+  "runtime_redirect_behavior_proven": false,
+  "conclusion": "Studio Next is live and the matching RC CLI profile is identifiable, but this read-only RPC preflight does not prove that its validators run the Covenant no-redirect GenVM remediation."
+}

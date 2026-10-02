@@ -1,0 +1,360 @@
+diff --git a/docs/schemas/default-config.json b/docs/schemas/default-config.json
+index b5dd936..8f5c31b 100644
+--- a/docs/schemas/default-config.json
++++ b/docs/schemas/default-config.json
+@@ -247,6 +247,11 @@
+             "items": { "type": "string" },
+             "description": "hosts for which all ports are allowed"
+           },
++          "follow_redirects": {
++            "type": "boolean",
++            "default": true,
++            "description": "whether web requests follow HTTP redirects before returning a response to the contract"
++          },
+           "max_wait_after_loaded": {
+             "$ref": "#/definitions/timeout",
+             "description": "upper bound for `post_load_wait` requested by contracts; larger values are clamped (with a warning). Defaults to 60s"
+diff --git a/implementation/src/common/mod.rs b/implementation/src/common/mod.rs
+index 005fc27..a5343ff 100644
+--- a/implementation/src/common/mod.rs
++++ b/implementation/src/common/mod.rs
+@@ -824,8 +824,20 @@ impl reqwest::dns::Resolve for FilteringResolver {
+ 
+ /// A plain client that connects to whatever DNS returns. For trusted endpoints
+ /// (LLM providers, the signer, allowlisted web hosts).
++pub fn create_client_unfiltered_with_redirects(
++    follow_redirects: bool,
++) -> anyhow::Result<reqwest::Client> {
++    let builder = base_client_builder();
++    let builder = if follow_redirects {
++        builder
++    } else {
++        builder.redirect(reqwest::redirect::Policy::none())
++    };
++    builder.build().map_err(Into::into)
++}
++
+ pub fn create_client_unfiltered() -> anyhow::Result<reqwest::Client> {
+-    base_client_builder().build().map_err(Into::into)
++    create_client_unfiltered_with_redirects(true)
+ }
+ 
+ /// Maximum redirect hops, matching reqwest's default policy.
+@@ -885,12 +897,20 @@ impl std::error::Error for SchemeDowngrade {}
+ /// A client whose resolver drops non-globally-routable addresses (see
+ /// [`FilteringResolver`]) and whose redirect policy rejects non-routable
+ /// IP-literal hops (see [`redirect_policy`]). For contract-controlled web URLs.
++pub fn create_client_filtered_with_redirects(
++    follow_redirects: bool,
++) -> anyhow::Result<reqwest::Client> {
++    let builder = base_client_builder().dns_resolver(Arc::new(FilteringResolver::new()?));
++    let builder = if follow_redirects {
++        builder.redirect(redirect_policy())
++    } else {
++        builder.redirect(reqwest::redirect::Policy::none())
++    };
++    builder.build().map_err(Into::into)
++}
++
+ pub fn create_client_filtered() -> anyhow::Result<reqwest::Client> {
+-    base_client_builder()
+-        .dns_resolver(Arc::new(FilteringResolver::new()?))
+-        .redirect(redirect_policy())
+-        .build()
+-        .map_err(Into::into)
++    create_client_filtered_with_redirects(true)
+ }
+ 
+ pub fn setup_cancels(
+diff --git a/implementation/src/manager/handlers.rs b/implementation/src/manager/handlers.rs
+index 50b2015..06d7f0a 100644
+--- a/implementation/src/manager/handlers.rs
++++ b/implementation/src/manager/handlers.rs
+@@ -408,6 +408,7 @@ async fn check_llm_availability(
+     let ctx = scripting::CtxPart {
+         client: common::create_client_unfiltered()?,
+         client_unfiltered: common::create_client_unfiltered()?,
++        signer_client: common::create_client_unfiltered()?,
+         metrics: sync::DArc::new(scripting::Metrics::default()),
+         node_address: "test_node".to_owned(),
+         sign_headers: Arc::new(BTreeMap::new()),
+diff --git a/implementation/src/manager/modules.rs b/implementation/src/manager/modules.rs
+index 7ed4321..976360e 100644
+--- a/implementation/src/manager/modules.rs
++++ b/implementation/src/manager/modules.rs
+@@ -58,11 +58,12 @@ impl ModuleStateWeb {
+         hello: &Arc<genvm_modules_interfaces::GenVMHello>,
+     ) -> anyhow::Result<WebSubContext> {
+         let metrics = sync::DArc::new(crate::web::Metrics::default());
+-        let scripting = crate::scripting::create_ctx_part(
++        let scripting = crate::scripting::create_ctx_part_with_redirects(
+             hello,
+             &self.config.gep(|x| &x.mod_base),
+             metrics.gep(|x| &x.scripting),
+             true,
++            self.config.follow_redirects,
+         )?;
+         Ok(WebSubContext { scripting })
+     }
+diff --git a/implementation/src/scripting/ctx/mod.rs b/implementation/src/scripting/ctx/mod.rs
+index fd694b3..968d5c9 100644
+--- a/implementation/src/scripting/ctx/mod.rs
++++ b/implementation/src/scripting/ctx/mod.rs
+@@ -35,6 +35,9 @@ pub struct CtxPart {
+     pub client: reqwest::Client,
+     /// Plain client used when a request sets `unfiltered` (allowlisted hosts).
+     pub client_unfiltered: reqwest::Client,
++    /// Plain client reserved for the operator-trusted signing service. Web
++    /// redirect policy must not change provider/signer transport behavior.
++    pub signer_client: reqwest::Client,
+     pub sign_url: Arc<str>,
+     pub sign_headers: Arc<BTreeMap<String, String>>,
+     pub sign_vars: BTreeMap<String, String>,
+diff --git a/implementation/src/scripting/ctx/signing.rs b/implementation/src/scripting/ctx/signing.rs
+index 2922ad5..9d643c5 100644
+--- a/implementation/src/scripting/ctx/signing.rs
++++ b/implementation/src/scripting/ctx/signing.rs
+@@ -62,7 +62,7 @@ impl Request {
+         // the signer is an operator-trusted endpoint (possibly internal), so it
+         // must not go through the SSRF-filtering client
+         let mut sign_request = ctx
+-            .client_unfiltered
++            .signer_client
+             .post(sign_url)
+             .timeout(SIGN_PREFLIGHT_TIMEOUT)
+             .body(signature_base.clone());
+diff --git a/implementation/src/scripting/mod.rs b/implementation/src/scripting/mod.rs
+index ac31767..daa1c2b 100644
+--- a/implementation/src/scripting/mod.rs
++++ b/implementation/src/scripting/mod.rs
+@@ -73,6 +73,20 @@ pub fn create_ctx_part(
+     base_config: &sync::DArc<common::ModuleBaseConfig>,
+     metrics: sync::DArc<Metrics>,
+     filter_dns: bool,
++) -> anyhow::Result<ctx::CtxPart> {
++    create_ctx_part_with_redirects(hello, base_config, metrics, filter_dns, true)
++}
++
++/// Create a scripting context with explicit web redirect behavior.
++///
++/// The default [`create_ctx_part`] path preserves the existing redirect-following
++/// behavior. The web module can opt out without changing the LLM/provider clients.
++pub fn create_ctx_part_with_redirects(
++    hello: &Arc<genvm_modules_interfaces::GenVMHello>,
++    base_config: &sync::DArc<common::ModuleBaseConfig>,
++    metrics: sync::DArc<Metrics>,
++    filter_dns: bool,
++    follow_redirects: bool,
+ ) -> anyhow::Result<ctx::CtxPart> {
+     let mut sign_vars = BTreeMap::new();
+ 
+@@ -87,17 +101,19 @@ pub fn create_ctx_part(
+         }
+     }
+ 
+-    let client_unfiltered = common::create_client_unfiltered()?;
++    let client_unfiltered = common::create_client_unfiltered_with_redirects(follow_redirects)?;
+     let client = if filter_dns {
+-        common::create_client_filtered()?
++        common::create_client_filtered_with_redirects(follow_redirects)?
+     } else {
+         client_unfiltered.clone()
+     };
++    let signer_client = common::create_client_unfiltered()?;
+ 
+     Ok(ctx::CtxPart {
+         hello: hello.clone(),
+         client,
+         client_unfiltered,
++        signer_client,
+         node_address: hello.host_data.node_address.clone(),
+         sign_vars,
+         sign_headers: base_config.signer_headers.clone(),
+diff --git a/implementation/src/web/config.rs b/implementation/src/web/config.rs
+index 54ba6cb..a6d5536 100644
+--- a/implementation/src/web/config.rs
++++ b/implementation/src/web/config.rs
+@@ -11,6 +11,10 @@ fn default_max_wait_after_loaded() -> common::Timeout {
+     common::Timeout::from_secs(60)
+ }
+ 
++fn default_follow_redirects() -> bool {
++    true
++}
++
+ /// NOTE: when changing fields, also update doc/schemas/default-config.json
+ #[derive(Serialize, Deserialize)]
+ pub struct Config {
+@@ -19,6 +23,12 @@ pub struct Config {
+     pub extra_tld: Vec<Box<str>>,
+     pub always_allow_hosts: Vec<Box<str>>,
+ 
++    /// Whether HTTP requests follow redirects before returning to the contract.
++    /// Defaults to true for backward compatibility. Set false when contracts
++    /// must inspect the original 3xx response and Location header.
++    #[serde(default = "default_follow_redirects")]
++    pub follow_redirects: bool,
++
+     #[serde(default = "default_json_null")]
+     pub meta: serde_json::Value,
+ 
+diff --git a/implementation/src/web/handler.rs b/implementation/src/web/handler.rs
+index 7fc5692..dac7128 100644
+--- a/implementation/src/web/handler.rs
++++ b/implementation/src/web/handler.rs
+@@ -106,11 +106,12 @@ impl common::MessageHandlerProvider<genvm_modules_interfaces::web::Message, Rend
+     ) -> anyhow::Result<sync::DArc<WebSubContext>> {
+         let hello = Arc::new(hello);
+         let metrics = sync::DArc::new(super::Metrics::default());
+-        let scripting = crate::scripting::create_ctx_part(
++        let scripting = crate::scripting::create_ctx_part_with_redirects(
+             &hello,
+             &self.config.gep(|x| &x.mod_base),
+             metrics.gep(|x| &x.scripting),
+             true,
++            self.config.follow_redirects,
+         )?;
+         Ok(sync::DArc::new(WebSubContext { scripting }))
+     }
+diff --git a/implementation/src/web/tests.rs b/implementation/src/web/tests.rs
+index a13d881..7383fea 100644
+--- a/implementation/src/web/tests.rs
++++ b/implementation/src/web/tests.rs
+@@ -154,6 +154,7 @@ fn test_config(webdriver_host: String) -> config::Config {
+         webdriver_host,
+         extra_tld: Vec::new(),
+         always_allow_hosts: Vec::new(),
++        follow_redirects: true,
+         meta: serde_json::Value::Null,
+         max_wait_after_loaded: common::Timeout::from_secs(60),
+         base: BaseConfig {
+diff --git a/implementation/tests/providers.rs b/implementation/tests/providers.rs
+index 680c880..8d5c7b0 100644
+--- a/implementation/tests/providers.rs
++++ b/implementation/tests/providers.rs
+@@ -95,6 +95,7 @@ fn make_test_ctx() -> anyhow::Result<scripting::CtxPart> {
+     Ok(scripting::CtxPart {
+         client: common::tests::create_client()?,
+         client_unfiltered: common::tests::create_client()?,
++        signer_client: common::tests::create_client()?,
+         metrics: sync::DArc::new(scripting::Metrics::default()),
+         node_address: "test_node".to_owned(),
+         sign_headers: std::sync::Arc::new(BTreeMap::new()),
+diff --git a/implementation/tests/request_localhost.rs b/implementation/tests/request_localhost.rs
+index bded29d..a488164 100644
+--- a/implementation/tests/request_localhost.rs
++++ b/implementation/tests/request_localhost.rs
+@@ -40,6 +40,21 @@ async fn serve_redirect(location: &'static str) -> std::net::SocketAddr {
+     addr
+ }
+ 
++async fn serve_redirect_owned(location: String) -> std::net::SocketAddr {
++    let server = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
++    let addr = server.local_addr().unwrap();
++
++    tokio::spawn(async move {
++        let (mut client, _) = server.accept().await.unwrap();
++        let response =
++            format!("HTTP/1.1 302 Found\r\nLocation: {location}\r\nContent-Length: 0\r\n\r\n");
++        client.write_all(response.as_bytes()).await.unwrap();
++        client.shutdown().await.unwrap();
++    });
++
++    addr
++}
++
+ #[tokio::test]
+ async fn test_request_to_localhost_resolving_host() {
+     common::tests::setup();
+@@ -135,6 +150,69 @@ async fn test_unfiltered_client_allows_loopback() {
+     assert_eq!(res.body, body);
+ }
+ 
++#[tokio::test]
++async fn test_unfiltered_client_can_expose_redirect_without_fetching_target() {
++    common::tests::setup();
++
++    let final_server = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
++    let final_addr = final_server.local_addr().unwrap();
++    let location = format!("http://127.0.0.1:{}/final", final_addr.port());
++    let redirect_addr = serve_redirect_owned(location.clone()).await;
++
++    let client = common::create_client_unfiltered_with_redirects(false).unwrap();
++    let url = format!("http://127.0.0.1:{}/start", redirect_addr.port());
++    let metrics = sync::DArc::new(Metrics::default());
++
++    let res = send_request_get_lua_compatible_response_bytes(
++        &metrics,
++        &url,
++        client.get(&url),
++        false,
++        usize::MAX,
++    )
++    .await
++    .expect("expected original redirect response");
++
++    assert_eq!(res.status, 302);
++    assert_eq!(
++        res.headers.get("location").map(|x| x.as_ref()),
++        Some(location.as_bytes())
++    );
++    assert!(
++        tokio::time::timeout(std::time::Duration::from_millis(100), final_server.accept())
++            .await
++            .is_err(),
++        "redirect target must not be fetched"
++    );
++}
++
++#[tokio::test]
++async fn test_unfiltered_client_preserves_default_redirect_following() {
++    common::tests::setup();
++
++    let final_body = b"redirect target reached";
++    let final_addr = serve_once(final_body).await;
++    let location = format!("http://127.0.0.1:{}/final", final_addr.port());
++    let redirect_addr = serve_redirect_owned(location).await;
++
++    let client = common::create_client_unfiltered().unwrap();
++    let url = format!("http://127.0.0.1:{}/start", redirect_addr.port());
++    let metrics = sync::DArc::new(Metrics::default());
++
++    let res = send_request_get_lua_compatible_response_bytes(
++        &metrics,
++        &url,
++        client.get(&url),
++        true,
++        usize::MAX,
++    )
++    .await
++    .expect("expected backward-compatible redirect following");
++
++    assert_eq!(res.status, 200);
++    assert_eq!(res.body, final_body);
++}
++
+ #[tokio::test]
+ async fn test_redirect_to_private_ip_is_rejected() {
+     common::tests::setup();
+diff --git a/implementation/tests/signing_server.rs b/implementation/tests/signing_server.rs
+index e0dfc9a..5552748 100644
+--- a/implementation/tests/signing_server.rs
++++ b/implementation/tests/signing_server.rs
+@@ -41,6 +41,7 @@ async fn signing_post_with_server() {
+         }),
+         client: common::tests::create_test_client(),
+         client_unfiltered: common::tests::create_test_client(),
++        signer_client: common::tests::create_test_client(),
+         sign_url: Arc::from("https://test-server.genlayer.com/genvm/sign"),
+         sign_headers: Arc::new(BTreeMap::new()),
+         sign_vars: BTreeMap::new(),
+diff --git a/install/config/genvm-module-web.yaml b/install/config/genvm-module-web.yaml
+index 3a18c75..48329b4 100644
+--- a/install/config/genvm-module-web.yaml
++++ b/install/config/genvm-module-web.yaml
+@@ -17,3 +17,4 @@ log_disable: ""
+ 
+ extra_tld: []
+ always_allow_hosts: []
++follow_redirects: true
+

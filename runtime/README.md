@@ -59,3 +59,31 @@ Bradbury proof. Public/Bradbury behavioral recertification and final release
 remain separately gated. See
 `docs/CURRENT_SOURCE_RUNTIME_CHECKPOINT_2026-09-27.md` and
 `deployments/release-manifest.json`.
+
+## Current GenVM remediation candidate (2026-10-02)
+
+`patches/genvm-v0.6.0-rc8-configurable-web-redirects.patch` is the current,
+forward-portable remediation. It applies to upstream GenVM commit
+`619dfad4bae51c191ef66c3e8cac6ed996961858` (`v0.6.0-rc8`) and adds the web
+module configuration key `follow_redirects`.
+
+The key defaults to `true`, preserving existing runtime behavior. Covenant
+requires validators to set it to `false`. In that mode both filtered web
+requests and allowlisted-host web requests return the original 3xx response
+and `Location` header without fetching the target. The signer has a separate
+client and LLM/provider clients retain their existing redirect behavior, so
+the remediation does not remove those features or silently change their
+transport semantics.
+
+The patch was checked against a clean checkout of the exact upstream commit,
+formatted with Rust 1.88, compiled with GenVM's `vendored-lua` feature, and
+tested with the pinned GenVM executor revision. The redirect regression suite
+passed three tests with zero failures, and the provider and signing-server
+integration test binaries compiled successfully. Exact commands and evidence
+are recorded in `docs/GENVM_REDIRECT_REMEDIATION_2026-10-02.md`.
+
+This is a verified source candidate, not deployed-runtime provenance. Studio
+Next and Bradbury remain unproven until GenLayer deploys this behavior on every
+validator, publishes an immutable runtime reference, configures
+`follow_redirects: false`, and a read-only contract probe proves 3xx/Location
+visibility without a target fetch.
