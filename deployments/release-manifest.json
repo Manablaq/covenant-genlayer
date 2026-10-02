@@ -1,8 +1,8 @@
 {
-  "manifest_version": 15,
+  "manifest_version": 16,
   "status": "UNRELEASED",
-  "release_scope": "current-source Bradbury deployment plus current-source local Gate G closure; a current GenVM redirect-remediation candidate and Studio Next read-only preflight are verified, but target-network runtime deployment, current-source behavioral recertification, effective-origin provenance, and Gate J remain open",
-  "candidate_state": "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED_RUNTIME_REMEDIATION_PREPARED_TARGET_NETWORK_PROVENANCE_AND_BEHAVIORAL_GATES_OPEN",
+  "release_scope": "current-source Bradbury deployment plus current-source local Gate F/G closure; a current GenVM redirect-remediation candidate and Studio Next read-only preflight are verified, but target-network runtime deployment, Bradbury Gate I, effective-origin provenance, and Gate J remain open",
+  "candidate_state": "CURRENT_SOURCE_LOCAL_GATE_F_AND_GATE_G_CLOSED_RUNTIME_REMEDIATION_PREPARED_TARGET_NETWORK_PROVENANCE_AND_GATE_I_J_OPEN",
   "protocol_acceptance": {
     "acceptance_rule": "MAJORITY",
     "successful_finalized_execution": "status=FINALIZED and execution_result=FINISHED_WITH_RETURN",
@@ -14,9 +14,9 @@
   },
   "production_deployment": {
     "status": "UNRELEASED",
-    "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity, and the exact current-source graph is finalized in the supported local full runtime with source parity and Authorization\u2192Mandates binding. The available behavioral receipts remain predecessor-source historical evidence; current-source Gate F/I behavioral recertification is open. Production remains unreleased because fresh immutable evidence is required, Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J remains open.",
+    "reason": "Current-source Mandates and Authorization are finalized on Bradbury with exact source parity, and current-source Gate F and Gate G are closed in the supported local full runtime with source parity and Authorization\u2192Mandates binding. Bradbury Gate I is still open because the local behavioral receipts are not target-network evidence; Bradbury effective-origin/runtime provenance is not externally enforceable, and Gate J remains open.",
     "required_before_release": [
-      "Current-source Gate F/I behavioral recertification against source hash 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e at Authorization 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
+      "Current-source Bradbury Gate I behavioral recertification against source hash 582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e at Authorization 0x1e55a34a91b227a1fdc27bd7ce675a7f01dc30a2",
       "Target-network deployment of the verified GenVM no-follow web configuration plus immutable runtime provenance and live redirect compatibility proof",
       "Gate J reviewer evidence freeze"
     ]
@@ -334,7 +334,8 @@
     "The predecessor-source Bradbury live behavior is recorded in docs/CURRENT_SOURCE_BRADBURY_LIVE_PROOF_2026-09-29.json. The evidence covers approval, denial, repair/replacement, expiry recovery, receipt consumption, and negative receipt paths. Its fresh evaluation reached AUTHORIZED and FINALIZED by protocol majority; TIMEOUT, DETERMINISTIC_VIOLATION, and non-uniform result hashes are preserved as dissent/tribunal evidence and are not current-source release evidence.",
     "The local no-redirect runtime probe exposes the redirect response and local effective-origin policy, but Bradbury does not expose an enforceable effective URL/history to this client. That external provenance gate remains false; Bradbury/public production release remains UNRELEASED.",
     "A current GenVM v0.6.0-rc8 remediation candidate now makes web redirect following explicitly configurable without changing signer or LLM/provider behavior. It applies cleanly, is formatted, compiles, and passes its redirect regression tests. Studio Next chain 61997 is reachable with 16 validators through the matching RC tooling, but no target network is yet proven to run the patch with follow_redirects=false, so this work does not change the UNRELEASED boundary.",
-    "The exact current-source local Gate G graph finalized on chain 61999 with five validators: Mandates 0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656 (0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07) and Authorization 0x562FA7DD960338B41C456b60564F964F571A1764 (0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d); both have exact source parity, Authorization binds the new Mandates address, each deployment was submitted exactly once, and Gate G is closed without changing the open Gate F/I, effective-origin, fresh-evidence, Gate J, or production boundaries."
+    "The exact current-source local Gate G graph finalized on chain 61999 with five validators: Mandates 0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656 (0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07) and Authorization 0x562FA7DD960338B41C456b60564F964F571A1764 (0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d); both have exact source parity, Authorization binds the new Mandates address, each deployment was submitted exactly once, and Gate G is closed without changing the open Bradbury Gate I, effective-origin, fresh-evidence, Gate J, or production boundaries.",
+    "The current-source local Gate F matrix is now closed on the supported full runtime and is recorded in docs/CURRENT_SOURCE_LOCAL_GATE_F_2026-10-02.json. It proves finalized approval, denial, repair/replacement, source-failure repair, expiry, receipt consumption and rejection paths, and original-transaction restart recovery; it is explicitly local-only and does not close Bradbury Gate I or runtime provenance."
   ],
   "current_local_runtime_checkpoint": {
     "status": "CURRENT_SOURCE_LOCAL_GATE_G_CLOSED",
@@ -417,6 +418,50 @@
       "current_timeout_recovery_proven": false,
       "current_receipt_consumption_proven": false,
       "current_redirect_provenance_proven": false,
+      "production_or_bradbury_release": false
+    }
+  },
+  "current_source_local_gate_f": {
+    "status": "CURRENT_SOURCE_LOCAL_GATE_F_CLOSED",
+    "evidence": "docs/CURRENT_SOURCE_LOCAL_GATE_F_2026-10-02.json",
+    "documentation": "docs/CURRENT_SOURCE_LOCAL_GATE_F_2026-10-02.md",
+    "source_commit": "4fc641de1ea95aaa401d997774a3731e47e683ea",
+    "chain_id": 61999,
+    "validator_count": 5,
+    "genvm_version": "v0.2.16",
+    "source_hashes": {
+      "covenant_authorization.py": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
+      "covenant_mandates.py": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244"
+    },
+    "deployed_addresses": {
+      "mandates": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+      "authorization": "0x562FA7DD960338B41C456b60564F964F571A1764"
+    },
+    "authorization_mandates_binding": true,
+    "behavioral_cases": {
+      "approval": "AUTHORIZED",
+      "independent_rejection": "DENIED",
+      "repair_replacement": "AUTHORIZED",
+      "source_failure_repair": "AUTHORIZED",
+      "restart_recovery": "AUTHORIZED",
+      "expiry": "EXPIRED",
+      "receipt_consumption": "CONSUMED",
+      "wrong_consumer_rejection": true,
+      "mutated_action_intent_rejection": true,
+      "replay_rejection": true
+    },
+    "transaction_policy": {
+      "all_transactions_submitted_once": true,
+      "automatic_resend_or_replacement": false,
+      "raw_request_response_persisted_before_decode": true,
+      "finality_required": true
+    },
+    "proof_boundary": {
+      "current_source_local_behavioral_gate_f_complete": true,
+      "current_source_bradbury_behavioral_gate_i_complete": false,
+      "current_source_redirect_provenance": false,
+      "target_network_runtime_provenance": false,
+      "gate_j_complete": false,
       "production_or_bradbury_release": false
     }
   },

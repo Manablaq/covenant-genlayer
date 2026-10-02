@@ -1,0 +1,137 @@
+{
+  "schema": "covenant-current-source-local-gate-f-v1",
+  "date": "2026-10-02",
+  "status": "GATE_F_CLOSED_LOCAL_ONLY",
+  "repository": {
+    "source_commit": "4fc641de1ea95aaa401d997774a3731e47e683ea",
+    "chain_id": 61999,
+    "validator_count": 5,
+    "genvm_version": "v0.2.16",
+    "runtime_scope": "supported local full runtime; not Bradbury runtime provenance"
+  },
+  "source": {
+    "covenant_mandates.py": {
+      "sha256": "76b86c2aa6e181593f9d18e5506c60c2499e123278bde41876245bc87a173244",
+      "bytes": 19852
+    },
+    "covenant_authorization.py": {
+      "sha256": "582463cffbe3e0fd55d3154f905a6b5b1cdb1ae3e2c087c08cedfad2d80d405e",
+      "bytes": 20022
+    }
+  },
+  "deployments": {
+    "mandates": {
+      "address": "0xaD8B37Eb0263Ea525BEe0767e5e512E320c71656",
+      "transaction": "0xbc65aa5dd8b0a3079ad17b9481c85ef20f89a9547e626a9b17adc1105aebde07",
+      "status": "FINALIZED",
+      "consensus_result": "AGREE",
+      "submission_count": 1
+    },
+    "authorization": {
+      "address": "0x562FA7DD960338B41C456b60564F964F571A1764",
+      "transaction": "0x3880d77e219dbfbe1527512fe5434bc15d4fc6f048463d344f1bb020516d961d",
+      "status": "FINALIZED",
+      "consensus_result": "AGREE",
+      "submission_count": 1,
+      "mandates_binding": true
+    }
+  },
+  "cases": {
+    "mandate_creation": {
+      "transaction": "0x07bddd4fd59227c4b8fb06a55b8952638962c1f8e8ca1d188def97c1d90239f6",
+      "status": "FINALIZED",
+      "consensus_result": "AGREE",
+      "mandate_id": "0xef5e1cb7bc2715e1f11c225c8b9ad54ac330ac7dce43eeda27a21abf3558f42b",
+      "submission_count": 1
+    },
+    "approval_and_receipt": {
+      "create_request": "0x997a45fb4e195b089cef5bd43c4ad714ea3e48e228f1e82fdf4ec203b44a8225",
+      "evaluate_request": "0x126b906566b521042a01769e97008d3fad5127cf5332b39a3071800ef5d0d92a",
+      "request_id": "0x1eb0b2bc9c3608dd7f1e922dc87f0316a393a891c362e508dedd373175700d22",
+      "terminal_state": "AUTHORIZED",
+      "receipt_id": "0x74b34bda6e49e59e26b8719a9da6a39ce1694914d068466bc8d26acf929f75a0",
+      "action_intent": "0x9913fc712bf7b2d6bd54615ff83634dd35ada8ac9847047a1c5f62c3f1baa91f",
+      "all_writes_finalized": true
+    },
+    "receipt_consumption": {
+      "wrong_consumer": "0x5ccd0a0ce19c0a3ca99bd01dde4e97342fab0b38109fba772d552bd8ef207d98",
+      "mutated_action_intent": "0x9325f0e442633a52e9c0d0612fa6f716b708269e37ad94b3e7b06002c2bc0509",
+      "successful_consumer": "0xe8f6ca0db02fceb363d0db82babfbf83a8b1fbdd87a9a09fb4a54ad9e95e7f1d",
+      "replay": "0xac4b6ab7cd5975376517f76e1410b78f4851ec2f60460198c981f531c5f1ea7b",
+      "correct_consumer_terminal_state": "CONSUMED",
+      "wrong_consumer_rejected": true,
+      "mutated_action_intent_rejected": true,
+      "replay_rejected": true,
+      "receipt_consumed_once": true
+    },
+    "independent_rejection": {
+      "create_request": "0x02168236e5c29bf48a9f2ebeb5934657cf8995801ef57a2b9c647ae926be1667",
+      "evaluate_request": "0xb2cfc7542dcf42f91e14092b5c6f853276127191f46d39dccd768806e172eeb8",
+      "request_id": "0x058daa6622708525099e7842766d21d90593b698a523b72dcd661517c2316a59",
+      "terminal_state": "DENIED",
+      "receipt_absent": true
+    },
+    "repair_replacement": {
+      "create_request": "0x29699d38e04419849826fffc3fbd34083b767711c73a1ebb98292c0972d97342",
+      "replace_evidence": "0x5bd67bd0e342321c6df9ae934b458fd27ca05ac5f76166c16467ab67ad472097",
+      "evaluate_request": "0xf5124e5cac567df56c2242388ea1ccfe062c1a39d6f378f9caf47b6056fb2218",
+      "request_id": "0xd16b45058dc0985625319c3301026d377768d77e9e4caae9821bcb7e5a0e61c9",
+      "initial_state": "REPAIR_REQUIRED",
+      "repaired_state": "AUTHORIZED",
+      "evidence_revision_before": 0,
+      "evidence_revision_after": 1,
+      "action_subject_unchanged": true,
+      "repair_deadline_unchanged": true
+    },
+    "restart_recovery": {
+      "create_request": "0x0d413e7d9d0160bbec325d9adf82dca4fc7dc0cd24f9ad0cfbb87619c2a547a6",
+      "evaluate_request": "0x82998f35728bb28bb54f54335b32cc63cf6d08428831e4a2523c43798cc3d168",
+      "request_id": "0xf7b30cc99e590db4cbbacd2fa1f8a4f7099b298258bb9f09fd9aad38b62169dd",
+      "state_before_restart": "PENDING",
+      "votes_before_restart": 0,
+      "worker_stopped_before_evaluation_submission": true,
+      "worker_restarted": true,
+      "same_original_transaction_finalized": true,
+      "terminal_state": "AUTHORIZED",
+      "additional_submission_count": 0,
+      "automatic_resend_or_replacement": false
+    },
+    "expiry": {
+      "create_request": "0x29bf4fd26b44af5f473833f28f926d310c237ef3b05c505057be217e3bec7104",
+      "expire_request": "0x9093be79b135a4014cddfa976b36cca838636d4a7dbb04f47d6d4e51cba02a84",
+      "request_id": "0xd4e72abcbacfd0bcfbe82981e5864d6c2793edcab23cbe5141567bba9093a6f3",
+      "premature_expiry_rejected_read_only": true,
+      "terminal_state": "EXPIRED"
+    },
+    "source_failure_repair": {
+      "create_request": "0x3e1869a77435ce3ed9b1b237340cebbfc3da3b0e665c746d4562df8075c00309",
+      "evaluate_to_repair": "0x79e58043824daef1a34a6d6cc493528ac086d1bfbe1f31258e76a24e534fc461",
+      "replace_evidence": "0xdeba2738370154883dab2bae8dc871231c744cfa74838379f81372bae960020f",
+      "repaired_evaluate": "0x4b264412a0339e911400e59fcd37ada6808ce9c3192d8433041cf7a5a3b1bab9",
+      "request_id": "0x5e80983fce22dcae3e29c017da20d9ea3f51e0bf6a416edc9ddb3dffbedcfae7",
+      "initial_reason": "SOURCE_FAILURE",
+      "terminal_state": "AUTHORIZED",
+      "evidence_revision_before": 0,
+      "evidence_revision_after": 1,
+      "action_subject_unchanged": true,
+      "repair_deadline_unchanged": true,
+      "receipt_id": "0x478d6563f83d4e8991ae8b172db38981c61253dd468c556ad00efd73a73d5ab7"
+    }
+  },
+  "transaction_policy": {
+    "all_transactions_submitted_once": true,
+    "automatic_resend_or_replacement": false,
+    "raw_request_response_persisted_before_decode": true,
+    "finality_required": true
+  },
+  "evidence_location": "work/current-source-gate-f-20261002/",
+  "boundary": {
+    "current_source_local_behavioral_gate_f_complete": true,
+    "current_source_bradbury_behavioral_gate_i_complete": false,
+    "effective_origin_proven": false,
+    "production_or_bradbury_release": false,
+    "gate_j_complete": false,
+    "target_network_runtime_provenance": false,
+    "redirect_note": "This local Gate F run used the supported local runtime and mock evidence URLs. It does not prove Bradbury effective-origin or redirect behavior. After restart recovery, the worker binary was restored from the exact simulator image; no no-redirect behavior is claimed from this run."
+  }
+}

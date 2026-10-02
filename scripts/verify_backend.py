@@ -34,6 +34,7 @@ CURRENT_REDIRECT_PROOF = ROOT / "docs" / "CURRENT_SOURCE_REDIRECT_PROBE_2026-09-
 CURRENT_CONSENSUS_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_REPAIRED_EVALUATION_CONSENSUS_2026-09-29.json"
 FRESH_EVALUATION_PROOF = ROOT / "docs" / "CURRENT_SOURCE_BRADBURY_FRESH_EVALUATION_CONSENSUS_2026-09-29.json"
 LOCAL_GATE_G_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LOCAL_GATE_G_2026-10-01.json"
+LOCAL_GATE_F_PROOF = ROOT / "docs" / "CURRENT_SOURCE_LOCAL_GATE_F_2026-10-02.json"
 STUDIO_NEXT_PREFLIGHT = ROOT / "docs" / "STUDIO_NEXT_READ_ONLY_PREFLIGHT_2026-10-02.json"
 
 
@@ -132,7 +133,7 @@ def main() -> int:
     )
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["manifest_version"] == 15
+    assert manifest["manifest_version"] == 16
     assert manifest["status"] == "UNRELEASED"
     production = manifest["production_deployment"]
     assert production["status"] == "UNRELEASED"
@@ -262,6 +263,73 @@ def main() -> int:
     assert local_gate_g["order2_authorization"]["address"] == checkpoint["deployed_addresses"]["authorization"]
     assert local_gate_g["order2_authorization"]["constructor_mandates_address"] == checkpoint["deployed_addresses"]["mandates"]
     assert local_gate_g["order2_authorization"]["mandates_binding"] is True
+
+    local_gate_f = json.loads(LOCAL_GATE_F_PROOF.read_text(encoding="utf-8"))
+    gate_f_checkpoint = manifest["current_source_local_gate_f"]
+    assert gate_f_checkpoint["status"] == "CURRENT_SOURCE_LOCAL_GATE_F_CLOSED"
+    assert gate_f_checkpoint["evidence"] == "docs/CURRENT_SOURCE_LOCAL_GATE_F_2026-10-02.json"
+    assert gate_f_checkpoint["documentation"] == "docs/CURRENT_SOURCE_LOCAL_GATE_F_2026-10-02.md"
+    assert gate_f_checkpoint["source_commit"] == local_gate_f["repository"]["source_commit"]
+    assert gate_f_checkpoint["chain_id"] == 61999
+    assert gate_f_checkpoint["validator_count"] == 5
+    assert gate_f_checkpoint["genvm_version"] == "v0.2.16"
+    assert gate_f_checkpoint["source_hashes"] == {
+        "covenant_authorization.py": sha256(AUTHORIZATION),
+        "covenant_mandates.py": sha256(MANDATES),
+    }
+    assert gate_f_checkpoint["deployed_addresses"] == {
+        "mandates": local_gate_f["deployments"]["mandates"]["address"],
+        "authorization": local_gate_f["deployments"]["authorization"]["address"],
+    }
+    assert local_gate_f["schema"] == "covenant-current-source-local-gate-f-v1"
+    assert local_gate_f["status"] == "GATE_F_CLOSED_LOCAL_ONLY"
+    assert local_gate_f["source"]["covenant_mandates.py"]["sha256"] == sha256(MANDATES)
+    assert local_gate_f["source"]["covenant_authorization.py"]["sha256"] == sha256(AUTHORIZATION)
+    assert local_gate_f["deployments"]["authorization"]["mandates_binding"] is True
+    assert local_gate_f["cases"]["approval_and_receipt"]["terminal_state"] == "AUTHORIZED"
+    assert local_gate_f["cases"]["independent_rejection"]["terminal_state"] == "DENIED"
+    assert local_gate_f["cases"]["repair_replacement"]["repaired_state"] == "AUTHORIZED"
+    assert local_gate_f["cases"]["source_failure_repair"]["terminal_state"] == "AUTHORIZED"
+    assert local_gate_f["cases"]["restart_recovery"]["same_original_transaction_finalized"] is True
+    assert local_gate_f["cases"]["restart_recovery"]["additional_submission_count"] == 0
+    assert local_gate_f["cases"]["restart_recovery"]["automatic_resend_or_replacement"] is False
+    assert local_gate_f["cases"]["expiry"]["terminal_state"] == "EXPIRED"
+    assert local_gate_f["cases"]["receipt_consumption"]["receipt_consumed_once"] is True
+    assert local_gate_f["cases"]["receipt_consumption"]["wrong_consumer_rejected"] is True
+    assert local_gate_f["cases"]["receipt_consumption"]["mutated_action_intent_rejected"] is True
+    assert local_gate_f["cases"]["receipt_consumption"]["replay_rejected"] is True
+    assert local_gate_f["transaction_policy"] == {
+        "all_transactions_submitted_once": True,
+        "automatic_resend_or_replacement": False,
+        "raw_request_response_persisted_before_decode": True,
+        "finality_required": True,
+    }
+    assert gate_f_checkpoint["authorization_mandates_binding"] is True
+    assert gate_f_checkpoint["behavioral_cases"] == {
+        "approval": "AUTHORIZED",
+        "independent_rejection": "DENIED",
+        "repair_replacement": "AUTHORIZED",
+        "source_failure_repair": "AUTHORIZED",
+        "restart_recovery": "AUTHORIZED",
+        "expiry": "EXPIRED",
+        "receipt_consumption": "CONSUMED",
+        "wrong_consumer_rejection": True,
+        "mutated_action_intent_rejection": True,
+        "replay_rejection": True,
+    }
+    assert gate_f_checkpoint["transaction_policy"] == local_gate_f["transaction_policy"]
+    assert gate_f_checkpoint["proof_boundary"]["current_source_local_behavioral_gate_f_complete"] is True
+    assert gate_f_checkpoint["proof_boundary"]["current_source_bradbury_behavioral_gate_i_complete"] is False
+    assert gate_f_checkpoint["proof_boundary"]["current_source_redirect_provenance"] is False
+    assert gate_f_checkpoint["proof_boundary"]["target_network_runtime_provenance"] is False
+    assert gate_f_checkpoint["proof_boundary"]["gate_j_complete"] is False
+    assert gate_f_checkpoint["proof_boundary"]["production_or_bradbury_release"] is False
+    assert local_gate_f["boundary"]["current_source_local_behavioral_gate_f_complete"] is True
+    assert local_gate_f["boundary"]["current_source_bradbury_behavioral_gate_i_complete"] is False
+    assert local_gate_f["boundary"]["effective_origin_proven"] is False
+    assert local_gate_f["boundary"]["target_network_runtime_provenance"] is False
+    assert local_gate_f["boundary"]["gate_j_complete"] is False
+    assert local_gate_f["boundary"]["production_or_bradbury_release"] is False
 
     current_proof = json.loads(CURRENT_PROOF.read_text(encoding="utf-8"))
     current_bradbury = json.loads(CURRENT_BRADBURY_PROOF.read_text(encoding="utf-8"))
